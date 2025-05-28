@@ -1,70 +1,59 @@
-# Getting Started with Create React App
+![MONEYWAY 로고](src/image/logo.png)
+# MONEYWAY
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**MONEYWAY**는 TOURAPI와 카카오 API를 활용한 제주도 여행 도우미 서비스입니다.  
+여행 예산을 중심으로 사용자 맞춤형 여행 계획 수립을 지원하며, 다양한 기능을 제공합니다.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 주요 기능
 
-### `npm start`
+- **계획 세우기**  
+  사용자가 직접 여행 계획표를 DIY 방식으로 세울 수 있으며, 세운 계획에 따른 예상 예산을 확인할 수 있습니다.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **계획 세워주기**  
+  여행 기간, 예산 등 핵심 정보를 입력하면 자동으로 최적화된 여행 계획을 생성해줍니다.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **계획 공유**  
+  사용자가 만든 여행 계획을 게시판 등에 공유하여 다른 사용자들과 정보를 나눌 수 있습니다.
 
-### `npm test`
+- **저예산 챌린지**  
+  자신이 세운 계획으로 실제 여행을 다녀오고, 경험과 관련 내용을 공유하여 챌린지에 참여할 수 있습니다.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## 팀 구성 및 역할
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| 역할       | 담당자    |
+|------------|-----------|
+| 디자인     | 주예원    |
+| 프론트엔드 | 김연희, 최지인 |
+| 백엔드     | 정재민, 이강현 |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 사용 기술 스택
 
-### `npm run eject`
+- **프론트엔드** : React  
+- **백엔드** : Spring Boot  
+- **디자인** : Figma  
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+---
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 프로젝트 개요
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+본 프로젝트는 예산 기반의 제주도 여행 맞춤형 서비스로,  
+실제 API 데이터와 사용자 입력을 바탕으로 현실적인 여행 계획을 지원하고,  
+커뮤니티를 통한 계획 공유 및 저예산 챌린지를 통해 여행 경험을 풍부하게 합니다.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## 설치 및 실행 방법
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+(프로젝트별 설치, 빌드, 실행 방법 추가 예정)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 라이선스
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+(프로젝트 라이선스 정보 추가 예정)
