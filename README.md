@@ -1,7 +1,6 @@
-<img src="/image/moneyway.png" alt="MONEYWAY 로고" width="100" height="100" /> 
+<img src="src/image/logo.png" alt="MONEYWAY 로고" width="90" height="100" /> 
+
 # MONEYWAY
-
-
 
 **MONEYWAY**는 TOURAPI와 카카오 API를 활용한 제주도 여행 도우미 서비스입니다.  
 여행 예산을 주제로, 쉽고 즐거운 제주 여행 계획을 도와드립니다.
