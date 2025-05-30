@@ -1,4 +1,4 @@
-<img src="src/image/logo.png" alt="MONEYWAY 로고" width="90" height="100" /> 
+<img src="src/images/logo.png" alt="MONEYWAY 로고" width="90" height="100" /> 
 
 # MONEYWAY
 
