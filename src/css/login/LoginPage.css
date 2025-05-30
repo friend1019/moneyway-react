@@ -1,3 +1,9 @@
+.login-header{
+  margin-top: 5%;
+  margin-left: 10%;
+  margin-bottom: 5%;
+}
+
 .auth-container {
   display: flex;
   flex-direction: column;
@@ -10,21 +16,26 @@
 
 .auth-header {
   position: relative;
+  width: 206.74px;
+  height: 54.43px;
   background: #fff;
   padding: 6px 14px;
   border-radius: 20px;
-  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
-  font-size: 14px;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  font-size: 19.95px;
   margin-bottom: 24px;
+  display: flex;
+  align-items: center; /* 수직 가운데 정렬 */
+  justify-content: center; /* 수평 가운데 정렬 */
 }
 
 .auth-header::after {
   content: "";
   position: absolute;
-  bottom: -6px; 
-  left: 50%; 
+  bottom: -13.78px;
+  left: 50%;
   transform: translateX(-50%);
-  border-width: 6px 6px 0; 
+  border-width: 13.78px 13.78px 0;
   border-style: solid;
   border-color: #fff transparent transparent transparent;
 }
@@ -36,8 +47,8 @@
 }
 
 .social-btn {
-  width: 60px;
-  height: 60px;
+  width: 91.25px;
+  height: 91.25px;
   border: none;
   border-radius: 12px;
   display: flex;
@@ -56,17 +67,12 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.social-btn img {
-  width: 32px;
-  height: 32px;
-}
-
 .email-btn {
-  width: 100%;
+  width: 440.64px;
+  height: 84.83px;
   background-color: #2979ff;
   color: #fff;
-  font-size: 16px;
-  padding: 14px;
+  font-size: 26.6px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -78,10 +84,11 @@
 }
 
 .login-btn {
-  width: 100%;
+  width: 440.64px;
+  height: 84.83px;
   background-color: #fff;
   color: #333;
-  font-size: 16px;
+  font-size: 26.6px;
   padding: 14px;
   border: 1px solid #ddd;
   border-radius: 8px;
