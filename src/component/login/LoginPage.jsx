@@ -1,9 +1,8 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import "../../css/login/LoginPage.css";
 
-import kakaoIcon from "../../images/kakaoAuth.svg";
-import googleIcon from "../../images/googleAuth.svg";
+import kakaoIcon from "../../images/login/kakaoAuth.svg";
+import googleIcon from "../../images/login/googleAuth.svg";
 
 const LoginPage = () => {
   //카카오 로그인
