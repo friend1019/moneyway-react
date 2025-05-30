@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 
-function loginTestPage() {
+function LoginTestPage() {
     const navigate = useNavigate();
     const [user, setUser] = useState(null);
     const handleLogout = () => {
@@ -44,4 +44,4 @@ function loginTestPage() {
         </div>
     );
 }
-export default loginTestPage;
+export default LoginTestPage;
