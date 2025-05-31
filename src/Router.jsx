@@ -1,7 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import Main from "./component/main/main";
+import RequireAuth from "./component/RequireAuth";
+import Main from "./component/main/Main";
 import LoginPage from "./component/login/LoginPage";
+import MyPage from "./component/main/MyPage";
+import Signup from "./component/login/Signup";
 
 function AppRouter() {
   return (
@@ -9,6 +12,16 @@ function AppRouter() {
       <Routes>
         {<Route path="/" element={<Main />} />}
         {<Route path="/login" element={<LoginPage />} />}
+        {<Route path="/signup" element={<Signup />} />}
+
+        <Route
+          path="/mypage"
+          element={
+            <RequireAuth>
+              <MyPage />
+            </RequireAuth>
+          }
+        />
       </Routes>
     </Router>
   );

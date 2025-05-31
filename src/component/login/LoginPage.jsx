@@ -1,7 +1,7 @@
 import React from "react";
 import "../../css/login/LoginPage.css";
 import LoginHeader from "./LoginHeader";
-import Header from "../header";
+import Header from "../Header.jsx";
 
 import kakaoIcon from "../../images/login/kakaoAuth.svg";
 import googleIcon from "../../images/login/googleAuth.svg";

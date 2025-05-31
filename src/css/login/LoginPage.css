@@ -1,6 +1,6 @@
-.login-header{
+.login-header {
   margin-top: 5%;
-  margin-left: 10%;
+  margin-left: 18rem;
   margin-bottom: 5%;
 }
 
@@ -16,13 +16,13 @@
 
 .auth-header {
   position: relative;
-  width: 206.74px;
-  height: 54.43px;
+  width: 20.674rem;
+  height: 5.4rem;
   background: #fff;
   padding: 6px 14px;
   border-radius: 20px;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
-  font-size: 19.95px;
+  font-size: 2.1rem;
   margin-bottom: 24px;
   display: flex;
   align-items: center; /* 수직 가운데 정렬 */
@@ -32,10 +32,10 @@
 .auth-header::after {
   content: "";
   position: absolute;
-  bottom: -13.78px;
+  bottom: -1.3rem;
   left: 50%;
   transform: translateX(-50%);
-  border-width: 13.78px 13.78px 0;
+  border-width: 1.3rem 1.3rem 0;
   border-style: solid;
   border-color: #fff transparent transparent transparent;
 }
@@ -68,11 +68,13 @@
 }
 
 .email-btn {
-  width: 440.64px;
-  height: 84.83px;
+  width: 76.5rem;
+  height: 8rem;
   background-color: #2979ff;
   color: #fff;
-  font-size: 26.6px;
+  font-size: 2.4rem;
+  font-family: Pretendard;
+  font-weight: bold;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -84,11 +86,13 @@
 }
 
 .login-btn {
-  width: 440.64px;
-  height: 84.83px;
+  width: 76.5rem;
+  height: 8rem;
   background-color: #fff;
   color: #333;
-  font-size: 26.6px;
+  font-size: 2.4rem;
+  font-family: Pretendard;
+  font-weight: bold;
   padding: 14px;
   border: 1px solid #ddd;
   border-radius: 8px;
