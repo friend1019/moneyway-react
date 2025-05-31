@@ -27,7 +27,8 @@ function Signup() {
                   name="nickname"
                   placeholder="머니웨이"
                 />
-                <button type="button" className="btn-check">
+                {/* 이것도 중복확인 여부에 따라서 css 요소 변경해야 함 */}
+                <button type="button" className="btn-check active">
                   중복확인
                 </button>
               </div>
@@ -41,7 +42,7 @@ function Signup() {
                   name="email"
                   placeholder="moneyway@gmail.com"
                 />
-                <button type="button" className="btn-check">
+                <button type="button" className="btn-check active">
                   중복확인
                 </button>
               </div>
@@ -57,7 +58,8 @@ function Signup() {
                 />
               </div>
 
-              <button type="submit" className="btn-submit">
+              {/* 가입 가능 상태일때 enable css요소 풀면 됨 */}
+              <button type="submit" className="btn-submit" enabled>
                 가입하기
               </button>
             </form>

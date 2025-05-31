@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../../css/login/LoginPage.css";
 import LoginHeader from "./LoginHeader";
 import Header from "../Header.jsx";
@@ -7,10 +8,20 @@ import kakaoIcon from "../../images/login/kakaoAuth.svg";
 import googleIcon from "../../images/login/googleAuth.svg";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+
   //카카오 로그인
   const handleKakaoLogin = () => {
     window.location.href =
       "http://192.168.208.20:8081/oauth2/authorization/kakao"; // 백엔드 카카오 로그인 URL
+  };
+
+  const goSignup = () => {
+    navigate("/signup");
+  };
+
+  const goSignin = () => {
+    navigate("/signin");
   };
 
   return (
@@ -28,7 +39,7 @@ const LoginPage = () => {
               <img
                 src={kakaoIcon}
                 alt="카카오 로그인"
-                style={{ width: "56px", height: "56px", objectFit: "contain" }}
+                style={{ width: "5.6rem", height: "5.6rem", objectFit: "contain" }}
               />
             </button>
             <button
@@ -38,18 +49,18 @@ const LoginPage = () => {
               <img
                 src={googleIcon}
                 alt="구글 로그인"
-                style={{ width: "80px", height: "80px", objectFit: "contain" }}
+                style={{ width: "8rem", height: "8rem", objectFit: "contain" }}
               />
             </button>
           </div>
 
-          <button className="email-btn">이메일로 회원가입</button>
+          <button className="email-btn" onClick={goSignup}>
+            이메일로 회원가입
+          </button>
 
-          <button className="login-btn">로그인</button>
-
-          <a href="/find-password" className="find-link">
-            아이디/비밀번호 찾기
-          </a>
+          <button className="login-btn" onClick={goSignin}>
+            로그인
+          </button>
         </div>
       </div>
     </>

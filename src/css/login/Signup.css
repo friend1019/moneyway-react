@@ -43,8 +43,9 @@
 .input-row {
   width: 76.5rem;
   display: flex;
-  margin-bottom: 5rem;
+  margin-bottom: 1rem;
   align-items: center;
+  gap: 4rem;
 }
 
 .input-field {
@@ -59,9 +60,15 @@
 }
 
 .input-field[disabled] {
-  background-color: #f0f0f0;
-  color: #999;
+  background-color: #ffffff;
+  color: #c1c1c1;
   cursor: not-allowed;
+}
+
+.input-field::placeholder {
+  color: #c1c1c1;
+  font-weight: bold;
+  opacity: 1;
 }
 
 .btn-check {
@@ -70,22 +77,22 @@
   color: #666;
   padding: 0 1rem;
   cursor: pointer;
-  font-size: 2.4rem;
-  border-radius: 0.4rem;
+  font-size: 1.8rem;
+  border-radius: 1.2rem;
   width: 15rem;
   height: 4.5rem; /* 인풋과 높이 맞춤 */
   transition: all 0.2s ease-in-out;
 }
 
 .btn-check.active {
-  background-color: #0052cc;
-  border-color: #0052cc;
+  background-color: #0066f9;
+  border-color: #0066f9;
   color: #fff;
 }
 
 .btn-check:hover:not(:disabled) {
-  background-color: #0041a8;
-  border-color: #0041a8;
+  background-color: #0066f9;
+  border-color: #0066f9;
   color: #fff;
 }
 
@@ -94,17 +101,17 @@
   height: 8rem;
   padding: 1.2rem;
   font-size: 2.4rem;
-  background-color: #a9c1f8;
+  background-color: #0066f9;
   color: #fff;
   border: none;
-  border-radius: 0.6rem;
+  border-radius: 1.2rem;
   cursor: not-allowed;
   margin-top: 2rem;
   transition: background-color 0.3s;
 }
 
 .btn-submit:enabled {
-  background-color: #0052cc;
+  background-color: #BBD6FF;
   cursor: pointer;
 }
 
@@ -116,6 +123,6 @@
 
 .login-link a {
   font-weight: 700;
-  color: #0052cc;
+  color: #0066f9;
   text-decoration: none;
 }
