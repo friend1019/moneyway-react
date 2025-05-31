@@ -1,0 +1,128 @@
+.signup-container {
+  display: flex;
+  overflow: hidden;
+}
+
+.signup-image {
+  flex: 0 0 6.8rem;
+  background-color: #f5f7fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.signup-image img {
+  width: 68rem;
+  height: 91rem;
+  object-fit: cover;
+}
+
+.signup-form {
+  flex: 1;
+  padding: 4rem 5rem;
+  font-size: 2.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: auto;
+  margin-left: 10rem;
+  margin-right: 26rem;
+}
+
+.signup-form h1 {
+  font-size: 4.8rem;
+  margin-bottom: 6.5rem;
+  font-weight: bold;
+}
+
+.signup-form label {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.input-row {
+  width: 76.5rem;
+  display: flex;
+  margin-bottom: 1rem;
+  align-items: center;
+  gap: 4rem;
+}
+
+.input-field {
+  width: 76.5rem;
+  height: 4.5rem;
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  font-size: 2.4rem;
+  padding: 0.6rem 0;
+  outline: none;
+}
+
+.input-field[disabled] {
+  background-color: #ffffff;
+  color: #c1c1c1;
+  cursor: not-allowed;
+}
+
+.input-field::placeholder {
+  color: #c1c1c1;
+  font-weight: bold;
+  opacity: 1;
+}
+
+.btn-check {
+  background-color: #eee;
+  border: 1px solid #ccc;
+  color: #666;
+  padding: 0 1rem;
+  cursor: pointer;
+  font-size: 1.8rem;
+  border-radius: 1.2rem;
+  width: 15rem;
+  height: 4.5rem; /* 인풋과 높이 맞춤 */
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-check.active {
+  background-color: #0066f9;
+  border-color: #0066f9;
+  color: #fff;
+}
+
+.btn-check:hover:not(:disabled) {
+  background-color: #0066f9;
+  border-color: #0066f9;
+  color: #fff;
+}
+
+.btn-submit {
+  width: 76.5rem;
+  height: 8rem;
+  padding: 1.2rem;
+  font-size: 2.4rem;
+  background-color: #0066f9;
+  color: #fff;
+  border: none;
+  border-radius: 1.2rem;
+  cursor: not-allowed;
+  margin-top: 2rem;
+  transition: background-color 0.3s;
+}
+
+.btn-submit:enabled {
+  background-color: #BBD6FF;
+  cursor: pointer;
+}
+
+.login-link {
+  margin-top: 2rem;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.login-link a {
+  font-weight: 700;
+  color: #0066f9;
+  text-decoration: none;
+}

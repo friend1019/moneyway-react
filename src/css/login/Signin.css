@@ -1,0 +1,64 @@
+.login-form {
+  max-width: 72rem;
+  margin: 4rem auto 0 auto;
+  margin-top: 10%;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-form label {
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  font-size: 2.6rem;
+  color: #000;
+}
+
+.input-field {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  padding: 0.8rem 0;
+  font-size: 2.4rem;
+  margin-bottom: 3rem;
+  outline: none;
+  background-color: transparent;
+}
+
+.input-field:disabled {
+  background-color: #f0f0f0;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.input-field::placeholder {
+  color: #c1c1c1;
+  font-weight: bold;
+  opacity: 1;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 1.6rem;
+  background-color: #BBD6FF;
+  color: #fff;
+  font-size: 2.4rem;
+  border: none;
+  border-radius: 0.6rem;
+  cursor: not-allowed;
+  transition: background-color 0.3s;
+}
+
+.btn-login:enabled {
+  background-color: #0052cc;
+  cursor: pointer;
+}
+
+.find-password-link {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 1.8rem;
+  color: #333;
+  text-decoration: underline;
+  cursor: pointer;
+}

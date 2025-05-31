@@ -1,6 +1,6 @@
 import "../../css/main/main.css";
 
-import Header from "../header";
+import Header from "../Header";
 import background from "../../images/main/background.png";
 
 function Main() {

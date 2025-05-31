@@ -1,0 +1,32 @@
+.forgot-pwd-header {
+  display: flex;               /* flex로 변경했으면 text-align 무시됨 */
+  flex-direction: column;
+  align-items: center;         /* 세로축 중앙 정렬 */
+  justify-content: center;     /* 필요 시 */
+  text-align: center;          /* 텍스트 중앙 정렬 */
+  margin-top: 14rem;
+  margin-bottom: -10rem;
+}
+
+.wallet-logo{
+    width: 15rem;
+    height: 16.8rem;
+    margin-bottom: 1rem;
+}
+
+.btn-emailcode {
+  width: 100%;
+  padding: 1.6rem;
+  background-color: #0066f9;
+  color: #fff;
+  font-size: 2.4rem;
+  border: none;
+  border-radius: 0.6rem;
+  cursor: not-allowed;
+  transition: background-color 0.3s;
+}
+
+.btn-emailcode:disabled {
+  background-color: #bbd6ff;
+  cursor: pointer;
+}
