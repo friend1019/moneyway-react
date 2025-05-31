@@ -1,6 +1,7 @@
+//로그인(아이디 비번 입력창)
 import React from "react";
 import LoginHeader from "./LoginHeader";
-import Header from "../Header.jsx";
+import Header from "../Header";
 import "../../css/login/Signin.css";
 import "../../css/login/LoginPage.css";
 

@@ -1,5 +1,6 @@
+//비밀번호 찾기 창
 import React from "react";
-import Header from "../Header.jsx";
+import Header from "../Header";
 import "../../css/login/Signin.css";
 import "../../css/login/LoginPage.css";
 import "../../css/login/ForgotPwd.css";

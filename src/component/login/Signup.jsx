@@ -1,3 +1,4 @@
+//회원가입 창
 import React from "react";
 import Header from "../Header";
 import signupImage from "../../images/login/signup.svg"; // 경로 확인 필요

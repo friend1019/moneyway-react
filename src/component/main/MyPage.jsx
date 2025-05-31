@@ -1,3 +1,4 @@
+//마이페이지 그냥 형태만 존재함 지금은
 import React from "react";
 import Header from "../Header";
 
@@ -13,12 +14,12 @@ const MyPage = () => {
     <>
       <Header />
       <div className="container">
-        {/* 1. 배너 영역 */}
+        {/* 배너 영역임 */}
         <div className="banner">
-          {/* 배경색이나 배너 이미지를 CSS로 설정 */}
+          {/* 배경색이나 배너 이미지 있으면 여기임 */}
         </div>
 
-        {/* 2. 프로필 요약 영역 */}
+        {/* 프로필 요약 영역임 */}
         <div className="profile">
           <div className="avatar">
             <img src={avatarUrl} alt="프로필 사진" />
@@ -34,16 +35,16 @@ const MyPage = () => {
           </div>
         </div>
 
-        {/* 3. 탭 네비게이션 */}
+        {/* 탭 네비임 */}
         <div className="tabs">
           <button className="tab tab--active">나의 로그</button>
           <button className="tab">내가 좋아한 글</button>
           <button className="tab">내 여행 리스트</button>
         </div>
 
-        {/* 4. 콘텐츠 영역 */}
+        {/* 콘텐츠들 */}
         <div className="content">
-          {/* 비어 있을 때 보여줄 빈 상태(Empty State) */}
+          {/* 비어 있을 때 보여줄 공간 */}
           <div className="empty-state">
             <p className="empty-state__text">
               기록을 남기고 추억을 공유해보세요
