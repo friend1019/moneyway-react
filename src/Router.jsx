@@ -7,6 +7,8 @@ import MyPage from "./component/main/MyPage";
 import Signup from "./component/login/Signup";
 import Signin from "./component/login/Signin";
 import ForgotPwd from "./component/login/ForgotPwd";
+import EmailCode from "./component/login/EmailCode";
+import ResetPassword from "./component/login/ResetPassword";
 
 function AppRouter() {
   return (
@@ -17,6 +19,8 @@ function AppRouter() {
         {<Route path="/signup" element={<Signup />} />}
         {<Route path="/signin" element={<Signin />} />}
         {<Route path="/forgot-pwd" element={<ForgotPwd />} />}
+        {<Route path="/emailcode" element={<EmailCode />} />}
+        {<Route path="/resetpassword" element={<ResetPassword />} />}
 
         <Route
           path="/mypage"

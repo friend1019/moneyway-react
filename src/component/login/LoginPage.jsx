@@ -30,7 +30,7 @@ const LoginPage = () => {
       <Header />
       <div className="container">
         <div className="login-header">
-          <LoginHeader />
+          <LoginHeader text="가입" />
         </div>
         <div className="auth-container">
           <div className="auth-header">간편가입 하기 😎</div>
