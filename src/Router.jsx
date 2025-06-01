@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+import KakaoMap from "./component/KakaoMapTest";
+
 import RequireAuth from "./component/RequireAuth";
 import Main from "./component/main/Main";
 import LoginPage from "./component/login/LoginPage";
@@ -14,6 +16,9 @@ function AppRouter() {
   return (
     <Router>
       <Routes>
+        {<Route path="/map" element={<KakaoMap />} />}
+
+
         {<Route path="/" element={<Main />} />}
         {<Route path="/login" element={<LoginPage />} />}
         {<Route path="/signup" element={<Signup />} />}
