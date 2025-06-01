@@ -5,7 +5,7 @@
   justify-content: center;     /* 필요 시 */
   text-align: center;          /* 텍스트 중앙 정렬 */
   margin-top: 11rem;
-  margin-bottom: -15rem;
+  margin-bottom: 1rem;
 }
 
 .wallet-logo{

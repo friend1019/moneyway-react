@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../Header";
-import "../../css/login/Signin.css";
-import "../../css/login/LoginPage.css";
 import "../../css/login/ForgotPwd.css";
 import logoWallet from "../../images/login/logoWallet.svg";
 

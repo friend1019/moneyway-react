@@ -1,7 +1,7 @@
 .login-form {
   max-width: 72rem;
   margin: 4rem auto 0 auto;
-  margin-top: 10%;
+  margin-top: 1%;
   padding: 0 2rem;
   display: flex;
   flex-direction: column;
@@ -15,7 +15,7 @@
 }
 
 .input-field {
-  width: 100%;
+  width: 72rem;
   border: none;
   border-bottom: 1px solid #ccc;
   padding: 0.8rem 0;

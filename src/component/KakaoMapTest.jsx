@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import Header from "./Header";
 import "../css/KakaoMapTest.css";
 import Filter from "../images/planning/filter.svg";
+import SearchIcon from "../images/planning/search.svg";
 
 const KakaoMap = () => {
     const mapRef = useRef(null); // 지도를 표시할 div 참조
@@ -35,10 +36,10 @@ const KakaoMap = () => {
 
     return (
         <>
-            <div className="header">
+            <div className="map-header">
                 <Header />
             </div>
-            <div className="container">
+            <div className="map-container">
                 <div className="category-container">
                     <h1>
                         <span className="highlight-blue">일정</span>을 추가하고<br />
@@ -51,10 +52,21 @@ const KakaoMap = () => {
                             placeholder="장소, 액티비티 등을 검색하세요"
                             aria-label="검색창"
                         />
+
+                        <button
+                            type="button"
+                            className="search-button"
+                            aria-label="검색"
+                        >
+                            <img src={SearchIcon} alt="검색" className="search-icon" />
+                        </button>
+
                         <button className="filter-btn">
                             <img src={Filter} alt="필터" style={{ width: "5rem", height: "5rem" }} />
                         </button>
                     </div>
+
+                    <p style={{ fontSize: "1.6rem", marginTop: "3rem", color: "#7F7F7F" }}>무엇을 찾고 계시나요?</p>
 
                     <div className="category-buttons">
                         {["식당", "카페", "관광지", "액티비티"].map((cat) => (

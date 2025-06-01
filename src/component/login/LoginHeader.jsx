@@ -1,14 +1,14 @@
 const LoginHeader = ({ text }) => {
   return (
-    <div className="container">
+    <div>
       <h1
-        className="header"
+        className="login=header"
         style={{ marginLeft: 0, fontSize: "4.8rem", fontWeight: "bold" }}
       >
         MoneyWay에 {text}하세요
       </h1>
       <h1
-        className="header2"
+        className="login-header2"
         style={{ marginTop: 0, fontSize: "4.8rem", fontWeight: "bold" }}
       >
         환영합니다!
