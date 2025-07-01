@@ -1,6 +1,6 @@
 // PlaceDetailView.jsx
 import React from 'react';
-import '../css/PlaceDetailView.css';
+import '../../css/search/PlaceDetailView.css';
 import {
   FaArrowLeft,
   FaHeart,

@@ -1,6 +1,6 @@
 // FilterModal.jsx
 import React from 'react';
-import '../css/FilterModal.css';
+import '../../css/search/FilterModal.css';
 
 const categoryOptions = {
     식당: ['한식', '일식', '중식', '양식'],

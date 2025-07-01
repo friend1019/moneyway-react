@@ -1,6 +1,6 @@
 // PlaceCard.jsx
 import React from 'react';
-import '../css/PlaceCard.css';
+import '../../css/search/PlaceCard.css';
 import { FaHeart, FaStar, FaRegStar } from 'react-icons/fa';
 
 const PlaceCard = ({ title, category, address, status, rating, imageUrls = [], onClick }) => {

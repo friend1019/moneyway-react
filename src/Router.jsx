@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import KakaoMap from "./component/KakaoMapTest";
+import KakaoMap from "./component/search/KakaoMapTest";
 
 import RequireAuth from "./component/RequireAuth";
 import Main from "./component/main/Main";

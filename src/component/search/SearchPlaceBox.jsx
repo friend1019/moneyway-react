@@ -1,6 +1,6 @@
 // SearchPlaceBox.jsx
 import React, { useEffect, useState } from 'react';
-import '../css/SearchPlaceBox.css';
+import '../../css/search/SearchPlaceBox.css';
 
 const CATEGORY_NAME_MAP = {
   RESTAURANT: '식당',

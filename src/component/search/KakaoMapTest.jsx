@@ -1,14 +1,14 @@
 // KakaoMapTest.jsx
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import Header from './Header';
-import '../css/KakaoMapTest.css';
+import Header from '../Header';
+import '../../css/search/KakaoMapTest.css';
 import PlaceListView from './PlaceListView';
 import PlaceDetailView from './PlaceDetailView';
 import SearchPlaceBox from './SearchPlaceBox';
 import FilterModal from './FilterModal';
 import CategorySelector from './CategorySelector';
 import SearchInput from './SearchInput';
-import { fetchJejuPlacesByCategory } from '../api/visitJejuApi';
+import { fetchJejuPlacesByCategory } from '../../api/visitJejuApi';
 
 const CATEGORY_MAP = {
   식당: 'RESTAURANT',
