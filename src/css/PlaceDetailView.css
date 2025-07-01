@@ -1,0 +1,172 @@
+.place-detail {
+    padding: 3rem 2rem;
+    height: calc(100vh - 10rem);
+    overflow-y: auto;
+    background-color: #f6f6f6;
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 3rem;
+    cursor: pointer;
+    color: #333;
+    margin-left: 1.4rem;
+}
+
+.title-section h2 {
+    font-size: 3.8rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.meta .category {
+    background-color: #ddd;
+    padding: 0.4rem 1rem;
+    border-radius: 1rem;
+    font-size: 1.8rem;
+}
+
+.meta .rating svg {
+    font-size: 1.8rem;
+}
+
+.like-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.6rem;
+    color: #e63946;
+}
+
+.heart-icon {
+    font-size: 1.6rem;
+}
+
+.image-section {
+    display: flex;
+    gap: 1.5rem;
+    margin: 2rem 0;
+}
+
+.image-card {
+    flex: 1;
+    height: 31rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: #eee;
+}
+
+.image-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #ddd;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.action-buttons button {
+    flex: 1;
+    padding: 1rem;
+    font-size: 1.4rem;
+    border: none;
+    background-color: #ffffff;
+    color: #C1C1C1;
+    border-radius: 1.8rem;
+    cursor: pointer;
+    box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
+
+}
+
+.info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 3rem;
+    margin-bottom: 2rem;
+    border: none;
+    border-radius: 1.3rem;
+    background-color: #ffffff;
+
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+}
+
+
+.info-row {
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
+}
+
+.info-icon {
+    font-size: 2rem;
+    color: #3478f6;
+    margin-top: 0.7rem;
+}
+
+.info-title {
+    font-weight: bold;
+    font-size: 1.6rem;
+}
+
+.info-desc {
+    font-size: 1.4rem;
+    color: #7F7F7F;
+    margin-top: 0.4rem;
+}
+
+.tag-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+}
+
+.tag-chip {
+    background-color: #e1ecf4;
+    color: #3178c6;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 1.2rem;
+}
+
+.schedule-btn {
+    padding: 1.2rem;
+    height: 8rem;
+    font-size: 2.4rem;
+    font-weight: bold;
+    background-color: #0066F9;
+    color: white;
+    border: none;
+    border-radius: 1.3rem;
+    cursor: pointer;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
+
+}

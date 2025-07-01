@@ -1,0 +1,131 @@
+/* 등장 애니메이션 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(1rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 전체 모달 배경 */
+.filter-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 1000;
+  padding: 2rem;
+  overflow-y: auto;
+  animation: fadeIn 0.3s ease;
+  box-sizing: border-box;
+}
+
+/* 모달 안쪽 카드 */
+.filter-content {
+  max-width: 400px;
+  margin: 5rem auto;
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  animation: fadeInUp 0.4s ease;
+}
+
+/* 제목 */
+.filter-modal h2 {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  font-weight: bold;
+}
+
+/* 카테고리 선택 */
+.category-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.category-tab {
+  padding: 0.8rem 1.6rem;
+  border-radius: 2rem;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  color: #555;
+  cursor: pointer;
+  font-size: 1.3rem;
+  transition: all 0.2s ease;
+}
+
+.category-tab.active {
+  background: #0066F9;
+  color: #fff;
+  border-color: #0066F9;
+  font-weight: bold;
+}
+
+/* 서브 카테고리 선택 */
+.subcategory-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.6rem;
+}
+
+.subcategory-chip {
+  padding: 0.6rem 1.4rem;
+  border-radius: 2rem;
+  border: 1px solid #ccc;
+  background: #f0f0f0;
+  font-size: 1.2rem;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.subcategory-chip.active {
+  background-color: #0066F9;
+  color: white;
+  border-color: #0066F9;
+  font-weight: bold;
+}
+
+/* 버튼 영역 */
+.filter-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.apply-btn,
+.close-btn {
+  padding: 0.8rem 1.6rem;
+  border: none;
+  border-radius: 0.8rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.apply-btn {
+  background-color: #0066F9;
+  color: white;
+}
+
+.apply-btn:hover {
+  background-color: #0052cc;
+}
+
+.close-btn {
+  background-color: #ccc;
+  color: black;
+}
