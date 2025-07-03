@@ -1,0 +1,826 @@
+body{
+  overflow-x: hidden;
+}
+
+/*첫번째 페이지*/
+.FirstMain {
+  width: 100vw;
+  min-height: 100vh;
+  background: #fff; 
+}
+
+.jeju-banner {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  background-image: url('../../images/main/background.png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.banner-circles {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1; 
+  pointer-events: none; 
+}
+
+.circle {
+  position: absolute;
+  border: 2px solid rgba(255,255,255,0.6);  
+  border-radius: 50%;
+  background: none;
+}
+
+.circle1 {
+  width: 400px;
+  height: 400px;
+  left: -5vw;
+  top: 2.5rem;
+}
+
+.circle2 {
+  width: 400px;
+  height: 400px;
+  left: 13vw;
+  top: 2.5rem;
+}
+
+.banner-horizontal-line {
+  position: absolute;
+  top: 50%;             
+  left: 35%;           
+  width: 17%;           
+  height: 2px;
+  background: rgba(255,255,255,1);   
+  border-radius: 2px;
+  z-index: 2;
+}
+
+.banner-text {
+  position: absolute;
+  top: 55%;
+  left: 70%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  text-align: left;
+  color: #fff;
+  z-index: 2;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.14);
+}
+
+.banner-text h1 {
+  font-size: 4.8rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.banner-text .highlight {
+  background: #ffe066;
+  color: #2176ff;
+  padding: 0.12em 0.75em;
+  font-weight: bold;
+}
+
+.main-content-bg {
+  width: 100vw;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  z-index: 2;
+}
+
+.banner-card-fix {
+  position: relative;
+  background: #fff;
+  border-radius: 2rem;
+  box-shadow: 0 12px 36px 0 rgba(20, 36, 60, 0.13);
+  min-width: 75vw;
+  max-width: 800px;
+  padding: 54px 48px 38px 48px;
+  display: flex;
+  align-items: flex-start;
+  margin-top: -100px; 
+  z-index: 2;
+}
+
+.icon-wrapper{
+  position: absolute;
+  top: -45px; 
+  left: 3px; 
+  background-color: #fff;
+  padding: 12px 15px;
+  border-radius: 2rem 2rem 0 0;
+  box-shadow: 0 -8px 16px rgba(20, 36, 60, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center; z-index: 1; 
+  transform: perspective(100px) rotateX(20deg); 
+  transform-origin: bottom center; 
+}
+
+.card-icon-img-fix {
+  width: 120px; height: 30px;
+  z-index: 2;
+  position: relative;
+  transform: translate(0%, 20%); 
+  background: transparent;
+}
+
+.card-title-fix {
+ font-weight: 700;
+ font-size: 2rem;
+ color: #181a1d;
+ margin-bottom: 2rem;
+ letter-spacing: -0.01em;
+}
+
+.card-footer-fix {
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start; 
+  width: 100%;
+}
+
+.card-footer-main-text {
+  color: #181a1d;
+  font-size: 1.3rem;
+}
+
+
+.card-footer-action-group {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+}
+
+.card-footer-sub-text {
+  color: #181a1d;
+  font-size: 1.3rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.arrow-line {
+  flex-grow: 1;
+  height: 1px;
+  background: black;
+  position: relative;
+  min-width: 200px;
+}
+
+.arrow-line::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid black;
+  border-right: 1px solid black;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.card-btn-fix {
+  background: #fff;
+  color: #23262c;
+  font-weight: 700;
+  border: 1px solid black;
+  padding: 0.5rem 3rem;
+  border-radius: 3rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+
+/*2번째 페이지*/
+.plan-form-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 80vh;
+  background: #EFF8FC;
+  gap: 8vw;
+  box-sizing: border-box;
+}
+
+.plan-form-left {
+  width: 100%;
+  max-width: 600px;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  margin-top: -3rem;
+}
+
+.plan-title-card {
+  width: 60%;
+  height: 40px;
+  margin-bottom: 10rem;
+  padding: 1.3rem 0;
+  background: #fff;
+  border-radius: 1.2rem; 
+  text-align: center;
+}
+
+.plan-title-card h2 {
+  color: #2176ff;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.plan-form-right {
+  flex: 1;
+  max-width: 500px;
+  margin: 10rem 0;
+}
+
+
+.plan-image-box {
+  position: relative;
+  width: 200%;
+  height: 500px;
+  border-radius: 2.3rem;
+  box-shadow: 0 6px 32px 0 rgba(70,100,180,0.12);
+}
+.plan-image {
+  width: 100%;
+  height: 100%;
+}
+.plan-image-title {
+  position: absolute;
+  top: 5rem;
+  left: 10rem;
+  color: #fff;
+  font-size: 1.8rem;
+  font-weight: 400;
+  text-shadow: 0 2px 10px rgba(10, 60, 120, 0.17);
+  letter-spacing: 0.01em;
+  line-height: 1.8;
+}
+.plan-title-bar {
+  display: inline-block;
+  width: 170px;
+  height: 1px;
+  background: rgba(255,255,255,0.86);
+  border-radius: 2px;
+  margin-left: 0.65rem;
+  margin-bottom: 0.27rem;
+}
+
+.selector-container {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1.2rem;
+  box-sizing: border-box;
+}
+
+.selector-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #D9D9D9 ;
+  border-radius: 5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  padding: 1.3rem;
+  color: #222;
+  gap: 0.8rem; 
+  cursor: pointer;
+  box-sizing: border-box;
+  justify-content: center;
+}
+
+.selector-options {
+  position: absolute;
+  width: 100%;
+  top: calc(100% + 8px); 
+  left: 0;
+  background: white;
+  border-radius: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 0.8rem;
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.selector-option-item {
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  padding: 0.9rem 1.3rem; 
+  border-radius: 0.8rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #555;
+  gap: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.selector-option-item .icon {
+  font-size: 1.3rem;
+  color: #2176ff;
+}
+
+.selector-option-item:hover {
+  background-color: #f7f7f9;
+}
+
+.selector-option-item.selected {
+  background-color: #f0f4ff;
+  color: #2176ff;
+  font-weight: 800;
+}
+
+.selector-row .placeholder {
+  color: #888;
+  font-weight: 500;
+}
+
+.react-datepicker-wrapper,
+.react-datepicker__input-container {
+  display: block;
+}
+
+.react-datepicker__input-container input {
+  display: none;
+}
+
+.plan-submit {
+  display: flex;
+  justify-content: center;   
+  align-items: center;
+  width: 100%;
+  background: #0066F9;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.6rem;
+  border: none;
+  padding: 1.3rem 0;
+  margin-top: 1.2rem;
+  margin-bottom: 0.4rem;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.plan-submit .icon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+.plan-direct {
+  width: 100%;
+  color: #555;
+  font-size: 1.4rem;
+  text-align: right;
+  margin-top: 0.8rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+
+/*3번째 페이지*/
+.editor-pick {
+  width: 100vw;
+  padding: 0;
+  margin: 8rem 0;
+  background: #fff;
+  min-height: 50vh;
+}
+
+.editor-section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 0 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.editor-section-header {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.editor-section-subtitle {
+  color: #2176ff;
+  font-size: 15px;
+  margin-bottom: 5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.editor-section-title {
+  color: #111;
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -0.015em;
+}
+
+.editor-cards-list {
+  display: flex;
+  gap: 36px;
+  padding: 10px 0 24px 0;
+  min-width: 0;
+}
+
+.editor-pick-card {
+  flex: 0 0 auto;
+  width: 240px;
+  height: 330px;
+  border-radius: 38px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+
+.editor-pick-card .card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+
+.editor-pick-card .card-title {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 26px 22px 18px 22px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.8rem;
+  letter-spacing: -0.025em;
+  background: linear-gradient(to top, rgba(0,0,0,0.36) 90%, rgba(0,0,0,0.0) 100%);
+  text-shadow: 0 1px 8px rgba(0,0,0,0.14);
+  border-bottom-left-radius: 38px;
+  border-bottom-right-radius: 38px;
+  box-sizing: border-box;
+}
+
+/*4번째 페이지*/
+.recommendation {
+  width: 100%;
+  margin: 15rem 0;
+  padding: 0 40px;
+  box-sizing: border-box;
+  min-height: 50vh;
+}
+
+.recommendation-section-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.recommendation-section-header {
+  margin-bottom: 22px;
+}
+
+.recommendation-section-subtitle {
+  color: #2176ff;
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 3px 0;
+  letter-spacing: 0.01em;
+}
+
+.recommendation-section-title {
+  font-size: 3rem; 
+  font-weight: 800;
+  margin: 0;
+  color: #111;
+  letter-spacing: -0.01em;
+}
+
+.moneyway-cards-list {
+  display: flex;
+  gap: 32px;
+  padding: 6px 0 18px 0; 
+}
+
+.recommendation-card {
+  width: 370px;
+  background: transparent; 
+  border-radius: 32px;
+  overflow: visible; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: none;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.14s;
+  margin-bottom: 24px; 
+}
+
+.recommendation-card .image-wrapper {
+  width: 100%;
+  height: 190px;
+  border-radius: 32px;
+  overflow: hidden;
+  margin-bottom: -36px; 
+  z-index: 2;
+  background: #fff; 
+}
+
+.recommendation-card .card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 32px;
+  display: block;
+}
+
+.recommendation-card .info-wrapper {
+  width: 100%;
+  margin: 0 auto;
+  z-index: 3;
+  position: relative;
+  top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;  
+  padding: 0 0 0 1rem;
+}
+
+.recommendation-card .title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #181818;
+  margin-bottom: 14px;
+  letter-spacing: -0.01em;
+  text-align: left;        
+  word-break: keep-all;
+}
+
+.tags-wrapper {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-start;  
+  width: auto;
+  margin-top: 0;
+}
+
+.tag {
+  font-size: 1rem;
+  color: #181818;
+  border-radius: 8rem;
+  border: 1.3px solid black;
+  padding: 4px 20px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  margin-top: 0.3rem;
+  transition: border 0.18s;
+}
+
+/*5번째 페이지*/
+.landing-main-wrapper {
+  display: flex;
+  width: 100vw;
+  min-height: 100vh;
+  background: #fff;
+  position: relative;
+}
+
+.landing-content {
+  width: 56vw;
+  min-width: 540px;
+  max-width: 680px;
+  padding: 64px 0 0 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  z-index: 2;
+}
+
+.landing-title {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1.15rem;
+  color: #181a2b;
+  letter-spacing: -1.2px;
+}
+
+.landing-desc {
+  font-size: 1.5rem;
+  color: #222;
+  margin-bottom: 1.15rem;
+  line-height: 1.65;
+}
+
+.landing-bar-img-row {
+  display: flex;
+  align-items: center;                    
+  margin-bottom: 14px;
+  position: relative;
+  min-height: 56px;  
+  left: -13vw;       
+}
+
+.landing-thumb {
+  width: 180px;               
+  height: 40px;               
+  object-fit: cover;
+  box-shadow: 0 2px 8px 0 rgba(40,80,120,0.10);
+  z-index: 2;
+}
+
+.landing-bar {               
+  height: 1px;               
+  background: gray;
+  border-radius: 1px;
+  z-index: 1;
+  width: 25rem;
+}
+
+.landing-sub {
+  margin-left: 20px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #181d2b;
+  white-space: nowrap;
+}
+
+.landing-category-cards {
+  margin-top: 10rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem 2.7rem;
+}
+
+.landing-category-card {
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  box-shadow: 0 4px 24px 0 rgba(32,40,60,0.12);
+  border-radius: 1.2rem;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  min-width: 180px;
+  max-width: 255px;
+  margin-bottom: 1.15rem;
+  gap: 3rem;
+  cursor: pointer;
+  transition: box-shadow 0.18s;
+}
+
+.category-icon {
+  width: 60px;
+  height: 60px;
+  color: #2176ff;
+}
+.category-title {
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #181a2b;
+}
+.category-desc {
+  color: black;
+  font-weight: 500;
+  font-size: 1.3rem;
+}
+.landing-category-card:nth-child(3) {
+  margin-left: 15rem; 
+}
+
+.landing-category-card:hover {
+  box-shadow: 0 8px 32px 0 rgba(32,40,60,0.17);
+  background: #307EF1;
+  transform: scale(1.1);
+}
+
+.landing-category-card:hover .category-icon {
+  color: white;
+  transition: color 0.18s;
+}
+
+.landing-category-card:hover .category-title,
+.landing-category-card:hover .category-desc {
+  color: white;
+  transition: color 0.18s;
+}
+
+.landing-visual-bg {
+  position: relative;
+
+  width: 48vw;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  right: -20vw;
+  bottom: -10vw;
+}
+
+.landing-bg-circle {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.landing-bg-circle.circle1 {
+  width: 800px;
+  height: 800px;
+  background: #EFF8FC;     
+  opacity: 1;
+  z-index: 1;
+}
+.landing-bg-circle.circle2 {
+  width: 530px;
+  height: 530px;
+  background: #fff;    
+  opacity: 0.98;
+  z-index: 2;
+}
+.landing-bg-circle.circle3 {
+  width: 370px;
+  height: 370px;
+  background:#EFF8FC;      
+  opacity: 0.58;
+  z-index: 3;
+}
+
+.landing-plane-img {
+  position: absolute;
+  right: 25vw;
+  bottom: 10vw;
+  width: 500px;
+  max-width: 41vw;
+  z-index: 4;
+}
+
+/*6번째 페이지*/
+.page-container {
+  margin-top: -10rem;
+  display: flex;
+  position: relative;
+  justify-content: center;
+  padding: 15rem 0;
+  gap: 5vw;
+  z-index: 55;
+  background-color: white;
+}
+
+.sidebar {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vw;
+}
+
+.main-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0 0 5rem 0;
+}
+
+.main-content {
+  background-color: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #C1C1C1;
+  padding: 24px;
+  width: 650px;
+  min-height: 450px;
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-plan-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5rem;
+  padding: 1rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.empty-plan-message {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #cccccc;
+  font-size: 18px;
+  line-height: 1.6;
+}
+

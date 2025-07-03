@@ -1,0 +1,21 @@
+.week-view-container {
+  display: flex;
+  justify-content: space-around;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+.day-block { 
+    text-align: center;
+}
+
+.day-of-week { 
+    font-size: 14px; 
+    color: #aaaaaa; 
+    margin-bottom: 8px; 
+}
+
+.date-number {
+    font-size: 24px; 
+    font-weight: 700; 
+    color: #333; 
+}
