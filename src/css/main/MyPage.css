@@ -1,0 +1,38 @@
+.main-container {
+    background-color: #F6F6F6;
+    min-height: 90rem;
+    position: relative;
+}
+
+/* view === 'edit'일 때 적용될 클래스 */
+.main-container.edit-mode {
+    background-color: white;
+}
+
+.nav-bar {
+    width: 100%;
+    display: flex;
+    gap: 10rem;
+    background-color: white;
+    padding: 3rem 60rem;
+    position: relative;
+}
+
+.nav-bar button {
+    border: none;
+    cursor: pointer;
+    font-size: 2.4rem;
+    color: #C1C1C1;
+    background-color: white;
+}
+
+.nav-bar button:active {
+    color: black;
+}
+
+.profile-container {
+    margin-left: 15rem;
+    position: absolute;
+    top: 6rem;
+    z-index: 10;
+}

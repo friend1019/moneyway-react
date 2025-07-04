@@ -1,0 +1,53 @@
+/* Profile.css */
+
+.container {
+    width: 30rem;
+    height: 40rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 2.5rem;
+}
+
+.profile-image {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 1.5rem;
+}
+
+.nickname p {
+    font-size: 3.2rem;
+    font-weight: bold;
+    margin-bottom: 2.2rem;
+}
+
+.info-fix button {
+    width: 20rem;
+    height: 5rem;
+    background-color: #0066F9;
+    color: white;
+    border: none;
+    border-radius: 2rem;
+    font-size: 1.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.logout-btn button {
+    background: none;
+    color: #307EF1;
+    border: none;
+    font-size: 1.8rem;
+    text-decoration: none;
+    cursor: pointer;
+}

@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import KakaoMap from "./component/search/SearchMain";
+import Search from "./component/search/SearchMain";
 
 import RequireAuth from "./component/RequireAuth";
 import Main from "./component/main/Main";
@@ -16,9 +16,6 @@ function AppRouter() {
   return (
     <Router>
       <Routes>
-        {<Route path="/search" element={<KakaoMap />} />}
-
-
         {<Route path="/" element={<Main />} />}
         {<Route path="/login" element={<LoginPage />} />}
         {<Route path="/signup" element={<Signup />} />}
@@ -30,11 +27,10 @@ function AppRouter() {
         <Route
           path="/mypage"
           element={
-            <RequireAuth>
               <MyPage />
-            </RequireAuth>
           }
         />
+        {<Route path="/search" element={<Search />} />}
       </Routes>
     </Router>
   );
