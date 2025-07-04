@@ -21,5 +21,4 @@ const Profile = ({ onEditClick }) => {
         </div>
     );
 };
-
 export default Profile;
