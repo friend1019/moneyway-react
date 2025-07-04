@@ -1,5 +1,5 @@
 import '../css/Footer.css';
-import logo from '../img/header/logo.svg';
+import logo from '../images/header/logo.svg';
 function Footer(){
     return(
         <div className='footer'>

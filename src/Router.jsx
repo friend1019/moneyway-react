@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Search from "./component/search/SearchMain";
-
 import RequireAuth from "./component/RequireAuth";
 import Main from "./component/main/Main";
 import LoginPage from "./component/login/LoginPage";

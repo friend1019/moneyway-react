@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
 }
-
 .login-header {
   margin-top: 3%;
   margin-left: 18rem;
