@@ -8,6 +8,9 @@ function Main() {
     <div className="main">
         <Header />
       <div className="main-container">
+        <div>
+          <h1 style={{display:"flex", fontSize:"10rem", justifyContent:"center"}}>모성애를 자극하는 남자 이강현!!!!!!!!</h1>
+        </div>
         <img
           src={background}
           alt="background"
