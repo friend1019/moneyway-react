@@ -3,7 +3,7 @@ import { MdEdit } from 'react-icons/md';
 
 const Profile = ({ onEditClick }) => {
     return (
-        <div className="container">
+        <div className="profilecard-container">
             <div className="profile-image">
                 {/* 이미지 삽입 */}
             </div>

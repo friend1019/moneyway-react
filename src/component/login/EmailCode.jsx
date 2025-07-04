@@ -27,7 +27,7 @@ const EmailCode = () => {
   return (
     <>
       <Header />
-      <div className="container">
+      <div className="login-container">
         <div className="forgot-pwd-header">
           <img src={logoWallet} alt="Wallet Logo" className="wallet-logo" />
           <h1 style={{ fontSize: "3.6rem", fontWeight: "bold" }}>

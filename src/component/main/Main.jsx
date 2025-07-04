@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import axios from "axios";
 import 'react-datepicker/dist/react-datepicker.css';
 import '../../css/main/Main.css';
 
 import Header from "../Header";
 import Footer from "../Footer";
-import BudgetSlider from '../main/BudgetSlider'; 
+import BudgetSlider from '../main/BudgetSlider';
 import HorizontalSlider from '../main/Slider';
 import WeekView from '../main/WeekView';
 import DateRange from '../main/DateRangePicker';
 
+import PlaceDetailView from "../search/PlaceDetailView";
+
 import { ReactComponent as BriefcaseIcon } from '../../images/main/briefcase.svg';
-import jejuOceanImg from '../../images/main/jejuocean.png'; 
-import PlaneIslandImg from "../../images/main/fifth/airplane.svg"; 
+import jejuOceanImg from '../../images/main/jejuocean.png';
+import PlaneIslandImg from "../../images/main/fifth/airplane.svg";
 import Mandarin from "../../images/main/fifth/mandarin.svg";
 
 import { ReactComponent as BedIcon } from "../../images/main//fifth/accommodation.svg";
@@ -34,10 +36,10 @@ import { ReactComponent as PlanButton } from '../../images/main/second/planbutto
 
 function Main() {
   const [budget, setBudget] = useState([100000, 300000]);
-  const [tripDuration, setTripDuration] = useState(null); 
+  const [tripDuration, setTripDuration] = useState(null);
   const [isDurationPickerVisible, setIsDurationPickerVisible] = useState(false);
   const durationOptions = ['당일치기', '1박 2일', '2박 3일', '3박 4일', '4박 5일 이상'];
-  
+
   const [personnel, setPersonnel] = useState(null); // 2 -> null
   const [isPersonnelPickerVisible, setPersonnelPickerVisible] = useState(false);
   const personnelOptions = [1, 2, 3, 4];
@@ -49,10 +51,15 @@ function Main() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
+  //장소누르는상태임 이거 -지인이 추가-
+  const [selectedPlace, setSelectedPlace] = useState(null);
+
+
   const handleDateChange = (start, end) => {
     setStartDate(start);
     setEndDate(end);
   };
+  
 
   const formatPersonnelDisplay = (p) => {
     if (p >= 4) return '4명 이상';
@@ -60,42 +67,42 @@ function Main() {
   };
 
   const categories = [
-  {
-    icon: BedIcon,
-    hoverIcon: HoverBedIcon,
-    title: "숙소",
-    desc: "취향 따라 고르는<br />제주 숙소",
-  },
-  {
-    icon: FoodIcon,
-    hoverIcon: HoverFoodIcon,
-    title: "식당",
-    desc: "숨겨있는 제주<br />맛집 발견",
-  },
-  {
-    icon: CafeIcon,
-    hoverIcon: HoverCafeIcon,
-    title: "카페",
-    desc: "테마별 제주<br />핫플 카페",
-  },
-  {
-    icon: ActivityIcon,
-    hoverIcon: HoverActivityIcon,
-    title: "액티비티",
-    desc: "제주에서만<br />다채로운 체험",
-  },];
+    {
+      icon: BedIcon,
+      hoverIcon: HoverBedIcon,
+      title: "숙소",
+      desc: "취향 따라 고르는<br />제주 숙소",
+    },
+    {
+      icon: FoodIcon,
+      hoverIcon: HoverFoodIcon,
+      title: "식당",
+      desc: "숨겨있는 제주<br />맛집 발견",
+    },
+    {
+      icon: CafeIcon,
+      hoverIcon: HoverCafeIcon,
+      title: "카페",
+      desc: "테마별 제주<br />핫플 카페",
+    },
+    {
+      icon: ActivityIcon,
+      hoverIcon: HoverActivityIcon,
+      title: "액티비티",
+      desc: "제주에서만<br />다채로운 체험",
+    },];
 
   const contentTypeMap = {
-          12: '관광지',
-          14: '문화시설',
-          15: '행사/공연/축제',
-          25: '여행코스',
-          28: '레포츠',
-          32: '숙박',
-          38: '쇼핑',
-          39: '음식점',
+    12: '관광지',
+    14: '문화시설',
+    15: '행사/공연/축제',
+    25: '여행코스',
+    28: '레포츠',
+    32: '숙박',
+    38: '쇼핑',
+    39: '음식점',
   };
-  
+
   useEffect(() => {
     axios.get("https://moneyway-zg4x.onrender.com/api/tour/places")
       .then(res => {
@@ -107,11 +114,11 @@ function Main() {
             image: item.firstimage || item.firstimage2,
             title: item.title,
             tags: [
-            contentTypeMap[item.contenttypeid],   
-            ...(item.tags || [])                  
-          ],
+              contentTypeMap[item.contenttypeid],
+              ...(item.tags || [])
+            ],
           }));
-        setRecommendationsData(simple); 
+        setRecommendationsData(simple);
       })
       .catch(err => {
         console.error("API 호출 에러:", err);
@@ -191,7 +198,7 @@ function Main() {
           </div>
 
           <BudgetSlider budget={budget} setBudget={setBudget} />
-          
+
           <div className="selector-container">
             <div className="selector-row" onClick={() => setIsDurationPickerVisible(!isDurationPickerVisible)}>
               {tripDuration ? <People className="icon" /> : <BasicPeople className="icon" />}
@@ -219,33 +226,33 @@ function Main() {
             )}
           </div>
 
-    
-            <div className="selector-container">
-              <div className="selector-row" onClick={() => setPersonnelPickerVisible(!isPersonnelPickerVisible)}>
-                {personnel ? <People className="icon" /> : <BasicPeople className="icon" />}
-                <span className={!personnel ? 'placeholder' : ''}>
-                  {personnel ? formatPersonnelDisplay(personnel) : '인원'}
-                </span>
-              </div>
 
-              {isPersonnelPickerVisible && (
-                <div className="selector-options">
-                  {personnelOptions.map((option) => (
-                    <div
-                      key={option}
-                      className={`selector-option-item ${personnel === option ? 'selected' : ''}`}
-                      onClick={() => {
-                        setPersonnel(option);
-                        setPersonnelPickerVisible(false); 
-                      }}
-                    >
-                      <People className="icon" />
-                      <span>{formatPersonnelDisplay(option)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+          <div className="selector-container">
+            <div className="selector-row" onClick={() => setPersonnelPickerVisible(!isPersonnelPickerVisible)}>
+              {personnel ? <People className="icon" /> : <BasicPeople className="icon" />}
+              <span className={!personnel ? 'placeholder' : ''}>
+                {personnel ? formatPersonnelDisplay(personnel) : '인원'}
+              </span>
             </div>
+
+            {isPersonnelPickerVisible && (
+              <div className="selector-options">
+                {personnelOptions.map((option) => (
+                  <div
+                    key={option}
+                    className={`selector-option-item ${personnel === option ? 'selected' : ''}`}
+                    onClick={() => {
+                      setPersonnel(option);
+                      setPersonnelPickerVisible(false);
+                    }}
+                  >
+                    <People className="icon" />
+                    <span>{formatPersonnelDisplay(option)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <button className="plan-submit">
             플랜 생성
             <PlanButton className="icon" />
@@ -295,7 +302,8 @@ function Main() {
           <HorizontalSlider>
             <div className="moneyway-cards-list">
               {recommendationsData.map(item => (
-                <div key={item.id} className="recommendation-card">
+                // 선택된 장소 저장하는 onclick 추가했음 -지인-
+                <div key={item.id} className="recommendation-card" onClick={() => setSelectedPlace(item)}>
                   <div className="image-wrapper">
                     <img src={item.image} alt={item.title} className="card-image" />
                   </div>
@@ -313,10 +321,10 @@ function Main() {
             </div>
           </HorizontalSlider>
         </section>
-      </div>
+      </div >
 
       {/*5번째 페이지*/}
-      <div className="landing-main-wrapper">
+      < div className="landing-main-wrapper" >
         <div className="landing-content">
           <h1 className="landing-title">저예산 제주 여행을 찾고 계신가요?</h1>
           <p className="landing-desc">
@@ -362,32 +370,39 @@ function Main() {
           </div>
           <img src={PlaneIslandImg} alt="비행기 일러스트" className="landing-plane-img" />
         </div>
-      </div>
+      </div >
 
-    {/*6번째 페이지 만드는중*/}
-    <div className="page-container">
-      <aside className="sidebar">
-        <h1 className="main-title">나의 플랜</h1>
-        
-        <DateRange onDateChange={handleDateChange} />
-        
-        <BudgetSlider budget={budget} setBudget={setBudget} />
-        
-        <button className="edit-plan-button">플랜 수정하기</button>
-      </aside>
+      {/*6번째 페이지 만드는중*/}
+      < div className="page-container" >
+        <aside className="sidebar">
+          <h1 className="main-title">나의 플랜</h1>
 
-      <main className="main-content">
-        <WeekView selectedDate={startDate} />
-        
-        <div className="empty-plan-message">
-          <p>아직 플랜이 없어요.</p>
-          <p>머니웨이와 플랜을 만들어 보세요!</p>
+          <DateRange onDateChange={handleDateChange} />
+
+          <BudgetSlider budget={budget} setBudget={setBudget} />
+
+          <button className="edit-plan-button">플랜 수정하기</button>
+        </aside>
+
+        <main className="main-content">
+          <WeekView selectedDate={startDate} />
+
+          <div className="empty-plan-message">
+            <p>아직 플랜이 없어요.</p>
+            <p>머니웨이와 플랜을 만들어 보세요!</p>
+          </div>
+        </main>
+      </div >
+
+
+      <Footer />
+      {selectedPlace && (
+        <div className="place-detail-overlay" onClick={() => setSelectedPlace(null)}>
+          <div className="place-detail-popup" onClick={(e) => e.stopPropagation()}>
+            <PlaceDetailView place={selectedPlace} onBack={() => setSelectedPlace(null)} />
+          </div>
         </div>
-      </main>
-    </div>
-  
-      
-    <Footer />
+      )}
     </>
   );
 }
