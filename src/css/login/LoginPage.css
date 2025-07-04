@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+.container{
+  display: flex;
+  flex-direction: column;
+}
+
+>>>>>>> 8d3d8cb (메인페이지)
 .login-header {
   margin-top: 3%;
   margin-left: 18rem;

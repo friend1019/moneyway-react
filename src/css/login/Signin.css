@@ -1,7 +1,11 @@
 .login-form {
   max-width: 72rem;
   margin: 4rem auto 0 auto;
+<<<<<<< HEAD
   margin-top: 10%;
+=======
+  margin-top: 1%;
+>>>>>>> 8d3d8cb (메인페이지)
   padding: 0 2rem;
   display: flex;
   flex-direction: column;
@@ -15,7 +19,11 @@
 }
 
 .input-field {
+<<<<<<< HEAD
   width: 100%;
+=======
+  width: 72rem;
+>>>>>>> 8d3d8cb (메인페이지)
   border: none;
   border-bottom: 1px solid #ccc;
   padding: 0.8rem 0;

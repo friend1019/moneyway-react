@@ -14,7 +14,10 @@
 }
 
 .App-header {
+<<<<<<< HEAD
   background-color: #282c34;
+=======
+>>>>>>> 8d3d8cb (메인페이지)
   min-height: 100vh;
   display: flex;
   flex-direction: column;

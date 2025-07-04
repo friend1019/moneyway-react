@@ -4,8 +4,13 @@
   align-items: center;         /* 세로축 중앙 정렬 */
   justify-content: center;     /* 필요 시 */
   text-align: center;          /* 텍스트 중앙 정렬 */
+<<<<<<< HEAD
   margin-top: 14rem;
   margin-bottom: -10rem;
+=======
+  margin-top: 11rem;
+  margin-bottom: 1rem;
+>>>>>>> 8d3d8cb (메인페이지)
 }
 
 .wallet-logo{
@@ -22,11 +27,19 @@
   font-size: 2.4rem;
   border: none;
   border-radius: 0.6rem;
+<<<<<<< HEAD
   cursor: not-allowed;
+=======
+  cursor: pointer;
+>>>>>>> 8d3d8cb (메인페이지)
   transition: background-color 0.3s;
 }
 
 .btn-emailcode:disabled {
   background-color: #bbd6ff;
+<<<<<<< HEAD
   cursor: pointer;
+=======
+  cursor: not-allowed;
+>>>>>>> 8d3d8cb (메인페이지)
 }

@@ -1,8 +1,16 @@
+<<<<<<< HEAD
+=======
+//로그인 진입 페이지
+>>>>>>> 8d3d8cb (메인페이지)
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../../css/login/LoginPage.css";
 import LoginHeader from "./LoginHeader";
+<<<<<<< HEAD
 import Header from "../Header.jsx";
+=======
+import Header from "../Header";
+>>>>>>> 8d3d8cb (메인페이지)
 
 import kakaoIcon from "../../images/login/kakaoAuth.svg";
 import googleIcon from "../../images/login/googleAuth.svg";
@@ -29,7 +37,11 @@ const LoginPage = () => {
       <Header />
       <div className="container">
         <div className="login-header">
+<<<<<<< HEAD
           <LoginHeader />
+=======
+          <LoginHeader text="가입" />
+>>>>>>> 8d3d8cb (메인페이지)
         </div>
         <div className="auth-container">
           <div className="auth-header">간편가입 하기 😎</div>
