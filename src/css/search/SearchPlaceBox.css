@@ -10,7 +10,7 @@
   border-radius: 1rem;
   box-shadow: 0 0.4rem 1.2rem rgba(0, 0, 0, 0.15);
   z-index: 10;
-  margin-top: 0.8rem;
+  margin-top: -2rem;
   animation: fadeInBox 0.3s ease-in-out;
 }
 

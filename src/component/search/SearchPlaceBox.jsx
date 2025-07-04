@@ -1,6 +1,6 @@
-// SearchPlaceBox.jsx
 import React, { useEffect, useState } from 'react';
-import '../css/SearchPlaceBox.css';
+import '../../css/search/SearchPlaceBox.css';
+import { getAllTourPlaces } from '../../api/tourApi'; // ✅ 변경
 
 const CATEGORY_NAME_MAP = {
   RESTAURANT: '식당',
@@ -9,7 +9,7 @@ const CATEGORY_NAME_MAP = {
   ACCOMMODATION: '숙소',
 };
 
-const SearchPlaceBox = ({ keyword, onSelect, fetchPlaces }) => {
+const SearchPlaceBox = ({ keyword, onSelect }) => {
   const [places, setPlaces] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -18,27 +18,25 @@ const SearchPlaceBox = ({ keyword, onSelect, fetchPlaces }) => {
       if (!keyword) return;
       setLoading(true);
       try {
-        const data = await fetchPlaces();
-        setPlaces(
-          data.filter(
-            (p) =>
-              p.title?.toLowerCase().includes(keyword.toLowerCase()) ||
-              p.tag?.toLowerCase().includes(keyword.toLowerCase())
-          )
+        const data = await getAllTourPlaces(); // ✅ 전체 데이터 가져옴
+        const filtered = data.filter((p) =>
+          p.title?.toLowerCase().includes(keyword.toLowerCase())
         );
+        setPlaces(filtered);
       } catch (e) {
-        console.error('장소 로딩 실패:', e);
+        console.error('검색 실패:', e);
       }
       setLoading(false);
     };
     loadPlaces();
-  }, [keyword, fetchPlaces]);
+  }, [keyword]);
 
-  const renderStars = (rating = 0) => {
-    const stars = Math.round(rating);
+  const renderStars = (rating) => {
+    const safeRating = typeof rating === 'number' && !isNaN(rating) ? rating : 0;
+    const stars = Math.round(safeRating);
     return (
       <span className="star-rating">
-        <span className="rating-number">{rating.toFixed(1)}</span>
+        <span className="rating-number">{safeRating.toFixed(1)}</span>
         <span className="stars">
           {'★'.repeat(stars)}
           {'☆'.repeat(5 - stars)}
@@ -46,6 +44,7 @@ const SearchPlaceBox = ({ keyword, onSelect, fetchPlaces }) => {
       </span>
     );
   };
+
 
   return (
     <div className="search-place-box">

@@ -1,6 +1,5 @@
-// PlaceDetailView.jsx
 import React from 'react';
-import '../css/PlaceDetailView.css';
+import '../../css/search/PlaceDetailView.css';
 import {
   FaArrowLeft,
   FaHeart,
@@ -8,6 +7,8 @@ import {
   FaStar,
   FaPhone,
   FaMapMarkerAlt,
+  FaShareAlt,
+  FaCopy,
 } from 'react-icons/fa';
 
 const CATEGORY_NAME_MAP = {
@@ -17,9 +18,34 @@ const CATEGORY_NAME_MAP = {
   ACCOMMODATION: '숙소',
 };
 
+const SIGUNGU_NAME_MAP = {
+  '3': '서귀포시',
+  '4': '제주시',
+};
+
 const PlaceDetailView = ({ place, onBack }) => {
   const tags = place.tag?.split(',').map(tag => tag.trim()).filter(Boolean) || [];
   const categoryName = CATEGORY_NAME_MAP[place.category] || place.category || '기타';
+
+  const handleCopyAddress = () => {
+    navigator.clipboard.writeText(place.address || '');
+    alert('주소가 복사되었습니다!');
+  };
+
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator
+        .share({
+          title: place.title,
+          text: '제주 여행지 추천!',
+          url: window.location.href,
+        })
+        .catch((err) => console.log('공유 취소 또는 실패:', err));
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('공유 링크가 복사되었습니다!');
+    }
+  };
 
   return (
     <>
@@ -55,7 +81,7 @@ const PlaceDetailView = ({ place, onBack }) => {
         </div>
 
         <div className="image-section">
-          {[0, 1].map(i => (
+          {[0].map(i => (
             <div className="image-card" key={i}>
               {place.imageUrls?.[i] ? (
                 <img src={place.imageUrls[i]} alt={`img-${i}`} />
@@ -67,14 +93,37 @@ const PlaceDetailView = ({ place, onBack }) => {
         </div>
 
         <div className="action-buttons">
-          <button>길찾기</button>
-          <button>리뷰</button>
-          <button>공유</button>
+          <button onClick={handleCopyAddress}>
+            <FaCopy style={{ marginRight: '6px' }} />
+            주소 복사
+          </button>
+          <button onClick={handleShare}>
+            <FaShareAlt style={{ marginRight: '6px' }} />
+            공유
+          </button>
+          {place.phone && (
+            <a href={`tel:${place.phone}`} style={{ textDecoration: 'none' }}>
+              <button>
+                <FaPhone style={{ marginRight: '6px' }} />
+                전화걸기
+              </button>
+            </a>
+          )}
         </div>
 
         <button className="schedule-btn">일정 추가하기</button>
 
         <div className="info-section">
+          {place.sigungucode && SIGUNGU_NAME_MAP[place.sigungucode] && (
+            <div className="info-row">
+              <FaMapMarkerAlt className="info-icon" />
+              <div>
+                <div className="info-title">지역</div>
+                <div className="info-desc">{SIGUNGU_NAME_MAP[place.sigungucode]}</div>
+              </div>
+            </div>
+          )}
+
           <div className="info-row">
             <FaMapMarkerAlt className="info-icon" />
             <div>
@@ -88,7 +137,25 @@ const PlaceDetailView = ({ place, onBack }) => {
               <FaPhone className="info-icon" />
               <div>
                 <div className="info-title">전화번호</div>
-                <div className="info-desc">{place.phone}</div>
+                <div className="info-desc">
+                  <a href={`tel:${place.phone}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                    {place.phone}
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {place.useTime && (
+            <div className="info-row">
+              <FaClock className="info-icon" />
+              <div>
+                <div className="info-title">운영시간</div>
+                <div className="info-desc">
+                  {place.useTime.split('<br>').map((line, idx) => (
+                    <div key={idx}>{line}</div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -98,10 +165,15 @@ const PlaceDetailView = ({ place, onBack }) => {
               <FaClock className="info-icon" />
               <div>
                 <div className="info-title">장소 소개</div>
-                <div className="info-desc">{place.overview}</div>
+                <div className="info-desc">
+                  {place.overview.split('<br>').map((line, idx) => (
+                    <div key={idx}>{line}</div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
+
         </div>
       </div>
     </>

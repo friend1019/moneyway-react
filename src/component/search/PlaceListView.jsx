@@ -1,7 +1,7 @@
 // PlaceListView.jsx (unchanged)
 import React from 'react';
 import PlaceCard from './PlaceCard';
-import '../css/PlaceListView.css';
+import '../../css/search/PlaceListView.css';
 
 const PlaceListView = ({ places, onSelect }) => (
   <div className="place-list">

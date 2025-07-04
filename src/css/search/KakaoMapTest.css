@@ -134,6 +134,10 @@
     z-index: 0;
 }
 
+.search-wrapper{
+    position: relative;
+}
+
 /* 검색 팝업 스타일 */
 .search-container {
     position: relative;
@@ -167,7 +171,7 @@
 }
 
 .search-input {
-    width: 45rem;
+    width: 95%;
     height: 5rem;
     border-radius: 1rem;
     border: 2px solid #E2E2E2;
