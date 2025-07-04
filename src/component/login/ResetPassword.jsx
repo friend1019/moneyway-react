@@ -54,7 +54,7 @@ const ResetPassword = () => {
     return (
         <>
             <Header />
-            <div className="container">
+            <div className="login-container">
                 <div className="forgot-pwd-header">
                     <img src={logoWallet} alt="Wallet Logo" className="wallet-logo" style={{marginBottom:"5rem"}} />
                 </div>

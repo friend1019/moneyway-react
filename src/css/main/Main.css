@@ -831,3 +831,50 @@ body{
   font-size: 18px;
   line-height: 1.6;
 }
+
+/* 여기부분은 장소 상세정보 팝업창 띄우는 거 관련임 -지인- */
+/* 팝업 백그라운드 */
+.place-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  animation: fadeInOverlay 0.3s forwards;
+}
+
+/* 팝업 카드 */
+.place-detail-popup {
+  width: 80rem;
+  max-height: 90vh;
+  background: white;
+  border-radius: 1.2rem;
+  overflow-y: auto;
+  padding: 2rem;
+  position: relative;
+  box-shadow: 0 0.4rem 2rem rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateY(2rem);
+  animation: fadeInPopup 0.3s ease-out forwards;
+}
+
+/* 백그라운드 페이드 인 */
+@keyframes fadeInOverlay {
+  to {
+    opacity: 1;
+  }
+}
+
+/* 팝업 슬라이드 업 + 페이드 인 */
+@keyframes fadeInPopup {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

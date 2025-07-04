@@ -28,7 +28,7 @@ const LoginPage = () => {
   return (
     <>
       <Header />
-      <div className="container">
+      <div className="login-container">
         <div className="login-header">
           <LoginHeader text="가입" />
         </div>

@@ -64,7 +64,7 @@ const Signin = () => {
   return (
     <>
       <Header />
-      <div className="container">
+      <div className="login-container">
         <div className="login-header">
           <LoginHeader text="로그인" />
         </div>
