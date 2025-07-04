@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Header from '../Header';
-import '../../css/search/KakaoMapTest.css';
+import '../../css/search/SearchMain.css';
 import PlaceListView from './PlaceListView';
 import PlaceDetailView from './PlaceDetailView';
 import SearchPlaceBox from './SearchPlaceBox';

@@ -95,9 +95,8 @@ export const getTourPlacesByCat1Array = async (cat1Array) => {
 // ✅ 키워드 검색 (가공 포함)
 export const searchTourPlaces = async (keyword) => {
     try {
-        const response = await api.get(`/tour/places/search?keyword=${encodeURIComponent(keyword)}`);
-        const items = response.data;
-        return items.map(mapTourPlace).filter(Boolean);
+        const response = await api.get(`/search?keyword=${encodeURIComponent(keyword)}`);
+        return response.data.map(mapTourPlace).filter(Boolean);
     } catch (error) {
         console.error('관광지 검색 실패:', error);
         return [];

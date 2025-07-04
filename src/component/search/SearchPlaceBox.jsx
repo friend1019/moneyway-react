@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../../css/search/SearchPlaceBox.css';
 import { getAllTourPlaces } from '../../api/tourApi'; // ✅ 변경
 
+
 const CATEGORY_NAME_MAP = {
   RESTAURANT: '식당',
   ATTRACTION: '관광지',
