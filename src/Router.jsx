@@ -26,7 +26,9 @@ function AppRouter() {
         <Route
           path="/mypage"
           element={
+            // <RequireAuth>
               <MyPage />
+            //</RequireAuth>
           }
         />
         {<Route path="/search" element={<Search />} />}
