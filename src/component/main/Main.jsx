@@ -104,7 +104,7 @@ function Main() {
   };
 
   useEffect(() => {
-    axios.get("https://moneyway-zg4x.onrender.com/api/tour/places")
+    axios.get("https://moneyway-zcym.onrender.com/api/tour/places")
       .then(res => {
         const data = res.data;
         const simple = data
@@ -126,7 +126,7 @@ function Main() {
   }, []);
 
   useEffect(() => {
-    axios.get("https://moneyway-zg4x.onrender.com/api/tour/places")
+    axios.get("https://moneyway-zcym.onrender.com/api/tour/places")
       .then(res => {
         const filtered = res.data
           .filter(item => [12, 14, 15, 25].includes(Number(item.contenttypeid)))
