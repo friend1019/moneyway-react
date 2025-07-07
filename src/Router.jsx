@@ -11,6 +11,11 @@ import ForgotPwd from "./component/login/ForgotPwd";
 import EmailCode from "./component/login/EmailCode";
 import ResetPassword from "./component/login/ResetPassword";
 
+import AIPeriod from './component/aiplan/AIPeriod';
+import AIPeople from './component/aiplan/AIPeople';
+import AIName from './component/aiplan/AIName';
+import AIBudget from "./component/aiplan/AIBudget";
+
 function AppRouter() {
   return (
     <Router>
@@ -30,6 +35,10 @@ function AppRouter() {
           }
         />
         {<Route path="/search" element={<Search />} />}
+        {<Route path="/aiplan" element={<AIBudget />} />}
+        {<Route path="/ai-period" element={<AIPeriod />} />}
+        {<Route path="/ai-people" element={<AIPeople />} />}
+        {<Route path="/ai-name" element={<AIName />} />}
       </Routes>
     </Router>
   );
