@@ -1,18 +1,26 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import 'react-datepicker/dist/react-datepicker.css';
-import '../../css/main/Main.css';
+import "react-datepicker/dist/react-datepicker.css";
+import "../../css/main/Main.css";
+import {
+  getTourPlacesByCat1Array,
+  getTourPlacesByCategory,
+  getCategoryFromCat1,
+} from "../../api/tourApi.js";
 
 import Header from "../Header";
 import Footer from "../Footer";
-import BudgetSlider from '../main/BudgetSlider'; 
-import HorizontalSlider from '../main/Slider';
-import WeekView from '../main/WeekView';
-import DateRange from '../main/DateRangePicker';
+import BudgetSlider from "../main/BudgetSlider";
+import HorizontalSlider from "../main/Slider";
+import WeekView from "../main/WeekView";
+import DateRange from "../main/DateRangePicker";
 
-import { ReactComponent as BriefcaseIcon } from '../../images/main/briefcase.svg';
-import jejuOceanImg from '../../images/main/jejuocean.png'; 
-import PlaneIslandImg from "../../images/main/fifth/airplane.svg"; 
+import PlaceDetailView from "../search/PlaceDetailView";
+
+import { ReactComponent as BriefcaseIcon } from "../../images/main/briefcase.svg";
+import jejuOceanImg from "../../images/main/jejuocean.png";
+import PlaneIslandImg from "../../images/main/fifth/airplane.svg";
 import Mandarin from "../../images/main/fifth/mandarin.svg";
 
 import { ReactComponent as BedIcon } from "../../images/main//fifth/accommodation.svg";
@@ -24,20 +32,25 @@ import { ReactComponent as HoverFoodIcon } from "../../images/main/fifth/hover_r
 import { ReactComponent as HoverCafeIcon } from "../../images/main/fifth/hover_cafe.svg";
 import { ReactComponent as HoverActivityIcon } from "../../images/main/fifth/hover_activity.svg";
 
-import { ReactComponent as Calendar } from '../../images/main/second/calendar_.svg'
-import { ReactComponent as People } from '../../images/main/second/people.svg'
-import { ReactComponent as BasicCalendar } from '../../images/main/second/basic_calendar.svg'
-import { ReactComponent as BasicPeople } from '../../images/main/second/basic_people.svg'
-import { ReactComponent as PlanButton } from '../../images/main/second/planbutton.svg'
-
-
+import { ReactComponent as Calendar } from "../../images/main/second/calendar_.svg";
+import { ReactComponent as People } from "../../images/main/second/people.svg";
+import { ReactComponent as BasicCalendar } from "../../images/main/second/basic_calendar.svg";
+import { ReactComponent as BasicPeople } from "../../images/main/second/basic_people.svg";
+import { ReactComponent as PlanButton } from "../../images/main/second/planbutton.svg";
+import { nav } from "framer-motion/client";
 
 function Main() {
   const [budget, setBudget] = useState([100000, 300000]);
-  const [tripDuration, setTripDuration] = useState(null); 
+  const [tripDuration, setTripDuration] = useState(null);
   const [isDurationPickerVisible, setIsDurationPickerVisible] = useState(false);
-  const durationOptions = ['당일치기', '1박 2일', '2박 3일', '3박 4일', '4박 5일 이상'];
-  
+  const durationOptions = [
+    "당일치기",
+    "1박 2일",
+    "2박 3일",
+    "3박 4일",
+    "4박 5일 이상",
+  ];
+
   const [personnel, setPersonnel] = useState(null); // 2 -> null
   const [isPersonnelPickerVisible, setPersonnelPickerVisible] = useState(false);
   const personnelOptions = [1, 2, 3, 4];
@@ -49,89 +62,103 @@ function Main() {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
 
+  //장소누르는상태임 이거 -지인이 추가-
+  const [selectedPlace, setSelectedPlace] = useState(null);
+
+  const navigate = useNavigate();
+
   const handleDateChange = (start, end) => {
     setStartDate(start);
     setEndDate(end);
   };
 
   const formatPersonnelDisplay = (p) => {
-    if (p >= 4) return '4명 이상';
+    if (p >= 4) return "4명 이상";
     return `${p}명`;
   };
 
   const categories = [
-  {
-    icon: BedIcon,
-    hoverIcon: HoverBedIcon,
-    title: "숙소",
-    desc: "취향 따라 고르는<br />제주 숙소",
-  },
-  {
-    icon: FoodIcon,
-    hoverIcon: HoverFoodIcon,
-    title: "식당",
-    desc: "숨겨있는 제주<br />맛집 발견",
-  },
-  {
-    icon: CafeIcon,
-    hoverIcon: HoverCafeIcon,
-    title: "카페",
-    desc: "테마별 제주<br />핫플 카페",
-  },
-  {
-    icon: ActivityIcon,
-    hoverIcon: HoverActivityIcon,
-    title: "액티비티",
-    desc: "제주에서만<br />다채로운 체험",
-  },];
+    {
+      icon: BedIcon,
+      hoverIcon: HoverBedIcon,
+      title: "숙소",
+      desc: "취향 따라 고르는<br />제주 숙소",
+    },
+    {
+      icon: FoodIcon,
+      hoverIcon: HoverFoodIcon,
+      title: "식당",
+      desc: "숨겨있는 제주<br />맛집 발견",
+    },
+    {
+      icon: CafeIcon,
+      hoverIcon: HoverCafeIcon,
+      title: "카페",
+      desc: "테마별 제주<br />핫플 카페",
+    },
+    {
+      icon: ActivityIcon,
+      hoverIcon: HoverActivityIcon,
+      title: "액티비티",
+      desc: "제주에서만<br />다채로운 체험",
+    },
+  ];
 
   const contentTypeMap = {
-          12: '관광지',
-          14: '문화시설',
-          15: '행사/공연/축제',
-          25: '여행코스',
-          28: '레포츠',
-          32: '숙박',
-          38: '쇼핑',
-          39: '음식점',
+    12: "관광지",
+    14: "문화시설",
+    15: "행사/공연/축제",
+    25: "여행코스",
+    28: "레포츠",
+    32: "숙박",
+    38: "쇼핑",
+    39: "음식점",
   };
-  
+
   useEffect(() => {
-    axios.get("https://moneyway-zg4x.onrender.com/api/tour/places")
-      .then(res => {
-        const data = res.data;
-        const simple = data
-          .slice(0, 8)
-          .map((item, idx) => ({
-            id: idx,
-            image: item.firstimage || item.firstimage2,
-            title: item.title,
-            tags: [
-            contentTypeMap[item.contenttypeid],   
-            ...(item.tags || [])                  
+    // 추천 명소: 관광지 (A01, A02)
+    const fetchRecommendations = async () => {
+      const data = await getTourPlacesByCat1Array(["A01", "A02"]);
+
+      const simple = data.slice(32, 40).map((item, idx) => {
+        const { contenttypeid, cat1, tag } = item;
+
+        return {
+          id: idx,
+          image: item.imageUrls?.[0],
+          title: item.title,
+          tags: [
+            contentTypeMap[String(contenttypeid)] ||
+              getCategoryFromCat1(cat1) ||
+              "관광지",
+            ...(tag?.split(",").map((t) => t.trim()) || []),
           ],
-          }));
-        setRecommendationsData(simple); 
-      })
-      .catch(err => {
-        console.error("API 호출 에러:", err);
+          ...item, // 마지막에 병합
+        };
       });
+
+      setRecommendationsData(simple);
+    };
+
+    fetchRecommendations();
   }, []);
 
   useEffect(() => {
-    axios.get("https://moneyway-zg4x.onrender.com/api/tour/places")
-      .then(res => {
-        const filtered = res.data
-          .filter(item => [12, 14, 15, 25].includes(Number(item.contenttypeid)))
-          .slice(0, 4)
-          .map((item, idx) => ({
-            id: idx,
-            image: item.firstimage || item.firstimage2,
-            title: item.title,
-            type: contentTypeMap[item.contenttypeid]
-          }));
-        setEditorPicksData(filtered);
-      });
+    // 이달의 여행: 액티비티 (A03)
+    const fetchEditorPicks = async () => {
+      const data = await getTourPlacesByCategory("A03");
+
+      const filtered = data.slice(0, 4).map((item, idx) => ({
+        id: idx,
+        image: item.imageUrls?.[0],
+        title: item.title,
+        type: contentTypeMap[item.contenttypeid],
+      }));
+
+      setEditorPicksData(filtered);
+    };
+
+    fetchEditorPicks();
   }, []);
 
   return (
@@ -149,8 +176,10 @@ function Main() {
             <div className="banner-horizontal-line"></div>
             <div className="banner-text">
               <h1>
-                머니웨이에서 만나보세요,<br />
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;당신을 위한 <span className="highlight">제주여행</span>
+                머니웨이에서 만나보세요,
+                <br />
+                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;당신을 위한{" "}
+                <span className="highlight">제주여행</span>
               </h1>
             </div>
           </div>
@@ -167,7 +196,8 @@ function Main() {
               </div>
               <div className="card-footer-fix">
                 <span className="card-footer-main-text">
-                  숙소, 액티비티부터 숨은 명소까지, 완벽하게 설계하는 나만의 일정!
+                  숙소, 액티비티부터 숨은 명소까지, 완벽하게 설계하는 나만의
+                  일정!
                 </span>
                 <div className="card-footer-action-group">
                   <span className="card-footer-sub-text">
@@ -182,7 +212,6 @@ function Main() {
         </div>
       </div>
 
-
       {/*두번째 페이지*/}
       <div className="plan-form-wrapper">
         <div className="plan-form-left">
@@ -191,12 +220,21 @@ function Main() {
           </div>
 
           <BudgetSlider budget={budget} setBudget={setBudget} />
-          
+
           <div className="selector-container">
-            <div className="selector-row" onClick={() => setIsDurationPickerVisible(!isDurationPickerVisible)}>
-              {tripDuration ? <People className="icon" /> : <BasicPeople className="icon" />}
-              <span className={!tripDuration ? 'placeholder' : ''}>
-                {tripDuration || '여행 기간'}
+            <div
+              className="selector-row"
+              onClick={() =>
+                setIsDurationPickerVisible(!isDurationPickerVisible)
+              }
+            >
+              {tripDuration ? (
+                <People className="icon" />
+              ) : (
+                <BasicPeople className="icon" />
+              )}
+              <span className={!tripDuration ? "placeholder" : ""}>
+                {tripDuration || "여행 기간"}
               </span>
             </div>
 
@@ -205,7 +243,9 @@ function Main() {
                 {durationOptions.map((option) => (
                   <div
                     key={option}
-                    className={`selector-option-item ${tripDuration === option ? 'selected' : ''}`}
+                    className={`selector-option-item ${
+                      tripDuration === option ? "selected" : ""
+                    }`}
                     onClick={() => {
                       setTripDuration(option);
                       setIsDurationPickerVisible(false);
@@ -219,43 +259,59 @@ function Main() {
             )}
           </div>
 
-    
-            <div className="selector-container">
-              <div className="selector-row" onClick={() => setPersonnelPickerVisible(!isPersonnelPickerVisible)}>
-                {personnel ? <People className="icon" /> : <BasicPeople className="icon" />}
-                <span className={!personnel ? 'placeholder' : ''}>
-                  {personnel ? formatPersonnelDisplay(personnel) : '인원'}
-                </span>
-              </div>
-
-              {isPersonnelPickerVisible && (
-                <div className="selector-options">
-                  {personnelOptions.map((option) => (
-                    <div
-                      key={option}
-                      className={`selector-option-item ${personnel === option ? 'selected' : ''}`}
-                      onClick={() => {
-                        setPersonnel(option);
-                        setPersonnelPickerVisible(false); 
-                      }}
-                    >
-                      <People className="icon" />
-                      <span>{formatPersonnelDisplay(option)}</span>
-                    </div>
-                  ))}
-                </div>
+          <div className="selector-container">
+            <div
+              className="selector-row"
+              onClick={() =>
+                setPersonnelPickerVisible(!isPersonnelPickerVisible)
+              }
+            >
+              {personnel ? (
+                <People className="icon" />
+              ) : (
+                <BasicPeople className="icon" />
               )}
+              <span className={!personnel ? "placeholder" : ""}>
+                {personnel ? formatPersonnelDisplay(personnel) : "인원"}
+              </span>
             </div>
+
+            {isPersonnelPickerVisible && (
+              <div className="selector-options">
+                {personnelOptions.map((option) => (
+                  <div
+                    key={option}
+                    className={`selector-option-item ${
+                      personnel === option ? "selected" : ""
+                    }`}
+                    onClick={() => {
+                      setPersonnel(option);
+                      setPersonnelPickerVisible(false);
+                    }}
+                  >
+                    <People className="icon" />
+                    <span>{formatPersonnelDisplay(option)}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <button className="plan-submit">
             플랜 생성
             <PlanButton className="icon" />
           </button>
-          <div className="plan-direct">직접 계획할래요</div>
+          <div className="plan-direct" onClick={() => navigate("/aiplan")}>
+            직접 계획할래요
+          </div>
         </div>
 
         <div className="plan-form-right">
           <div className="plan-image-box">
-            <img src={jejuOceanImg} alt="JEJU a beautiful island" className="plan-image" />
+            <img
+              src={jejuOceanImg}
+              alt="JEJU a beautiful island"
+              className="plan-image"
+            />
             <div className="plan-image-title">
               <div>JEJU,</div>
               <div>a beautiful island</div>
@@ -274,9 +330,13 @@ function Main() {
           </div>
           <HorizontalSlider>
             <div className="editor-cards-list">
-              {editorPicksData.map(item => (
+              {editorPicksData.map((item) => (
                 <div key={item.id} className="editor-pick-card">
-                  <img src={item.image} alt={item.title} className="card-image" />
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="card-image"
+                  />
                   <div className="card-title">{item.title}</div>
                 </div>
               ))}
@@ -294,17 +354,28 @@ function Main() {
           </div>
           <HorizontalSlider>
             <div className="moneyway-cards-list">
-              {recommendationsData.map(item => (
-                <div key={item.id} className="recommendation-card">
+              {recommendationsData.map((item) => (
+                // 선택된 장소 저장하는 onclick 추가했음 -지인-
+                <div
+                  key={item.id}
+                  className="recommendation-card"
+                  onClick={() => setSelectedPlace(item)}
+                >
                   <div className="image-wrapper">
-                    <img src={item.image} alt={item.title} className="card-image" />
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="card-image"
+                    />
                   </div>
 
                   <div className="info-wrapper">
                     <h4 className="title">{item.title}</h4>
                     <div className="tags-wrapper">
                       {item.tags.map((tag, index) => (
-                        <span key={index} className="tag">{tag}</span>
+                        <span key={index} className="tag">
+                          {tag}
+                        </span>
                       ))}
                     </div>
                   </div>
@@ -320,14 +391,18 @@ function Main() {
         <div className="landing-content">
           <h1 className="landing-title">저예산 제주 여행을 찾고 계신가요?</h1>
           <p className="landing-desc">
-            돌담길, 귤밭, 바다 내음 가득한 골목까지.<br />
-            제주다운 여행을 돈 걱정 없이 즐기고 싶다면?<br />
+            돌담길, 귤밭, 바다 내음 가득한 골목까지.
+            <br />
+            제주다운 여행을 돈 걱정 없이 즐기고 싶다면?
+            <br />
             머니웨이가 숨은 스팟과 감성 숙소까지 챙겨드립니다.
           </p>
           <div className="landing-bar-img-row">
             <div className="landing-bar" />
             <img src={Mandarin} alt="" className="landing-thumb" />
-            <div className="landing-sub">당신만을 위한 제주, 지금 여기서 시작해요.</div>
+            <div className="landing-sub">
+              당신만을 위한 제주, 지금 여기서 시작해요.
+            </div>
           </div>
 
           <div className="landing-category-cards">
@@ -339,6 +414,11 @@ function Main() {
                   key={cat.title}
                   onMouseEnter={() => setHoveredIndex(idx)}
                   onMouseLeave={() => setHoveredIndex(null)}
+                  onClick={() =>
+                    navigate(
+                      `/search?category=${encodeURIComponent(cat.title)}`
+                    )
+                  }
                 >
                   <Icon className="category-icon" />
                   <div>
@@ -360,34 +440,53 @@ function Main() {
               <div className="landing-bg-circle circle3"></div>
             </div>
           </div>
-          <img src={PlaneIslandImg} alt="비행기 일러스트" className="landing-plane-img" />
+          <img
+            src={PlaneIslandImg}
+            alt="비행기 일러스트"
+            className="landing-plane-img"
+          />
         </div>
       </div>
 
-    {/*6번째 페이지 만드는중*/}
-    <div className="page-container">
-      <aside className="sidebar">
-        <h1 className="main-title">나의 플랜</h1>
-        
-        <DateRange onDateChange={handleDateChange} />
-        
-        <BudgetSlider budget={budget} setBudget={setBudget} />
-        
-        <button className="edit-plan-button">플랜 수정하기</button>
-      </aside>
+      {/*6번째 페이지 만드는중*/}
+      <div className="page-container">
+        <aside className="sidebar">
+          <h1 className="main-title">나의 플랜</h1>
 
-      <main className="main-content">
-        <WeekView selectedDate={startDate} />
-        
-        <div className="empty-plan-message">
-          <p>아직 플랜이 없어요.</p>
-          <p>머니웨이와 플랜을 만들어 보세요!</p>
+          <DateRange onDateChange={handleDateChange} />
+
+          <BudgetSlider budget={budget} setBudget={setBudget} />
+
+          <button className="edit-plan-button">플랜 수정하기</button>
+        </aside>
+
+        <main className="main-content">
+          <WeekView selectedDate={startDate} />
+
+          <div className="empty-plan-message">
+            <p>아직 플랜이 없어요.</p>
+            <p>머니웨이와 플랜을 만들어 보세요!</p>
+          </div>
+        </main>
+      </div>
+
+      <Footer />
+      {selectedPlace && (
+        <div
+          className="place-detail-overlay"
+          onClick={() => setSelectedPlace(null)}
+        >
+          <div
+            className="place-detail-popup"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <PlaceDetailView
+              place={selectedPlace}
+              onBack={() => setSelectedPlace(null)}
+            />
+          </div>
         </div>
-      </main>
-    </div>
-  
-      
-    <Footer />
+      )}
     </>
   );
 }
