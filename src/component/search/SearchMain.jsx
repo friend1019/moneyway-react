@@ -17,7 +17,7 @@ const CATEGORY_CAT1 = {
   숙소: ['B02'],
 };
 
-const KakaoMapTest = () => {
+const SearchMain = () => {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [places, setPlaces] = useState([]);
@@ -234,4 +234,4 @@ const KakaoMapTest = () => {
   );
 };
 
-export default KakaoMapTest;
+export default SearchMain;
