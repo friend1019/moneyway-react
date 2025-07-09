@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://moneyway-zcym.onrender.com/api", // 서버 주소에 맞게 조정
+  baseURL: "https://moneyway-3zca.onrender.com/api", // 서버 주소에 맞게 조정
   withCredentials: true, // 쿠키 자동 포함
 });
 
