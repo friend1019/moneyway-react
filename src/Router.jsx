@@ -4,7 +4,7 @@ import Search from "./component/search/SearchMain";
 import RequireAuth from "./component/RequireAuth";
 import Main from "./component/main/Main";
 import LoginPage from "./component/login/LoginPage";
-import MyPage from "./component/main/MyPage";
+import MyPage from "./component/mypage/MyPage";
 import Signup from "./component/login/Signup";
 import Signin from "./component/login/Signin";
 import ForgotPwd from "./component/login/ForgotPwd";

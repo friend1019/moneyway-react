@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdEdit } from "react-icons/md";
 import api from "../../api/axios";
-import "../../css/main/Profile.css";
+import "../../css/mypage/Profile.css";
 
 const Profile = ({ onEditClick }) => {
   const [userInfo, setUserInfo] = useState(null);
@@ -11,11 +11,12 @@ const Profile = ({ onEditClick }) => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await api.get("/mypage/me");
-        setUserInfo(res.data);
+        const res = await api.get("/api/mypage/me");
+        setUserInfo(res.data.data); // ✅ 명세서 기준으로 'data' 안쪽에 유저 정보 존재
       } catch (err) {
-        console.error("내 정보 불러오기 실패", err);
-        alert("로그인이 만료되었거나 인증 정보가 없습니다.");
+        const message = err.response?.data?.message || "인증 오류가 발생했습니다.";
+        console.error("내 정보 불러오기 실패:", err);
+        alert(message);
         navigate("/login");
       }
     };
@@ -23,10 +24,15 @@ const Profile = ({ onEditClick }) => {
     fetchProfile();
   }, [navigate]);
 
-  const handleLogout = () => {
-    // 필요 시 서버에 로그아웃 요청 추가 가능
-    alert("로그아웃 되었습니다.");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await api.post("/api/auth/logout");
+    } catch (err) {
+      console.warn("로그아웃 API 실패:", err);
+    } finally {
+      alert("로그아웃 되었습니다.");
+      navigate("/login");
+    }
   };
 
   if (!userInfo) return <p className="loading">로딩 중...</p>;
