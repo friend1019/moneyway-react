@@ -14,7 +14,7 @@ const LoginPage = () => {
   //카카오 로그인
   const handleKakaoLogin = () => {
     window.location.href =
-      "https://moneyway-zcym.onrender.com/oauth2/authorization/kakao"; // 백엔드 카카오 로그인 URL
+      "https://moneyway-3zca.onrender.com/oauth2/authorization/kakao"; // 백엔드 카카오 로그인 URL
   };
 
   const goSignup = () => {
