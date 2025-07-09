@@ -14,14 +14,11 @@ const BudgetSlider = ({ budget, setBudget }) => {
     const cleanedValue = e.target.value.replace(/\D/g, '');
     let numValue = Number(cleanedValue);
 
-    // ◀◀◀ 추가된 부분 시작
-    // 최대 예산인 5,000,000원을 넘지 않도록 값을 제한합니다.
     const MAX_BUDGET = 5000000;
     if (numValue > MAX_BUDGET) {
       numValue = MAX_BUDGET;
     }
-    // ◀◀◀ 추가된 부분 끝
-
+    
     if (isNaN(numValue)) {
       return;
     }
