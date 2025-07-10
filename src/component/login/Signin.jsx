@@ -1,7 +1,10 @@
+// src/components/login/Signin.js
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import LoginHeader from "./LoginHeader";
 import Header from "../Header";
-import api from "../../api/axios"; // ✅ axios 인스턴스 사용
+import api from "../../api/axios"; // ✅ axios 인스턴스
+import useAuthStore from "../../api/authStore.js"; // ✅ Zustand 스토어 추가 import
 import "../../css/login/Signin.css";
 import "../../css/login/Signup.css";
 import "../../css/login/LoginPage.css";
@@ -9,13 +12,20 @@ import "../../css/login/LoginPage.css";
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loginError, setLoginError] = useState("");
 
+  const { setAccessToken } = useAuthStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // ✅ 로그인 전 사용자가 보려던 경로 저장 (기본값은 '/')
+  const from = location.state?.from?.pathname || "/";
+
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validatePassword = (password) => /^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/.test(password);
+  const validatePassword = (password) =>
+    /^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/.test(password);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -45,10 +55,16 @@ const Signin = () => {
     }
 
     try {
-      await api.post("/auth/login", { email, password });
-      // 로그인 성공: 쿠키 저장 자동 (axios withCredentials로 처리됨)
-      alert("로그인 성공!");
-      window.location.href = "/"; // 또는 navigate("/")
+      const response = await api.post("/auth/login", { email, password });
+
+      const token = response.data?.tokenInfo?.accessToken;
+      if (token) {
+        setAccessToken(token); // ✅ Zustand에 저장
+        alert("로그인 성공!");
+        navigate(from, { replace: true }); // ✅ 이전 페이지로 이동
+      } else {
+        console.error("❌ 토큰이 응답에 없음!", response.data);
+      }
     } catch (err) {
       const code = err.response?.data?.code;
       if (code === "INVALID_PASSWORD") {
@@ -76,7 +92,9 @@ const Signin = () => {
               id="email"
               name="email"
               placeholder="moneyway@gmail.com"
-              className={`input-field ${emailError || loginError ? "error" : ""}`}
+              className={`input-field ${
+                emailError || loginError ? "error" : ""
+              }`}
               value={email}
               onChange={handleEmailChange}
             />
@@ -88,7 +106,9 @@ const Signin = () => {
               id="password"
               name="password"
               placeholder="8~16자 + 특수문자 포함"
-              className={`input-field ${passwordError || loginError ? "error" : ""}`}
+              className={`input-field ${
+                passwordError || loginError ? "error" : ""
+              }`}
               value={password}
               onChange={handlePasswordChange}
             />

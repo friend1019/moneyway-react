@@ -53,16 +53,25 @@ const ResetPassword = () => {
     if (!valid) return;
 
     try {
-      await api.patch("/users/password/reset", {
+      const res = await api.patch("/users/password/reset", {
         email,
         newPassword: password,
       });
 
-      alert("비밀번호가 성공적으로 재설정되었습니다.");
-      navigate("/login");
+      console.log("📦 서버 응답:", res.data);
+
+      if (res.data.code === "SUCCESS") {
+        alert(res.data.message || "비밀번호가 성공적으로 재설정되었습니다.");
+        navigate("/login");
+      } else {
+        setGeneralError(res.data.message || "비밀번호 재설정에 실패했습니다.");
+      }
     } catch (err) {
-      console.error(err);
-      setGeneralError("비밀번호 재설정 중 오류가 발생했습니다.");
+      const message =
+        err.response?.data?.message ||
+        "비밀번호 재설정 중 오류가 발생했습니다.";
+      setGeneralError(message);
+      console.error("❌ 서버 에러:", err.response?.data || err);
     }
   };
 

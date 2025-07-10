@@ -36,7 +36,7 @@ const ForgotPwd = () => {
       await api.post("/users/password/send-code", { email });
 
       alert("비밀번호 재설정 코드가 이메일로 발송되었습니다.");
-      navigate("/emailcode"); // 다음 단계로 이동
+      navigate("/emailcode", { state: { email } });
     } catch (error) {
       const code = error.response?.data?.code;
 
@@ -73,7 +73,9 @@ const ForgotPwd = () => {
               id="email"
               name="email"
               placeholder="moneyway@gmail.com"
-              className={`input-field ${emailError || generalError ? "error" : ""}`}
+              className={`input-field ${
+                emailError || generalError ? "error" : ""
+              }`}
               value={email}
               onChange={handleEmailChange}
             />
@@ -81,7 +83,11 @@ const ForgotPwd = () => {
             {generalError && !emailError && (
               <p className="error-message">{generalError}</p>
             )}
-            <button type="submit" className="btn-emailcode" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="btn-emailcode"
+              disabled={isSubmitting}
+            >
               이메일로 코드 받기
             </button>
           </form>

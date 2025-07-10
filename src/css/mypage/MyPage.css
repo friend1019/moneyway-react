@@ -1,7 +1,5 @@
 .main-container {
-    background-color: #F6F6F6;
-    min-height: 90rem;
-    position: relative;
+    background-color: white;
 }
 
 /* view === 'edit'일 때 적용될 클래스 */
@@ -31,8 +29,9 @@
 }
 
 .profile-container {
-    margin-left: 10rem;
-    position: absolute;
-    top: 6rem;
-    z-index: 10;
+    margin-left: 7rem;
+}
+
+.sub-container{
+    margin-top: -30rem;
 }

@@ -9,7 +9,7 @@ const MyArticles = () => {
   useEffect(() => {
     const fetchMyPosts = async () => {
       try {
-        const res = await api.get("/api/mypage/posts?page=0&size=10");
+        const res = await api.get("/mypage/posts?page=0&size=10");
         setPosts(res.data.data.content);
       } catch (err) {
         console.error("내 글 목록 불러오기 실패:", err);

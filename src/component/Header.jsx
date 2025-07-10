@@ -1,4 +1,7 @@
+// Header.jsx
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import SideMenu from "./SideMenu";
 
 import "../css/Header.css";
 
@@ -7,6 +10,9 @@ import menu from "../images/header/menu.svg";
 import account from "../images/header/account.svg";
 
 function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
   return (
     <div className="header">
@@ -23,9 +29,9 @@ function Header() {
               </Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/menu">
+              <button className="nav-link" onClick={toggleMenu}>
                 <img src={menu} alt="menu" className="nav-icon" />
-              </Link>
+              </button>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/mypage">
@@ -35,7 +41,9 @@ function Header() {
           </nav>
         </div>
       </header>
+      {isMenuOpen && <SideMenu onClose={toggleMenu} />}
     </div>
   );
 }
+
 export default Header;
