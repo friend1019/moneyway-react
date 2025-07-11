@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios"; // ✅ axios 인스턴스로 변경
-import Header from "../Header";
+import Header from "../common/Header";
 import "../../css/login/ForgotPwd.css";
 import logoWallet from "../../images/login/logoWallet.svg";
 

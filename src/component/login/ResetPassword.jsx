@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../../api/axios"; // ✅ API 연동
-import Header from "../Header";
+import Header from "../common/Header";
 import logoWallet from "../../images/login/logoWallet.svg";
 import "../../css/login/Signin.css";
 

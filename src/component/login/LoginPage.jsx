@@ -3,7 +3,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../../css/login/LoginPage.css";
 import LoginHeader from "./LoginHeader";
-import Header from "../Header";
+import Header from "../common/Header";
 
 import kakaoIcon from "../../images/login/kakaoAuth.svg";
 import googleIcon from "../../images/login/googleAuth.svg";

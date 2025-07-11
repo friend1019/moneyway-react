@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import SideMenu from "./SideMenu";
 
-import "../css/Header.css";
+import "../../css/common/Header.css";
 
-import logo from "../images/header/logo.svg";
-import menu from "../images/header/menu.svg";
-import account from "../images/header/account.svg";
+import logo from "../../images/header/logo.svg";
+import menu from "../../images/header/menu.svg";
+import account from "../../images/header/account.svg";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

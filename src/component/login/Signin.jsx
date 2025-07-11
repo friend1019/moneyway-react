@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import LoginHeader from "./LoginHeader";
-import Header from "../Header";
+import Header from "../common/Header";
 import api from "../../api/axios"; // ✅ axios 인스턴스
 import useAuthStore from "../../api/authStore.js"; // ✅ Zustand 스토어 추가 import
 import "../../css/login/Signin.css";

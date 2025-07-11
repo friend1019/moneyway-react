@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Header from "../Header";
+import Header from "../common/Header";
 import signupImage from "../../images/login/signup.svg";
 import api from "../../api/axios"; // ✅ axios 인스턴스 불러오기
 

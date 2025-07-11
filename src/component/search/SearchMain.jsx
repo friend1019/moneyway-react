@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import Header from "../Header";
+import Header from "../common/Header";
 import "../../css/search/SearchMain.css";
 import PlaceListView from "./PlaceListView";
 import PlaceDetailView from "./PlaceDetailView";

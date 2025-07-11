@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import api from "../../api/axios";
-import Header from "../Header";
+import Header from "../common/Header";
 import logoWallet from "../../images/login/logoWallet.svg";
 
 const EmailCode = () => {

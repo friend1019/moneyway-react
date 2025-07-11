@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import Header from "../Header";
+import Header from "../common/Header";
 import BudgetSlider from "../main/BudgetSlider";
 import ProgressStep from '../aiplan/ProgressStep';
 import '../../css/aiplan/AIBudget.css'; 

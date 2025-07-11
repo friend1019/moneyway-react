@@ -4,6 +4,7 @@ import { MdEdit } from "react-icons/md";
 import api from "../../api/axios";
 import useAuthStore from "../../api/authStore"; // ✅ Zustand 토큰 상태
 import "../../css/mypage/Profile.css";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const Profile = ({ onEditClick }) => {
   const [userInfo, setUserInfo] = useState(null);
@@ -41,7 +42,7 @@ const Profile = ({ onEditClick }) => {
     }
   };
 
-  if (!userInfo) return <p className="loading">로딩 중...</p>;
+  if (!userInfo) return <LoadingSpinner />
 
   return (
     <div className="profilecard-container">

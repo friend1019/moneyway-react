@@ -8,8 +8,8 @@ import {
   getCategoryFromCat1,
 } from "../../api/tourApi.js";
 
-import Header from "../Header";
-import Footer from "../Footer";
+import Header from "../common/Header";
+import Footer from "../common/Footer.jsx";
 import BudgetSlider from "../main/BudgetSlider";
 import HorizontalSlider from "../main/Slider";
 import WeekView from "../main/WeekView";

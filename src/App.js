@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import AppRouter from "./Router";
 import api from "./api/axios";
 import useAuthStore from "./api/authStore.js";
+import LoadingSpinner from "./component/common/LoadingSpinner.jsx";
 
 window.authStore = useAuthStore;
 
@@ -30,7 +31,7 @@ function App() {
 
   if (!isInitialized) {
     // 아직 자동 로그인 시도 중이면 로딩 표시
-    return <div>로딩 중...</div>; // 또는 <LoadingSpinner /> 컴포넌트 사용
+    <LoadingSpinner />;
   }
 
   return (
