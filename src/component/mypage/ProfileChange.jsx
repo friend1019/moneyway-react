@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import api from "../../api/axios";
 import "../../css/mypage/ProfileChange.css";
 
@@ -11,7 +12,7 @@ const ProfileChange = () => {
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
-  // ✅ 현재 닉네임 및 프로필 이미지 불러오기
+  // 현재 닉네임 및 프로필 이미지 불러오기
   useEffect(() => {
     const fetchMyInfo = async () => {
       try {
@@ -22,14 +23,14 @@ const ProfileChange = () => {
         }
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
-        alert("정보를 불러오는 데 실패했습니다.");
+        toast.warn("정보를 불러오는 데 실패했습니다.");
       }
     };
 
     fetchMyInfo();
   }, []);
 
-  // ✅ 이미지 선택 시 미리보기 생성
+  // 이미지 선택 시 미리보기 생성
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -38,7 +39,7 @@ const ProfileChange = () => {
     }
   };
 
-  // ✅ 저장 버튼 핸들러
+  // 저장 버튼
   const handleSave = async () => {
     setIsSaving(true);
 
@@ -61,12 +62,12 @@ const ProfileChange = () => {
         });
       }
 
-      alert("프로필이 성공적으로 변경되었습니다.");
+      toast.success("프로필이 성공적으로 변경되었습니다.");
       navigate("/mypage");
     } catch (err) {
       const message =
         err.response?.data?.message || "정보 저장 중 오류가 발생했습니다.";
-      alert(message);
+      toast.error(message);
       console.error("프로필 변경 실패:", err);
     } finally {
       setIsSaving(false);
@@ -128,13 +129,13 @@ const ProfileChange = () => {
 
             try {
               await api.delete("/mypage/withdraw");
-              alert("회원 탈퇴가 완료되었습니다.");
+              toast.success("회원 탈퇴가 완료되었습니다.");
               navigate("/login");
             } catch (err) {
               const message =
                 err.response?.data?.message ||
                 "회원 탈퇴 중 오류가 발생했습니다.";
-              alert(message);
+              toast.error(message);
               console.error("회원 탈퇴 실패:", err);
             }
           }}

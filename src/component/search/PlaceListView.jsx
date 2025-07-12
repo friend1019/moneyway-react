@@ -1,4 +1,3 @@
-// PlaceListView.jsx (unchanged)
 import React from 'react';
 import PlaceCard from './PlaceCard';
 import '../../css/search/PlaceListView.css';

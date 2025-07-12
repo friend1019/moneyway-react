@@ -1,9 +1,11 @@
 // src/components/auth/LogoutButton.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import api from '../../api/axios';
 import useAuthStore from '../../store/authStore';
 import '../../css/login/LogoutButton.css';
+import { toast } from 'react-toastify';
 
 const LogoutButton = () => {
   const navigate = useNavigate();
@@ -18,6 +20,7 @@ const LogoutButton = () => {
     } finally {
       // 메모리에서 Access Token 제거
       clearAccessToken();
+      toast.success("로그아웃되었습니다");
       // 로그인 페이지로 이동
       navigate('/login');
     }

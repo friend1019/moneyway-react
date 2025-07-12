@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import api from "../../api/axios"; // ✅ API 연동
+import { toast } from "react-toastify";
+import api from "../../api/axios";
 import Header from "../common/Header";
 import logoWallet from "../../images/login/logoWallet.svg";
-import "../../css/login/Signin.css";
+import "../../css/login/ResetPassword.css";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -54,17 +55,16 @@ const ResetPassword = () => {
 
     try {
       const res = await api.patch("/users/password/reset", {
-        email,
         newPassword: password,
       });
 
       console.log("📦 서버 응답:", res.data);
 
       if (res.data.code === "SUCCESS") {
-        alert(res.data.message || "비밀번호가 성공적으로 재설정되었습니다.");
+        toast.success(res.data.message || "비밀번호가 성공적으로 재설정되었습니다.");
         navigate("/login");
       } else {
-        setGeneralError(res.data.message || "비밀번호 재설정에 실패했습니다.");
+        toast.error(res.data.message || "비밀번호 재설정에 실패했습니다.");
       }
     } catch (err) {
       const message =
@@ -80,8 +80,8 @@ const ResetPassword = () => {
   return (
     <>
       <Header />
-      <div className="login-container">
-        <div className="forgot-pwd-header">
+      <div className="reset-password-container">
+        <div className="reset-password-header">
           <img
             src={logoWallet}
             alt="Wallet Logo"
@@ -89,7 +89,7 @@ const ResetPassword = () => {
             style={{ marginBottom: "5rem" }}
           />
         </div>
-        <div className="login-form">
+        <div className="reset-password-form">
           <form onSubmit={handleResetPassword}>
             <label htmlFor="password">새 비밀번호 입력</label>
             <input
@@ -97,7 +97,7 @@ const ResetPassword = () => {
               id="password"
               name="password"
               placeholder="8자리 이상"
-              className={`input-field ${passwordError ? "error" : ""}`}
+              className={`reset-input-field ${passwordError ? "error" : ""}`}
               value={password}
               onChange={handlePasswordChange}
             />
@@ -109,7 +109,7 @@ const ResetPassword = () => {
               id="passwordConfirm"
               name="passwordConfirm"
               placeholder="비밀번호 확인"
-              className={`input-field ${confirmError ? "error" : ""}`}
+              className={`reset-input-field ${confirmError ? "error" : ""}`}
               value={passwordConfirm}
               onChange={handleConfirmChange}
             />
@@ -117,7 +117,7 @@ const ResetPassword = () => {
 
             {generalError && <p className="error-message">{generalError}</p>}
 
-            <button type="submit" className="btn-login" disabled={!canSubmit}>
+            <button type="submit" className="reset-btn" disabled={!canSubmit}>
               비밀번호 재설정
             </button>
           </form>

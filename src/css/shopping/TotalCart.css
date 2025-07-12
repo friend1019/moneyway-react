@@ -1,0 +1,84 @@
+.totalcart-container {
+  width: 63rem;
+  height: 80rem;
+  border: 1px solid #bebebe;
+  border-radius: 1.2rem;
+  padding: 8rem;
+  box-sizing: border-box;
+  font-size: 2rem;
+  background-color: white;
+  margin-right: 10rem;
+}
+
+.totalcart-title {
+  font-weight: bold;
+  margin-bottom: 4rem;
+  margin-top: -2rem;
+  font-size: 3.2rem;
+}
+
+.totalcart-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.totalcart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3rem;
+}
+
+.totalcart-icon {
+  width: 5rem;
+  height: 5rem;
+  margin-right: 0.8rem;
+  flex-shrink: 0;
+}
+
+.totalcart-icon-placeholder {
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.8rem;
+  background-color: #eee;
+  color: #666;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.totalcart-item .label {
+  flex: 1;
+  text-align: left;
+  font-size: 2rem;
+}
+
+.totalcart-item .count {
+  font-weight: bold;
+}
+
+.totalcart-total {
+  display: flex;
+  justify-content: space-between;
+  margin: 3rem 0 6rem;
+  padding-top: 4rem;
+  border-top: 1px solid #ddd;
+  font-weight: bold;
+  font-size: 2.4rem;
+}
+
+.totalcart-button {
+  width: 100%;
+  background-color: #d4e4ff;
+  color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: 999px;
+  font-size: 1.3rem;
+  cursor: not-allowed;
+  opacity: 0.7;
+}

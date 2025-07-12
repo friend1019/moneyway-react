@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../../css/search/SearchPlaceBox.css';
-import { getAllTourPlaces } from '../../api/tourApi'; // ✅ 변경
+import { getAllTourPlaces } from '../../api/tourApi';
 
 
 const CATEGORY_NAME_MAP = {
@@ -19,7 +19,7 @@ const SearchPlaceBox = ({ keyword, onSelect }) => {
       if (!keyword) return;
       setLoading(true);
       try {
-        const data = await getAllTourPlaces(); // ✅ 전체 데이터 가져옴
+        const data = await getAllTourPlaces();
         const filtered = data.filter((p) =>
           p.title?.toLowerCase().includes(keyword.toLowerCase())
         );

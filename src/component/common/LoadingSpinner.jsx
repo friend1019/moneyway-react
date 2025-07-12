@@ -1,3 +1,4 @@
+//로딩 애니메이션이야 이거
 import React from 'react';
 import LogoWallet from '../../images/login/logoWallet.svg';
 
@@ -14,7 +15,6 @@ const containerStyle = {
   padding: '2rem',
 };
 
-// 회전 애니메이션 정의 (한 번만 삽입되도록 체크)
 const styleSheet = document.styleSheets[0];
 const keyframes = `
 @keyframes spin {

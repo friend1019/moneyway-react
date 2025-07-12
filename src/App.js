@@ -1,9 +1,10 @@
-// src/App.js
 import React, { useEffect } from "react";
 import AppRouter from "./Router";
 import api from "./api/axios";
 import useAuthStore from "./api/authStore.js";
 import LoadingSpinner from "./component/common/LoadingSpinner.jsx";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 window.authStore = useAuthStore;
 
@@ -36,6 +37,7 @@ function App() {
 
   return (
     <div className="App">
+      <ToastContainer position="bottom-center" autoClose={3000} newestOnTop={false} theme="colored"/>
       <AppRouter />
     </div>
   );

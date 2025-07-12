@@ -1,8 +1,9 @@
-// SideMenu.jsx
+// 햄버거
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import api from "../../api/axios";
-import "../../css/SideMenu.css";
+import "../../css/common/SideMenu.css";
 import LoadingSpinner from "./LoadingSpinner";
 
 const SideMenu = ({ onClose }) => {
@@ -10,15 +11,18 @@ const SideMenu = ({ onClose }) => {
   const navigate = useNavigate();
   const [profileImageUrl, setProfileImageUrl] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await api.get("/mypage/me");
         setNickname(res.data.nickname);
-        setProfileImageUrl(res.data.profileImageUrl); // 프로필 이미지 URL 추가
+        setProfileImageUrl(res.data.profileImageUrl);
+        setIsLoggedIn(true); // 로그인 성공
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
+        setIsLoggedIn(false); //로그인 안 되어 있는 상태
       } finally {
         setLoading(false);
       }
@@ -29,10 +33,10 @@ const SideMenu = ({ onClose }) => {
   const handleLogout = async () => {
     try {
       await api.post("/auth/logout");
-      alert("로그아웃 되었습니다.");
+      toast.success("로그아웃 되었습니다.");
       navigate("/login");
     } catch (err) {
-      alert("로그아웃 중 오류가 발생했습니다.");
+      toast.error("로그아웃 중 오류가 발생했습니다.");
     }
   };
 
@@ -47,20 +51,37 @@ const SideMenu = ({ onClose }) => {
           <LoadingSpinner />
         ) : (
           <>
-            <div className="user-info">
-              {profileImageUrl ? (
-                <img
-                  className="profile-image"
-                  src={profileImageUrl}
-                  alt="프로필"
-                />
+            <div className="user-info-ham">
+              {isLoggedIn ? (
+                <>
+                  {profileImageUrl ? (
+                    <img
+                      className="profile-image"
+                      src={profileImageUrl}
+                      alt="프로필"
+                    />
+                  ) : (
+                    <div className="profile-circle" />
+                  )}
+                  <div className="nickname">{nickname}</div>
+                  <div className="logout" onClick={handleLogout}>
+                    로그아웃
+                  </div>
+                </>
               ) : (
-                <div className="profile-circle" />
+                <div className="logged-out">
+                  {" "}
+                  <div
+                    className="login-btn-ham"
+                    onClick={() => {
+                      navigate("/");
+                      onClose(); // 사이드메뉴도 닫아줌
+                    }}
+                  >
+                    로그인하기
+                  </div>
+                </div>
               )}
-              <div className="nickname">{nickname}</div>
-              <div className="logout" onClick={handleLogout}>
-                로그아웃
-              </div>
             </div>
             <ul className="menu-list">
               <li>

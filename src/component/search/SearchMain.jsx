@@ -117,7 +117,7 @@ const SearchMain = () => {
         const items = await getTourPlacesByCat1Array(cat1List);
         let mapped = items.map((i) => ({ ...i, category }));
 
-        // ✅ 카페만 필터링
+        //카페만 필터링
         if (category === "카페") {
           mapped = mapped.filter(
             (p) =>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import api from "../../api/axios";
 import Header from "../common/Header";
 import logoWallet from "../../images/login/logoWallet.svg";
@@ -38,7 +39,7 @@ const EmailCode = () => {
       console.log("📦 서버 응답:", res.data);
 
       if (res.data.message === "이메일 인증이 완료되었습니다.") {
-        alert("인증 완료! 비밀번호를 재설정해주세요.");
+        toast.success("인증 완료! 비밀번호를 재설정해주세요.");
         navigate("/resetpassword", { state: { email } });
       } else {
         setError("인증에 실패했습니다. 코드를 다시 확인해주세요.");

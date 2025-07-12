@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../../api/axios"; // ✅ axios 인스턴스로 변경
+import { toast } from "react-toastify";
+import api from "../../api/axios";
 import Header from "../common/Header";
 import "../../css/login/ForgotPwd.css";
 import logoWallet from "../../images/login/logoWallet.svg";
@@ -35,7 +36,7 @@ const ForgotPwd = () => {
     try {
       await api.post("/users/password/send-code", { email });
 
-      alert("비밀번호 재설정 코드가 이메일로 발송되었습니다.");
+      toast.success("비밀번호 재설정 코드가 이메일로 발송되었습니다.");
       navigate("/emailcode", { state: { email } });
     } catch (error) {
       const code = error.response?.data?.code;

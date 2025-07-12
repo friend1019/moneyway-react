@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MdEdit } from "react-icons/md";
+import { toast } from "react-toastify";
 import api from "../../api/axios";
-import useAuthStore from "../../api/authStore"; // ✅ Zustand 토큰 상태
+import useAuthStore from "../../api/authStore";
 import "../../css/mypage/Profile.css";
 import LoadingSpinner from "../common/LoadingSpinner";
 
 const Profile = ({ onEditClick }) => {
   const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
-  const { clearAccessToken } = useAuthStore(); // ✅ 로그아웃 시 메모리 토큰 제거
+  const { clearAccessToken } = useAuthStore();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -17,12 +18,11 @@ const Profile = ({ onEditClick }) => {
         const res = await api.get("/mypage/me");
         console.log("🎯 유저 정보 응답:", res.data);
 
-        setUserInfo(res.data); // ✅ 여기 고쳤음!
+        setUserInfo(res.data);
       } catch (err) {
         const message =
           err.response?.data?.message || "인증 오류가 발생했습니다.";
         console.error("내 정보 불러오기 실패:", err);
-        alert(message);
         navigate("/login");
       }
     };
@@ -36,9 +36,9 @@ const Profile = ({ onEditClick }) => {
     } catch (err) {
       console.warn("로그아웃 API 실패:", err);
     } finally {
-      clearAccessToken(); // ✅ 메모리 상태도 초기화
-      alert("로그아웃 되었습니다.");
-      navigate("/login");
+      clearAccessToken();
+      toast.success("로그아웃 되었습니다.");
+      navigate("/");
     }
   };
 

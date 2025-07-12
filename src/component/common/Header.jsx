@@ -1,4 +1,3 @@
-// Header.jsx
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import SideMenu from "./SideMenu";
@@ -8,6 +7,7 @@ import "../../css/common/Header.css";
 import logo from "../../images/header/logo.svg";
 import menu from "../../images/header/menu.svg";
 import account from "../../images/header/account.svg";
+import cartlogo from "../../images/header/cart.svg";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,6 +32,11 @@ function Header() {
               <button className="nav-link" onClick={toggleMenu}>
                 <img src={menu} alt="menu" className="nav-icon" />
               </button>
+            </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/cart">
+                <img src={cartlogo} alt="account" className="nav-icon" />
+              </Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/mypage">

@@ -1,4 +1,3 @@
-// PlaceCard.jsx
 import React from 'react';
 import '../../css/search/PlaceCard.css';
 import { FaHeart, FaStar, FaRegStar } from 'react-icons/fa';

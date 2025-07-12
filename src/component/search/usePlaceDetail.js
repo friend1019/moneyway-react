@@ -1,5 +1,3 @@
-// 📁 src/hooks/usePlaceDetail.js
-
 import { useEffect, useState } from 'react';
 import { getTourPlaceById } from '../../api/tourApi.js';
 

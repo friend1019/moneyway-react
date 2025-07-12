@@ -1,10 +1,11 @@
 // src/components/login/Signin.js
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import LoginHeader from "./LoginHeader";
 import Header from "../common/Header";
-import api from "../../api/axios"; // ✅ axios 인스턴스
-import useAuthStore from "../../api/authStore.js"; // ✅ Zustand 스토어 추가 import
+import api from "../../api/axios";
+import useAuthStore from "../../api/authStore.js";
 import "../../css/login/Signin.css";
 import "../../css/login/Signup.css";
 import "../../css/login/LoginPage.css";
@@ -20,7 +21,7 @@ const Signin = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ 로그인 전 사용자가 보려던 경로 저장 (기본값은 '/')
+  //로그인 전 사용자가 보려던 경로 저장 (기본값은 '/')
   const from = location.state?.from?.pathname || "/";
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -59,9 +60,9 @@ const Signin = () => {
 
       const token = response.data?.tokenInfo?.accessToken;
       if (token) {
-        setAccessToken(token); // ✅ Zustand에 저장
-        alert("로그인 성공!");
-        navigate(from, { replace: true }); // ✅ 이전 페이지로 이동
+        setAccessToken(token); //Zustand에 저장
+        toast.success("로그인 성공!");
+        navigate(from, { replace: true }); //이전 페이지로 이동
       } else {
         console.error("❌ 토큰이 응답에 없음!", response.data);
       }

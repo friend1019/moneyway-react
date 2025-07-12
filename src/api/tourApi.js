@@ -1,9 +1,4 @@
-// 📁 src/api/tourApi.js
 import api from "./axios.js";
-
-// -----------------------------
-// ✅ 유틸 함수
-// -----------------------------
 
 export const isValidJejuCoordinate = (lat, lng) => {
   return (
@@ -28,10 +23,6 @@ export const getCategoryFromCat1 = (cat1) => {
   return mapping[cat1] || null;
 };
 
-// -----------------------------
-// ✅ 공통 가공 함수
-// -----------------------------
-
 export const mapTourPlace = (item) => {
   const lat = Number(item.mapy);
   const lng = Number(item.mapx);
@@ -55,10 +46,6 @@ export const mapTourPlace = (item) => {
     tag: null,
   };
 };
-
-// -----------------------------
-// ✅ API 함수
-// -----------------------------
 
 // 전체 관광지
 export const getAllTourPlaces = async () => {

@@ -1,4 +1,3 @@
-// FilterModal.jsx
 import React from 'react';
 import '../../css/search/FilterModal.css';
 

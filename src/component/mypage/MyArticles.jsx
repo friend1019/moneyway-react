@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
-import "../../css/mypage/MyArticles.css"; // 필요시 스타일 파일 추가
+import "../../css/mypage/MyArticles.css";
 import LoadingSpinner from "../common/LoadingSpinner";
 
 const MyArticles = () => {

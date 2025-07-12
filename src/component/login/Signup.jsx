@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import Header from "../common/Header";
 import signupImage from "../../images/login/signup.svg";
-import api from "../../api/axios"; // ✅ axios 인스턴스 불러오기
+import api from "../../api/axios";
+import { toast } from "react-toastify";
 
 import "../../css/login/Signup.css";
 
@@ -123,7 +124,7 @@ function Signup() {
     e.preventDefault();
 
     if (!(nicknameChecked && emailChecked && validatePassword(password))) {
-      alert("입력을 다시 확인해주세요.");
+      toast.warn("입력을 다시 확인해주세요.");
       return;
     }
 
@@ -134,11 +135,11 @@ function Signup() {
         nickname,
       });
 
-      alert("회원가입 성공! 로그인 페이지로 이동합니다.");
+      toast.success("회원가입 성공! 로그인 페이지로 이동합니다.");
       window.location.href = "/login";
     } catch (err) {
       console.error(err);
-      alert(
+      toast.error(
         "회원가입 실패: " + (err.response?.data?.message || "알 수 없는 오류")
       );
     }
@@ -158,6 +159,35 @@ function Signup() {
           <h1>MoneyWay 가입하기</h1>
           <div className="input-form">
             <form onSubmit={handleSignup}>
+              {/* 이메일 */}
+              <label htmlFor="email">이메일</label>
+              <div className="input-row">
+                <input
+                  className={`input-field ${emailChecked ? "checked" : ""} ${
+                    emailError ? "error" : ""
+                  } ${emailSuccess ? "success" : ""}`}
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="moneyway@gmail.com"
+                  value={email}
+                  onChange={handleEmailChange}
+                />
+                <button
+                  type="button"
+                  className={`btn-check ${
+                    emailChecked && email.length > 0 ? "active" : ""
+                  }`}
+                  onClick={handleEmailCheck}
+                  disabled={email.length === 0}
+                >
+                  중복확인
+                </button>
+              </div>
+              {emailError && <p className="error-message">{emailError}</p>}
+              {!emailError && emailSuccess && (
+                <p className="success-message">{emailSuccess}</p>
+              )}
               {/* 닉네임 */}
               <label htmlFor="nickname">닉네임</label>
               <div className="input-row">
@@ -188,36 +218,6 @@ function Signup() {
               )}
               {!nicknameError && nicknameSuccess && (
                 <p className="success-message">{nicknameSuccess}</p>
-              )}
-
-              {/* 이메일 */}
-              <label htmlFor="email">이메일</label>
-              <div className="input-row">
-                <input
-                  className={`input-field ${emailChecked ? "checked" : ""} ${
-                    emailError ? "error" : ""
-                  } ${emailSuccess ? "success" : ""}`}
-                  type="email"
-                  id="email"
-                  name="email"
-                  placeholder="moneyway@gmail.com"
-                  value={email}
-                  onChange={handleEmailChange}
-                />
-                <button
-                  type="button"
-                  className={`btn-check ${
-                    emailChecked && email.length > 0 ? "active" : ""
-                  }`}
-                  onClick={handleEmailCheck}
-                  disabled={email.length === 0}
-                >
-                  중복확인
-                </button>
-              </div>
-              {emailError && <p className="error-message">{emailError}</p>}
-              {!emailError && emailSuccess && (
-                <p className="success-message">{emailSuccess}</p>
               )}
 
               {/* 비밀번호 */}
