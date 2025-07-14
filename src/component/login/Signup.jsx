@@ -27,8 +27,9 @@ function Signup() {
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validateNickname = (nickname) =>
     nickname.trim().length >= 2 && nickname.trim().length <= 10;
+  // 영문+숫자+특수문자 모두 포함, 8~16자
   const validatePassword = (pwd) =>
-    /^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/.test(pwd);
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/.test(pwd);
 
   const handleNicknameChange = (e) => {
     const val = e.target.value;
@@ -58,7 +59,9 @@ function Signup() {
     if (validatePassword(val)) {
       setPasswordError("");
     } else {
-      setPasswordError("8~16자, 특수문자(@$!%*?&)를 포함해야 합니다.");
+      setPasswordError(
+        "8~16자, 영문+숫자+특수문자(@$!%*?&)를 모두 포함해야 합니다."
+      );
     }
   };
 
@@ -135,10 +138,10 @@ function Signup() {
         nickname,
       });
 
-      toast.success("회원가입 성공! 로그인 페이지로 이동합니다.");
-      window.location.href = "/login";
+      toast.success("회원가입 성공!");
+      window.location.href = "/";
     } catch (err) {
-      console.error(err);
+      console.error("서버 응답:", err.response?.data);
       toast.error(
         "회원가입 실패: " + (err.response?.data?.message || "알 수 없는 오류")
       );
@@ -188,6 +191,24 @@ function Signup() {
               {!emailError && emailSuccess && (
                 <p className="success-message">{emailSuccess}</p>
               )}
+
+              {/* 비밀번호 */}
+              <label htmlFor="password">비밀번호</label>
+              <div className="input-row">
+                <input
+                  className={`input-field ${passwordError ? "error" : ""}`}
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="8~16자 + 특수문자 포함"
+                  value={password}
+                  onChange={handlePasswordChange}
+                />
+              </div>
+              {passwordError && (
+                <p className="error-message">{passwordError}</p>
+              )}
+
               {/* 닉네임 */}
               <label htmlFor="nickname">닉네임</label>
               <div className="input-row">
@@ -218,23 +239,6 @@ function Signup() {
               )}
               {!nicknameError && nicknameSuccess && (
                 <p className="success-message">{nicknameSuccess}</p>
-              )}
-
-              {/* 비밀번호 */}
-              <label htmlFor="password">비밀번호</label>
-              <div className="input-row">
-                <input
-                  className={`input-field ${passwordError ? "error" : ""}`}
-                  type="password"
-                  id="password"
-                  name="password"
-                  placeholder="8~16자 + 특수문자 포함"
-                  value={password}
-                  onChange={handlePasswordChange}
-                />
-              </div>
-              {passwordError && (
-                <p className="error-message">{passwordError}</p>
               )}
 
               {/* 가입 버튼 */}

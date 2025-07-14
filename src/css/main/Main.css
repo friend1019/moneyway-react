@@ -21,7 +21,7 @@ body{
   position: relative;
   width: 100%;
   height: 70vh;
-  background-image: url('../../images/main/background.png');
+  background-image: url('../../images/main/background.svg');
   background-size: cover;
   background-position: center;
   display: flex;
@@ -41,21 +41,21 @@ body{
 
 .circle {
   position: absolute;
-  border: 2px solid rgba(255,255,255,0.6);  
+  border: 0.2rem solid rgba(255,255,255,0.6);  
   border-radius: 50%;
   background: none;
 }
 
 .circle1 {
-  width: 400px;
-  height: 400px;
+  width: 40.0rem;
+  height: 40.0rem;
   left: -5vw;
   top: 2.5rem;
 }
 
 .circle2 {
-  width: 400px;
-  height: 400px;
+  width: 40.0rem;
+  height: 40.0rem;
   left: 13vw;
   top: 2.5rem;
 }
@@ -65,9 +65,9 @@ body{
   top: 50%;             
   left: 35%;           
   width: 17%;           
-  height: 2px;
+  height: 0.2rem;
   background: rgba(255,255,255,1);   
-  border-radius: 2px;
+  border-radius: 0.2rem;
   z-index: 2;
 }
 
@@ -80,7 +80,7 @@ body{
   text-align: left;
   color: #fff;
   z-index: 2;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.14);
+  text-shadow: 0 0.2rem 0.8rem rgba(0,0,0,0.14);
 }
 
 .banner-text h1 {
@@ -110,33 +110,33 @@ body{
   position: relative;
   background: #fff;
   border-radius: 2rem;
-  box-shadow: 0 12px 36px 0 rgba(20, 36, 60, 0.13);
+  box-shadow: 0 1.2rem 3.6rem 0 rgba(20, 36, 60, 0.13);
   min-width: 75vw;
-  max-width: 800px;
-  padding: 54px 48px 38px 48px;
+  max-width: 80.0rem;
+  padding: 5.4rem 4.8rem 3.8rem 4.8rem;
   display: flex;
   align-items: flex-start;
-  margin-top: -100px; 
+  margin-top: -10.0rem; 
   z-index: 2;
 }
 
 .icon-wrapper{
   position: absolute;
-  top: -45px; 
-  left: 3px; 
+  top: -4.5rem; 
+  left: 0.3rem; 
   background-color: #fff;
-  padding: 12px 15px;
+  padding: 1.2rem 1.5rem;
   border-radius: 2rem 2rem 0 0;
-  box-shadow: 0 -8px 16px rgba(20, 36, 60, 0.05);
+  box-shadow: 0 -0.8rem 1.6rem rgba(20, 36, 60, 0.05);
   display: flex;
   align-items: center;
   justify-content: center; z-index: 1; 
-  transform: perspective(100px) rotateX(20deg); 
+  transform: perspective(10.0rem) rotateX(20deg); 
   transform-origin: bottom center; 
 }
 
 .card-icon-img-fix {
-  width: 120px; height: 30px;
+  width: 12.0rem; height: 3.0rem;
   z-index: 2;
   position: relative;
   transform: translate(0%, 20%); 
@@ -180,21 +180,21 @@ body{
 
 .arrow-line {
   flex-grow: 1;
-  height: 1px;
+  height: 0.1rem;
   background: black;
   position: relative;
-  min-width: 200px;
+  min-width: 20.0rem;
 }
 
 .arrow-line::after {
   content: '';
   position: absolute;
   top: 50%;
-  right: -1px;
-  width: 8px;
-  height: 8px;
-  border-top: 1px solid black;
-  border-right: 1px solid black;
+  right: -0.1rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-top: 0.1rem solid black;
+  border-right: 0.1rem solid black;
   transform: translateY(-50%) rotate(45deg);
 }
 
@@ -202,7 +202,7 @@ body{
   background: #fff;
   color: #23262c;
   font-weight: 700;
-  border: 1px solid black;
+  border: 0.1rem solid black;
   padding: 0.5rem 3rem;
   border-radius: 3rem;
   font-size: 1.2rem;
@@ -218,7 +218,7 @@ body{
   justify-content: center;
   align-items: flex-start;
   width: 100%;
-  min-height: 80vh;
+  min-height: 80rem;
   background: #EFF8FC;
   gap: 8vw;
   box-sizing: border-box;
@@ -226,7 +226,7 @@ body{
 
 .plan-form-left {
   width: 100%;
-  max-width: 600px;
+  max-width: 60.0rem;
   background: none;
   display: flex;
   flex-direction: column;
@@ -235,10 +235,10 @@ body{
 }
 
 .plan-title-card {
-  width: 60%;
-  height: 40px;
+  width: 30rem;
+  height: 4rem;
   margin-bottom: 10rem;
-  padding: 1.3rem 0;
+  padding: 1rem;
   background: #fff;
   border-radius: 1.2rem; 
   text-align: center;
@@ -246,14 +246,14 @@ body{
 
 .plan-title-card h2 {
   color: #2176ff;
-  font-size: 2.5rem;
+  font-size: 2.3rem;
   font-weight: 800;
   margin: 0;
 }
 
 .plan-form-right {
   flex: 1;
-  max-width: 500px;
+  max-width: 50.0rem;
   margin: 10rem 0;
 }
 
@@ -261,9 +261,9 @@ body{
 .plan-image-box {
   position: relative;
   width: 200%;
-  height: 500px;
+  height: 50.0rem;
   border-radius: 2.3rem;
-  box-shadow: 0 6px 32px 0 rgba(70,100,180,0.12);
+  box-shadow: 0 0.6rem 3.2rem 0 rgba(70,100,180,0.12);
 }
 .plan-image {
   width: 100%;
@@ -276,16 +276,16 @@ body{
   color: #fff;
   font-size: 1.8rem;
   font-weight: 400;
-  text-shadow: 0 2px 10px rgba(10, 60, 120, 0.17);
+  text-shadow: 0 0.2rem 1.0rem rgba(10, 60, 120, 0.17);
   letter-spacing: 0.01em;
   line-height: 1.8;
 }
 .plan-title-bar {
   display: inline-block;
-  width: 170px;
-  height: 1px;
+  width: 17.0rem;
+  height: 0.1rem;
   background: rgba(255,255,255,0.86);
-  border-radius: 2px;
+  border-radius: 0.2rem;
   margin-left: 0.65rem;
   margin-bottom: 0.27rem;
 }
@@ -302,7 +302,7 @@ body{
   display: flex;
   align-items: center;
   background: #fff;
-  border: 1px solid #D9D9D9 ;
+  border: 0.1rem solid #D9D9D9 ;
   border-radius: 5rem;
   font-size: 1.5rem;
   font-weight: 600;
@@ -317,11 +317,11 @@ body{
 .selector-options {
   position: absolute;
   width: 100%;
-  top: calc(100% + 8px); 
+  top: calc(100% + 0.8rem); 
   left: 0;
   background: white;
   border-radius: 2rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.4rem 2.0rem rgba(0, 0, 0, 0.1);
   padding: 0.8rem;
   z-index: 100;
   box-sizing: border-box;
@@ -412,9 +412,9 @@ body{
 }
 
 .editor-section-container {
-  max-width: 1200px;
+  max-width: 120.0rem;
   margin: 0 auto;
-  padding: 60px 0 0 0;
+  padding: 6.0rem 0 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -422,12 +422,12 @@ body{
 
 .editor-section-header {
   text-align: center;
-  margin-bottom: 22px;
+  margin-bottom: 2.2rem;
 }
 .editor-section-subtitle {
   color: #2176ff;
-  font-size: 15px;
-  margin-bottom: 5px;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
   font-weight: 500;
   letter-spacing: 0.02em;
 }
@@ -441,16 +441,16 @@ body{
 
 .editor-cards-list {
   display: flex;
-  gap: 36px;
-  padding: 10px 0 24px 0;
+  gap: 3.6rem;
+  padding: 1.0rem 0 2.4rem 0;
   min-width: 0;
 }
 
 .editor-pick-card {
   flex: 0 0 auto;
-  width: 240px;
-  height: 330px;
-  border-radius: 38px;
+  width: 24.0rem;
+  height: 33.0rem;
+  border-radius: 3.8rem;
   overflow: hidden;
   position: relative;
   cursor: pointer;
@@ -467,15 +467,15 @@ body{
 .editor-pick-card .card-title {
   position: absolute;
   left: 0; right: 0; bottom: 0;
-  padding: 26px 22px 18px 22px;
+  padding: 2.6rem 2.2rem 1.8rem 2.2rem;
   color: #fff;
   font-weight: 700;
   font-size: 1.8rem;
   letter-spacing: -0.025em;
   background: linear-gradient(to top, rgba(0,0,0,0.36) 90%, rgba(0,0,0,0.0) 100%);
-  text-shadow: 0 1px 8px rgba(0,0,0,0.14);
-  border-bottom-left-radius: 38px;
-  border-bottom-right-radius: 38px;
+  text-shadow: 0 0.1rem 0.8rem rgba(0,0,0,0.14);
+  border-bottom-left-radius: 3.8rem;
+  border-bottom-right-radius: 3.8rem;
   box-sizing: border-box;
 }
 
@@ -483,26 +483,25 @@ body{
 .recommendation {
   width: 100%;
   margin: 15rem 0;
-  padding: 0 40px;
+  padding: 0 4rem;
   box-sizing: border-box;
-  min-height: 50vh;
+  min-height: 50rem;
 }
 
 .recommendation-section-container {
-  max-width: 1280px;
+  max-width: 128.0rem;
   margin: 0 auto;
   padding: 0;
 }
 
 .recommendation-section-header {
-  margin-bottom: 22px;
+  margin-bottom: 2.2rem;
 }
 
 .recommendation-section-subtitle {
   color: #2176ff;
-  font-size: 15px;
+  font-size: 1.5rem;
   font-weight: 500;
-  margin: 0 0 3px 0;
   letter-spacing: 0.01em;
 }
 
@@ -516,14 +515,14 @@ body{
 
 .moneyway-cards-list {
   display: flex;
-  gap: 32px;
-  padding: 6px 0 18px 0; 
+  gap: 3.2rem;
+  padding: 0.6rem 0 1.8rem 0; 
 }
 
 .recommendation-card {
-  width: 370px;
+  width: 37.0rem;
   background: transparent; 
-  border-radius: 32px;
+  border-radius: 3.2rem;
   overflow: visible; 
   display: flex;
   flex-direction: column;
@@ -532,15 +531,15 @@ body{
   position: relative;
   cursor: pointer;
   transition: transform 0.14s;
-  margin-bottom: 24px; 
+  margin-bottom: 2.4rem; 
 }
 
 .recommendation-card .image-wrapper {
   width: 100%;
-  height: 190px;
-  border-radius: 32px;
+  height: 19.0rem;
+  border-radius: 3.2rem;
   overflow: hidden;
-  margin-bottom: -36px; 
+  margin-bottom: -3.6rem; 
   z-index: 2;
   background: #fff; 
 }
@@ -549,7 +548,7 @@ body{
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 32px;
+  border-radius: 3.2rem;
   display: block;
 }
 
@@ -558,7 +557,7 @@ body{
   margin: 0 auto;
   z-index: 3;
   position: relative;
-  top: 40px;
+  top: 4rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;  
@@ -569,7 +568,7 @@ body{
   font-size: 1.5rem;
   font-weight: 800;
   color: #181818;
-  margin-bottom: 14px;
+  margin-bottom: 1.4rem;
   letter-spacing: -0.01em;
   text-align: left;        
   word-break: keep-all;
@@ -577,7 +576,7 @@ body{
 
 .tags-wrapper {
   display: flex;
-  gap: 8px;
+  gap: 0.8rem;
   flex-wrap: wrap;
   justify-content: flex-start;  
   width: auto;
@@ -588,8 +587,8 @@ body{
   font-size: 1rem;
   color: #181818;
   border-radius: 8rem;
-  border: 1.3px solid black;
-  padding: 4px 20px;
+  border: 0.13rem solid black;
+  padding: 0.4rem 2rem;
   font-weight: 500;
   letter-spacing: 0.01em;
   margin-top: 0.3rem;
@@ -600,16 +599,16 @@ body{
 .landing-main-wrapper {
   display: flex;
   width: 100vw;
-  min-height: 100vh;
+  min-height: 120rem;
   background: #fff;
   position: relative;
 }
 
 .landing-content {
   width: 56vw;
-  min-width: 540px;
-  max-width: 680px;
-  padding: 64px 0 0 200px;
+  min-width: 54.0rem;
+  max-width: 68.0rem;
+  padding: 6.4rem 0 0 20.0rem;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -621,7 +620,7 @@ body{
   font-weight: 800;
   margin-bottom: 1.15rem;
   color: #181a2b;
-  letter-spacing: -1.2px;
+  letter-spacing: -0.12rem;
 }
 
 .landing-desc {
@@ -634,30 +633,30 @@ body{
 .landing-bar-img-row {
   display: flex;
   align-items: center;                    
-  margin-bottom: 14px;
+  margin-bottom: 1.4rem;
   position: relative;
-  min-height: 56px;  
+  min-height: 5.6rem;  
   left: -13vw;       
 }
 
 .landing-thumb {
-  width: 180px;               
-  height: 40px;               
+  width: 18.0rem;               
+  height: 4.0rem;               
   object-fit: cover;
-  box-shadow: 0 2px 8px 0 rgba(40,80,120,0.10);
+  box-shadow: 0 0.2rem 0.8rem 0 rgba(40,80,120,0.10);
   z-index: 2;
 }
 
 .landing-bar {               
-  height: 1px;               
+  height: 0.1rem;               
   background: gray;
-  border-radius: 1px;
+  border-radius: 0.1rem;
   z-index: 1;
   width: 25rem;
 }
 
 .landing-sub {
-  margin-left: 20px;
+  margin-left: 2.0rem;
   font-size: 1.3rem;
   font-weight: 600;
   color: #181d2b;
@@ -675,13 +674,13 @@ body{
   align-items: center;
   justify-content: center;
   background: #fff;
-  box-shadow: 0 4px 24px 0 rgba(32,40,60,0.12);
+  box-shadow: 0 0.4rem 2.4rem 0 rgba(32,40,60,0.12);
   border-radius: 1.2rem;
   padding: 2rem;
   display: flex;
   align-items: center;
-  min-width: 180px;
-  max-width: 255px;
+  min-width: 18.0rem;
+  max-width: 25.5rem;
   margin-bottom: 1.15rem;
   gap: 3rem;
   cursor: pointer;
@@ -689,8 +688,8 @@ body{
 }
 
 .category-icon {
-  width: 60px;
-  height: 60px;
+  width: 6.0rem;
+  height: 6.0rem;
   color: #2176ff;
 }
 .category-title {
@@ -709,7 +708,7 @@ body{
 }
 
 .landing-category-card:hover {
-  box-shadow: 0 8px 32px 0 rgba(32,40,60,0.17);
+  box-shadow: 0 0.8rem 3.2rem 0 rgba(32,40,60,0.17);
   background: #307EF1;
   transform: scale(1.1);
 }
@@ -744,22 +743,22 @@ body{
 }
 
 .landing-bg-circle.circle1 {
-  width: 800px;
-  height: 800px;
+  width: 80.0rem;
+  height: 80.0rem;
   background: #EFF8FC;     
   opacity: 1;
   z-index: 1;
 }
 .landing-bg-circle.circle2 {
-  width: 530px;
-  height: 530px;
+  width: 53.0rem;
+  height: 53.0rem;
   background: #fff;    
   opacity: 0.98;
   z-index: 2;
 }
 .landing-bg-circle.circle3 {
-  width: 370px;
-  height: 370px;
+  width: 37.0rem;
+  height: 37.0rem;
   background:#EFF8FC;      
   opacity: 0.58;
   z-index: 3;
@@ -769,67 +768,9 @@ body{
   position: absolute;
   right: 25vw;
   bottom: 10vw;
-  width: 500px;
+  width: 50.0rem;
   max-width: 41vw;
   z-index: 4;
-}
-
-/*6번째 페이지*/
-.page-container {
-  margin-top: -10rem;
-  display: flex;
-  position: relative;
-  justify-content: center;
-  padding: 15rem 0;
-  gap: 5vw;
-  z-index: 55;
-  background-color: white;
-}
-
-.sidebar {
-  width: 280px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8vw;
-}
-
-.main-title {
-  font-size: 3rem;
-  font-weight: 700;
-  margin: 0 0 5rem 0;
-}
-
-.main-content {
-  background-color: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #C1C1C1;
-  padding: 24px;
-  width: 650px;
-  min-height: 450px;
-  display: flex;
-  flex-direction: column;
-}
-
-.edit-plan-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5rem;
-  padding: 1rem;
-  font-size: 1.5rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.empty-plan-message {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  color: #cccccc;
-  font-size: 18px;
-  line-height: 1.6;
 }
 
 /* 여기부분은 장소 상세정보 팝업창 띄우는 거 관련임 -지인- */

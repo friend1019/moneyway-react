@@ -1,9 +1,10 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
-import '../../css/main/Slider.css';
-import LeftArrowIcon from '../../images/main/left-arrow.svg';
-import RightArrowIcon from '../../images/main/right-arrow.svg';
+import React, { useRef, useEffect, useState, useCallback } from "react";
+import "../../css/main/Slider.css";
+import LeftArrowIcon from "../../images/main/left-arrow.svg";
+import RightArrowIcon from "../../images/main/right-arrow.svg";
 
-const ANIMATION_DURATION = 300; 
+const ANIMATION_DURATION = 300;
+const PX_PER_REM = 10;
 
 const HorizontalSlider = ({ children }) => {
   const scrollRef = useRef(null);
@@ -16,26 +17,37 @@ const HorizontalSlider = ({ children }) => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [maxIndex, setMaxIndex] = useState(0);
 
+  // 컨테이너 너비 측정
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
         setContainerWidth(containerRef.current.offsetWidth);
       }
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
     handleResize();
-    return () => window.removeEventListener('resize', handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const BAR_WIDTH = containerWidth / totalCards;
+  // maxIndex 계산
+  useEffect(() => {
+    if (!listRef.current || !listRef.current.children[0]) return;
+
+    const cardWidth = listRef.current.children[0].offsetWidth;
+    const visibleCount = Math.floor(containerWidth / cardWidth) || 1;
+    const newMaxIndex = Math.max(totalCards - visibleCount, 0);
+    setMaxIndex(newMaxIndex);
+  }, [containerWidth, totalCards]);
 
   useEffect(() => {
     if (
       !listRef.current ||
       !listRef.current.children ||
       !listRef.current.children[0]
-    ) return;
+    )
+      return;
     if (scrollRef.current) {
       scrollRef.current.scrollLeft = 0;
     }
@@ -51,8 +63,11 @@ const HorizontalSlider = ({ children }) => {
 
     function animStep(timestamp) {
       if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / ANIMATION_DURATION, 1);
-      const easeOutQuad = p => p * (2 - p);
+      const progress = Math.min(
+        (timestamp - startTime) / ANIMATION_DURATION,
+        1
+      );
+      const easeOutQuad = (p) => p * (2 - p);
 
       el.scrollLeft = start + (targetPosition - start) * easeOutQuad(progress);
 
@@ -71,27 +86,35 @@ const HorizontalSlider = ({ children }) => {
       !listRef.current.children ||
       !listRef.current.children[0] ||
       !scrollRef.current
-    ) return;
+    )
+      return;
     const cardW = listRef.current.children[0].offsetWidth;
     const targetPosition = cardW * currentIndex;
     animateTo(targetPosition);
-  }, [currentIndex, totalCards, animateTo]);
+  }, [currentIndex, animateTo]);
 
   const handleArrowClick = (direction) => {
     if (animatingRef.current) return;
-    if (direction === 'left') {
-      setCurrentIndex(prev => Math.max(prev - 1, 0));
+
+    if (direction === "left") {
+      setCurrentIndex((prev) => Math.max(prev - 1, 0));
     } else {
-      setCurrentIndex(prev => Math.min(prev + 1, totalCards - 1));
+      setCurrentIndex((prev) => Math.min(prev + 1, maxIndex));
     }
   };
+
+  // 진행바 너비 및 위치 계산 (maxIndex + 1 칸으로 분할)
+  const barTrackWidth = containerWidth;
+  const barWidth = maxIndex === 0 ? barTrackWidth : barTrackWidth / (maxIndex + 1);
+  const barWidthRem = barWidth / PX_PER_REM;
+  const leftRem = (currentIndex * barWidth) / PX_PER_REM;
 
   return (
     <div className="horizontal-slider-root">
       <div
         className="scroll-wrapper"
         ref={scrollRef}
-        style={{ overflowX: 'hidden', scrollBehavior: 'auto' }}
+        style={{ overflowX: "hidden", scrollBehavior: "auto" }}
       >
         <div className={children.props.className} ref={listRef}>
           {cardsArray}
@@ -100,7 +123,7 @@ const HorizontalSlider = ({ children }) => {
       <div className="controls-container">
         <button
           className="arrow-button left"
-          onClick={() => handleArrowClick('left')}
+          onClick={() => handleArrowClick("left")}
           disabled={currentIndex === 0}
         >
           <img src={LeftArrowIcon} alt="왼쪽" />
@@ -108,23 +131,21 @@ const HorizontalSlider = ({ children }) => {
         <div
           className="progress-bar-container"
           ref={containerRef}
-          style={{ width: '30vw' }}
+          style={{ width: "30vw" }}
         >
           <div
             className="progress-bar-fill"
             style={{
-              width: BAR_WIDTH,
-              left: totalCards <= 1
-              ? 0
-              : `${(currentIndex / (totalCards - 1)) * (containerWidth - BAR_WIDTH)}px`,
+              width: `${barWidthRem}rem`,
+              left: `${leftRem}rem`,
               transition: `left ${ANIMATION_DURATION}ms cubic-bezier(0.4, 0, 0.2, 1)`,
             }}
           />
         </div>
         <button
           className="arrow-button right"
-          onClick={() => handleArrowClick('right')}
-          disabled={currentIndex === totalCards - 1}
+          onClick={() => handleArrowClick("right")}
+          disabled={currentIndex >= maxIndex}
         >
           <img src={RightArrowIcon} alt="오른쪽" />
         </button>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../api/axios";
@@ -6,10 +6,7 @@ import "../../css/mypage/ProfileChange.css";
 
 const ProfileChange = () => {
   const [nickname, setNickname] = useState("");
-  const [profileImage, setProfileImage] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const fileInputRef = useRef(null);
   const navigate = useNavigate();
 
   // 현재 닉네임 및 프로필 이미지 불러오기
@@ -18,9 +15,6 @@ const ProfileChange = () => {
       try {
         const res = await api.get("/mypage/me");
         setNickname(res.data.nickname || "");
-        if (res.data.profileImageUrl) {
-          setPreviewUrl(res.data.profileImageUrl); // 기존 프로필 이미지 미리보기
-        }
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
         toast.warn("정보를 불러오는 데 실패했습니다.");
@@ -29,15 +23,6 @@ const ProfileChange = () => {
 
     fetchMyInfo();
   }, []);
-
-  // 이미지 선택 시 미리보기 생성
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProfileImage(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    }
-  };
 
   // 저장 버튼
   const handleSave = async () => {
@@ -48,17 +33,6 @@ const ProfileChange = () => {
       if (nickname.trim().length > 0) {
         await api.patch("/mypage/nickname", {
           newNickname: nickname.trim(),
-        });
-      }
-
-      // 프로필 이미지 업로드
-      if (profileImage) {
-        const formData = new FormData();
-        formData.append("image", profileImage);
-        await api.post("/mypage/profile-image", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
         });
       }
 
@@ -77,34 +51,38 @@ const ProfileChange = () => {
   return (
     <div className="profile-change-container">
       <div className="section">
-        <label className="label">프로필 사진</label>
-        <button
-          className="upload-btn"
-          onClick={() => fileInputRef.current.click()}
-        >
-          사진 업로드하기 <span className="icon">🔄</span>
-        </button>
-        <input
-          type="file"
-          accept="image/*"
-          style={{ display: "none" }}
-          ref={fileInputRef}
-          onChange={handleImageChange}
-        />
-        {previewUrl && (
-          <div className="preview">
-            <img src={previewUrl} alt="미리보기" className="preview-image" />
-          </div>
-        )}
-      </div>
-
-      <div className="section">
         <label className="label">닉네임</label>
-        <input
-          type="text"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-        />
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <input
+            type="text"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+          />
+          <button
+            type="button"
+            className="btn-check"
+            onClick={async () => {
+              if (!nickname.trim()) {
+                toast.warn("닉네임을 입력해주세요.");
+                return;
+              }
+              try {
+                const res = await api.get("/users/check/nickname", {
+                  params: { nickname: nickname.trim() },
+                });
+                if (res.data.exists) {
+                  toast.error("중복된 닉네임입니다.");
+                } else {
+                  toast.success("사용 가능한 닉네임입니다.");
+                }
+              } catch (err) {
+                toast.error("닉네임 중복 확인 중 오류가 발생했습니다.");
+              }
+            }}
+          >
+            중복확인
+          </button>
+        </div>
       </div>
 
       <div className="section password-section">

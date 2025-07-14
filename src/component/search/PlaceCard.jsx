@@ -2,7 +2,8 @@ import React from 'react';
 import '../../css/search/PlaceCard.css';
 import { FaHeart, FaStar, FaRegStar } from 'react-icons/fa';
 
-const PlaceCard = ({ title, category, address, status, rating, imageUrls = [], onClick }) => {
+const PlaceCard = ({ place, onClick }) => {
+  const { title, category, address, status, rating, imageUrls = [] } = place;
   // 별점 5개 생성
   const stars = [];
   for (let i = 1; i <= 5; i++) {
@@ -21,7 +22,7 @@ const PlaceCard = ({ title, category, address, status, rating, imageUrls = [], o
         <div>
           <span className="place-title">{title}</span>
           <span className="place-rating">{stars}</span>
-          {/* <p className="place-status">{status}</p> */}
+          <p className="place-status">{status}</p>
         </div>
         <button className="favorite-btn" onClick={e => e.stopPropagation()}>
           <FaHeart />

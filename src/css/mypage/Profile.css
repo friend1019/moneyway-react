@@ -12,15 +12,14 @@
     border-radius: 2.5rem;
 }
 
-.profile-image {
-    width: 8rem;
-    height: 8rem;
+.profile-image img {
+    width: 11rem;
+    height: 11rem;
     font-size: 8rem;
     border-radius: 50%;
     background-size: cover;
     background-position: center;
-    margin-bottom: 1.5rem;
-    margin-left: -3.7rem;
+    margin-top: 1.5rem;
 }
 
 .nickname p {

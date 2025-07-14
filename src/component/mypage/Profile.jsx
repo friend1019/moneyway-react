@@ -20,8 +20,6 @@ const Profile = ({ onEditClick }) => {
 
         setUserInfo(res.data);
       } catch (err) {
-        const message =
-          err.response?.data?.message || "인증 오류가 발생했습니다.";
         console.error("내 정보 불러오기 실패:", err);
         navigate("/login");
       }
@@ -39,10 +37,11 @@ const Profile = ({ onEditClick }) => {
       clearAccessToken();
       toast.success("로그아웃 되었습니다.");
       navigate("/");
+      window.location.reload();
     }
   };
 
-  if (!userInfo) return <LoadingSpinner />
+  if (!userInfo) return <LoadingSpinner />;
 
   return (
     <div className="profilecard-container">

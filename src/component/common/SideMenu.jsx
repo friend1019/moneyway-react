@@ -35,6 +35,7 @@ const SideMenu = ({ onClose }) => {
       await api.post("/auth/logout");
       toast.success("로그아웃 되었습니다.");
       navigate("/login");
+      window.location.reload(); // 페이지 새로고침
     } catch (err) {
       toast.error("로그아웃 중 오류가 발생했습니다.");
     }
@@ -56,7 +57,7 @@ const SideMenu = ({ onClose }) => {
                 <>
                   {profileImageUrl ? (
                     <img
-                      className="profile-image"
+                      className="profile-image-sidemenu"
                       src={profileImageUrl}
                       alt="프로필"
                     />
@@ -74,11 +75,11 @@ const SideMenu = ({ onClose }) => {
                   <div
                     className="login-btn-ham"
                     onClick={() => {
-                      navigate("/");
+                      navigate("/login");
                       onClose(); // 사이드메뉴도 닫아줌
                     }}
                   >
-                    로그인하기
+                    로그인하세요
                   </div>
                 </div>
               )}
