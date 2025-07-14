@@ -1,9 +1,10 @@
 //로그인 진입 페이지
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../../css/login/LoginPage.css";
 import LoginHeader from "./LoginHeader";
-import Header from "../Header";
+import Header from "../common/Header";
 
 import kakaoIcon from "../../images/login/kakaoAuth.svg";
 import googleIcon from "../../images/login/googleAuth.svg";
@@ -52,7 +53,7 @@ const LoginPage = () => {
             {/* (향후) 구글 로그인 버튼 - 아직 구현 안 됐으면 제외 가능 */}
             <button
               className="social-btn google-btn"
-              onClick={() => alert("준비 중입니다!")}
+              onClick={() => toast.info("준비 중입니다!")}
             >
               <img
                 src={googleIcon}

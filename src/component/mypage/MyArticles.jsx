@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/axios";
-import "../../css/mypage/MyArticles.css"; // 필요시 스타일 파일 추가
+import "../../css/mypage/MyArticles.css";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 const MyArticles = () => {
   const [posts, setPosts] = useState([]);
@@ -9,7 +10,7 @@ const MyArticles = () => {
   useEffect(() => {
     const fetchMyPosts = async () => {
       try {
-        const res = await api.get("/api/mypage/posts?page=0&size=10");
+        const res = await api.get("/mypage/posts?page=0&size=10");
         setPosts(res.data.data.content);
       } catch (err) {
         console.error("내 글 목록 불러오기 실패:", err);
@@ -22,7 +23,7 @@ const MyArticles = () => {
     fetchMyPosts();
   }, []);
 
-  if (loading) return <p className="loading">로딩 중...</p>;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="container">
@@ -37,9 +38,12 @@ const MyArticles = () => {
               <div className="info">
                 <h3>{post.title}</h3>
                 <p className="meta">
-                  좋아요 {post.likeCount} · 댓글 {post.commentCount} · 스크랩 {post.scrapCount}
+                  좋아요 {post.likeCount} · 댓글 {post.commentCount} · 스크랩{" "}
+                  {post.scrapCount}
                 </p>
-                <p className="date">{new Date(post.createdAt).toLocaleDateString()}</p>
+                <p className="date">
+                  {new Date(post.createdAt).toLocaleDateString()}
+                </p>
               </div>
             </li>
           ))}

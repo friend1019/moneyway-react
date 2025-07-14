@@ -3,36 +3,13 @@ import "../../css/search/PlaceDetailView.css";
 import {
   FaArrowLeft,
   FaHeart,
-  FaClock,
-  FaStar,
   FaPhone,
   FaMapMarkerAlt,
   FaShareAlt,
   FaCopy,
-  FaThumbtack,
 } from "react-icons/fa";
 
-const CATEGORY_NAME_MAP = {
-  RESTAURANT: "식당",
-  ATTRACTION: "관광지",
-  ACTIVITY: "액티비티",
-  ACCOMMODATION: "숙소",
-};
-
-const SIGUNGU_NAME_MAP = {
-  3: "서귀포시",
-  4: "제주시",
-};
-
 const PlaceDetailView = ({ place, onBack }) => {
-  const tags =
-    place.tag
-      ?.split(",")
-      .map((tag) => tag.trim())
-      .filter(Boolean) || [];
-  const categoryName =
-    CATEGORY_NAME_MAP[place.category] || place.category || "기타";
-
   const handleCopyAddress = () => {
     navigator.clipboard.writeText(place.address || "");
     alert("주소가 복사되었습니다!");
@@ -64,25 +41,8 @@ const PlaceDetailView = ({ place, onBack }) => {
           <div className="title-section">
             <h2>{place.title}</h2>
             <div className="meta">
-              <span className="category">{categoryName}</span>
-              <span className="rating">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <FaStar
-                    key={i}
-                    color={i <= place.rating ? "#ffc107" : "#ddd"}
-                  />
-                ))}
-              </span>
+              <span className="category">{place.categoryName}</span>
             </div>
-            {tags.length > 0 && (
-              <div className="tag-section">
-                {tags.map((tag, i) => (
-                  <span key={i} className="tag-chip">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           <div className="like-section">
@@ -125,18 +85,6 @@ const PlaceDetailView = ({ place, onBack }) => {
         <button className="schedule-btn">일정 추가하기</button>
 
         <div className="info-section">
-          {place.sigungucode && SIGUNGU_NAME_MAP[place.sigungucode] && (
-            <div className="info-row">
-              <FaMapMarkerAlt className="info-icon" />
-              <div>
-                <div className="info-title">지역</div>
-                <div className="info-desc">
-                  {SIGUNGU_NAME_MAP[place.sigungucode]}
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="info-row">
             <FaMapMarkerAlt className="info-icon" />
             <div>
@@ -164,60 +112,32 @@ const PlaceDetailView = ({ place, onBack }) => {
             </div>
           )}
 
-          {place.useTime && (
+          {place.priceInfo && (
             <div className="info-row">
-              <FaClock className="info-icon" />
+              <FaMapMarkerAlt className="info-icon" />
               <div>
-                <div className="info-title">운영시간</div>
-                <div className="info-desc">
-                  {place.useTime.split("<br>").map((line, idx) => (
-                    <div key={idx}>{line}</div>
-                  ))}
-                </div>
+                <div className="info-title">요금 정보</div>
+                <div className="info-desc">{place.priceInfo}</div>
               </div>
             </div>
           )}
 
-          {/* 요금 정보 */}
-          {place.price !== undefined && (
+          {place.menu && (
             <div className="info-row">
-              <FaStar className="info-icon" />
+              <FaMapMarkerAlt className="info-icon" />
               <div>
-                <div className="info-title">요금</div>
-                <div className="info-desc">
-                  {place.price > 0
-                    ? `${place.price.toLocaleString()}원`
-                    : "무료"}
-                </div>
+                <div className="info-title">메뉴</div>
+                <div className="info-desc">{place.menu}</div>
               </div>
             </div>
           )}
 
-          {place.overview && (
+          {place.description && (
             <div className="info-row">
-              <FaClock className="info-icon" />
+              <FaMapMarkerAlt className="info-icon" />
               <div>
                 <div className="info-title">장소 소개</div>
-                <div className="info-desc">
-                  {place.overview.split("<br>").map((line, idx) => (
-                    <div key={idx}>{line}</div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* 비고 (infotext) */}
-          {place.infotext && (
-            <div className="info-row">
-              <FaThumbtack className="info-icon" />
-              <div>
-                <div className="info-title">비고</div>
-                <div className="info-desc">
-                  {place.infotext.split("<br>").map((line, idx) => (
-                    <div key={idx}>{line}</div>
-                  ))}
-                </div>
+                <div className="info-desc">{place.description}</div>
               </div>
             </div>
           )}

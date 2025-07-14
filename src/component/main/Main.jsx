@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../css/main/Main.css";
-import {
-  getTourPlacesByCat1Array,
-  getTourPlacesByCategory,
-  getCategoryFromCat1,
-} from "../../api/tourApi.js";
+import { getPlacesByCategory } from "../../api/tourApi.js";
 
-import Header from "../Header";
-import Footer from "../Footer";
+import Header from "../common/Header";
+import Footer from "../common/Footer.jsx";
 import BudgetSlider from "../main/BudgetSlider";
 import HorizontalSlider from "../main/Slider";
-import WeekView from "../main/WeekView";
-import DateRange from "../main/DateRangePicker";
 
 import PlaceDetailView from "../search/PlaceDetailView";
 
@@ -32,12 +25,9 @@ import { ReactComponent as HoverFoodIcon } from "../../images/main/fifth/hover_r
 import { ReactComponent as HoverCafeIcon } from "../../images/main/fifth/hover_cafe.svg";
 import { ReactComponent as HoverActivityIcon } from "../../images/main/fifth/hover_activity.svg";
 
-import { ReactComponent as Calendar } from "../../images/main/second/calendar_.svg";
 import { ReactComponent as People } from "../../images/main/second/people.svg";
-import { ReactComponent as BasicCalendar } from "../../images/main/second/basic_calendar.svg";
 import { ReactComponent as BasicPeople } from "../../images/main/second/basic_people.svg";
 import { ReactComponent as PlanButton } from "../../images/main/second/planbutton.svg";
-import { nav } from "framer-motion/client";
 
 function Main() {
   const [budget, setBudget] = useState([100000, 300000]);
@@ -48,33 +38,21 @@ function Main() {
     "1박 2일",
     "2박 3일",
     "3박 4일",
-    "4박 5일 이상",
   ];
 
-  const [personnel, setPersonnel] = useState(null); // 2 -> null
+  const [personnel, setPersonnel] = useState(null);
   const [isPersonnelPickerVisible, setPersonnelPickerVisible] = useState(false);
   const personnelOptions = [1, 2, 3, 4];
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
-
   const [editorPicksData, setEditorPicksData] = useState([]);
   const [recommendationsData, setRecommendationsData] = useState([]);
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-
-  //장소누르는상태임 이거 -지인이 추가-
   const [selectedPlace, setSelectedPlace] = useState(null);
 
   const navigate = useNavigate();
 
-  const handleDateChange = (start, end) => {
-    setStartDate(start);
-    setEndDate(end);
-  };
-
   const formatPersonnelDisplay = (p) => {
-    if (p >= 4) return "4명 이상";
-    return `${p}명`;
+    return p >= 4 ? "4명 이상" : `${p}명`;
   };
 
   const categories = [
@@ -104,60 +82,32 @@ function Main() {
     },
   ];
 
-  const contentTypeMap = {
-    12: "관광지",
-    14: "문화시설",
-    15: "행사/공연/축제",
-    25: "여행코스",
-    28: "레포츠",
-    32: "숙박",
-    38: "쇼핑",
-    39: "음식점",
-  };
-
   useEffect(() => {
-    // 추천 명소: 관광지 (A01, A02)
     const fetchRecommendations = async () => {
-      const data = await getTourPlacesByCat1Array(["A01", "A02"]);
-
-      const simple = data.slice(32, 40).map((item, idx) => {
-        const { contenttypeid, cat1, tag } = item;
-
-        return {
-          id: idx,
-          image: item.imageUrls?.[0],
-          title: item.title,
-          tags: [
-            contentTypeMap[String(contenttypeid)] ||
-              getCategoryFromCat1(cat1) ||
-              "관광지",
-            ...(tag?.split(",").map((t) => t.trim()) || []),
-          ],
-          ...item, // 마지막에 병합
-        };
-      });
-
-      setRecommendationsData(simple);
+      const data = await getPlacesByCategory("TOURIST_ATTRACTION");
+      const sliced = data.slice(0, 8).map((item, idx) => ({
+        id: idx,
+        image: item.imageUrls?.[0],
+        title: item.title,
+        tags: [item.categoryName],
+        ...item,
+      }));
+      setRecommendationsData(sliced);
     };
-
     fetchRecommendations();
   }, []);
 
   useEffect(() => {
-    // 이달의 여행: 액티비티 (A03)
     const fetchEditorPicks = async () => {
-      const data = await getTourPlacesByCategory("A03");
-
-      const filtered = data.slice(0, 4).map((item, idx) => ({
+      const data = await getPlacesByCategory("ACTIVITY");
+      const sliced = data.slice(0, 6).map((item, idx) => ({
         id: idx,
         image: item.imageUrls?.[0],
         title: item.title,
-        type: contentTypeMap[item.contenttypeid],
+        type: item.categoryName,
       }));
-
-      setEditorPicksData(filtered);
+      setEditorPicksData(sliced);
     };
-
     fetchEditorPicks();
   }, []);
 
@@ -169,10 +119,10 @@ function Main() {
       <div className="FirstMain">
         <div className="visual-section">
           <div className="jeju-banner">
-            <div className="banner-circles">
+            {/* <div className="banner-circles">
               <div className="circle circle1"></div>
               <div className="circle circle2"></div>
-            </div>
+            </div> */}
             <div className="banner-horizontal-line"></div>
             <div className="banner-text">
               <h1>
@@ -224,9 +174,10 @@ function Main() {
           <div className="selector-container">
             <div
               className="selector-row"
-              onClick={() =>
-                setIsDurationPickerVisible(!isDurationPickerVisible)
-              }
+              onClick={() => {
+                setIsDurationPickerVisible(!isDurationPickerVisible);
+                setPersonnelPickerVisible(false);
+              }}
             >
               {tripDuration ? (
                 <People className="icon" />
@@ -262,9 +213,10 @@ function Main() {
           <div className="selector-container">
             <div
               className="selector-row"
-              onClick={() =>
-                setPersonnelPickerVisible(!isPersonnelPickerVisible)
-              }
+              onClick={() => {
+                setPersonnelPickerVisible(!isPersonnelPickerVisible);
+                setIsDurationPickerVisible(false);
+              }}
             >
               {personnel ? (
                 <People className="icon" />
@@ -448,29 +400,8 @@ function Main() {
         </div>
       </div>
 
-      {/*6번째 페이지 만드는중*/}
-      <div className="page-container">
-        <aside className="sidebar">
-          <h1 className="main-title">나의 플랜</h1>
-
-          <DateRange onDateChange={handleDateChange} />
-
-          <BudgetSlider budget={budget} setBudget={setBudget} />
-
-          <button className="edit-plan-button">플랜 수정하기</button>
-        </aside>
-
-        <main className="main-content">
-          <WeekView selectedDate={startDate} />
-
-          <div className="empty-plan-message">
-            <p>아직 플랜이 없어요.</p>
-            <p>머니웨이와 플랜을 만들어 보세요!</p>
-          </div>
-        </main>
-      </div>
-
       <Footer />
+
       {selectedPlace && (
         <div
           className="place-detail-overlay"

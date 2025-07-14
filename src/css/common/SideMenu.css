@@ -1,0 +1,78 @@
+/* SideMenu.css */
+.side-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+.user-info-ham {
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.profile-image-sidemenu {
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.nickname {
+  font-size: 2.1rem;
+  font-weight: bold;
+}
+
+.logout {
+  font-size: 1.4rem;
+  color: black;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  text-decoration: underline;
+}
+
+.menu-list {
+  margin-top: 3rem;
+  list-style: none;
+  padding: 0;
+  color: black;
+}
+
+.menu-list li {
+  padding: 2rem 0;
+  margin-left: 3rem;
+  border-bottom: 1px solid #eee;
+  font-size: 2.1rem;
+  font-weight: bold;
+}
+
+.menu-list li a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.logged-out {
+  display: flex;
+  justify-content: center; /* 가로 가운데 */
+  align-items: center; /* 세로 가운데 */
+}
+
+.login-btn-ham {
+  border: none;
+  color: black;
+  text-decoration: underline;
+  font-weight: bold;
+  border-radius: 1rem;
+  cursor: pointer;
+  font-size: 2.1rem;
+
+  display: flex;
+  justify-content: center; /* 가로 가운데 */
+  align-items: center; /* 세로 가운데 */
+}

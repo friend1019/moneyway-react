@@ -1,4 +1,3 @@
-// CategorySelector.jsx
 import React from 'react';
 
 const CategorySelector = ({ category, setCategory, categories }) => {

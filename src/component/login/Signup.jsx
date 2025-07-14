@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import Header from "../Header";
+import Header from "../common/Header";
 import signupImage from "../../images/login/signup.svg";
-import api from "../../api/axios"; // ✅ axios 인스턴스 불러오기
+import api from "../../api/axios";
+import { toast } from "react-toastify";
 
 import "../../css/login/Signup.css";
 
@@ -26,8 +27,9 @@ function Signup() {
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validateNickname = (nickname) =>
     nickname.trim().length >= 2 && nickname.trim().length <= 10;
+  // 영문+숫자+특수문자 모두 포함, 8~16자
   const validatePassword = (pwd) =>
-    /^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/.test(pwd);
+    /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/.test(pwd);
 
   const handleNicknameChange = (e) => {
     const val = e.target.value;
@@ -57,7 +59,9 @@ function Signup() {
     if (validatePassword(val)) {
       setPasswordError("");
     } else {
-      setPasswordError("8~16자, 특수문자(@$!%*?&)를 포함해야 합니다.");
+      setPasswordError(
+        "8~16자, 영문+숫자+특수문자(@$!%*?&)를 모두 포함해야 합니다."
+      );
     }
   };
 
@@ -123,7 +127,7 @@ function Signup() {
     e.preventDefault();
 
     if (!(nicknameChecked && emailChecked && validatePassword(password))) {
-      alert("입력을 다시 확인해주세요.");
+      toast.warn("입력을 다시 확인해주세요.");
       return;
     }
 
@@ -134,11 +138,11 @@ function Signup() {
         nickname,
       });
 
-      alert("회원가입 성공! 로그인 페이지로 이동합니다.");
-      window.location.href = "/login";
+      toast.success("회원가입 성공!");
+      window.location.href = "/";
     } catch (err) {
-      console.error(err);
-      alert(
+      console.error("서버 응답:", err.response?.data);
+      toast.error(
         "회원가입 실패: " + (err.response?.data?.message || "알 수 없는 오류")
       );
     }
@@ -158,38 +162,6 @@ function Signup() {
           <h1>MoneyWay 가입하기</h1>
           <div className="input-form">
             <form onSubmit={handleSignup}>
-              {/* 닉네임 */}
-              <label htmlFor="nickname">닉네임</label>
-              <div className="input-row">
-                <input
-                  className={`input-field ${nicknameChecked ? "checked" : ""} ${
-                    nicknameError ? "error" : ""
-                  } ${nicknameSuccess ? "success" : ""}`}
-                  type="text"
-                  id="nickname"
-                  name="nickname"
-                  placeholder="2~10자 입력"
-                  value={nickname}
-                  onChange={handleNicknameChange}
-                />
-                <button
-                  type="button"
-                  className={`btn-check ${
-                    nicknameChecked && nickname.length > 0 ? "active" : ""
-                  }`}
-                  onClick={handleNicknameCheck}
-                  disabled={nickname.length === 0}
-                >
-                  중복확인
-                </button>
-              </div>
-              {nicknameError && (
-                <p className="error-message">{nicknameError}</p>
-              )}
-              {!nicknameError && nicknameSuccess && (
-                <p className="success-message">{nicknameSuccess}</p>
-              )}
-
               {/* 이메일 */}
               <label htmlFor="email">이메일</label>
               <div className="input-row">
@@ -235,6 +207,38 @@ function Signup() {
               </div>
               {passwordError && (
                 <p className="error-message">{passwordError}</p>
+              )}
+
+              {/* 닉네임 */}
+              <label htmlFor="nickname">닉네임</label>
+              <div className="input-row">
+                <input
+                  className={`input-field ${nicknameChecked ? "checked" : ""} ${
+                    nicknameError ? "error" : ""
+                  } ${nicknameSuccess ? "success" : ""}`}
+                  type="text"
+                  id="nickname"
+                  name="nickname"
+                  placeholder="2~10자 입력"
+                  value={nickname}
+                  onChange={handleNicknameChange}
+                />
+                <button
+                  type="button"
+                  className={`btn-check ${
+                    nicknameChecked && nickname.length > 0 ? "active" : ""
+                  }`}
+                  onClick={handleNicknameCheck}
+                  disabled={nickname.length === 0}
+                >
+                  중복확인
+                </button>
+              </div>
+              {nicknameError && (
+                <p className="error-message">{nicknameError}</p>
+              )}
+              {!nicknameError && nicknameSuccess && (
+                <p className="success-message">{nicknameSuccess}</p>
               )}
 
               {/* 가입 버튼 */}

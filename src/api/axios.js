@@ -1,33 +1,63 @@
+// src/api/axios.js
 import axios from "axios";
+import useAuthStore from "./authStore.js";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const api = axios.create({
-  baseURL: "https://moneyway-3zca.onrender.com/api", // 서버 주소에 맞게 조정
-  withCredentials: true, // 쿠키 자동 포함
+  baseURL: "https://moneyway-3zca.onrender.com/api",
+  withCredentials: true, // 쿠키 포함
 });
 
+//메모리에서 Access Token 가져와 Authorization 헤더에 추가하는 거임
+api.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+//401 발생 시 자동 리프레시 → 메모리에 새 토큰 저장 → 원래 요청 재시도
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
 
-    // 401 Unauthorized -> 토큰 갱신 요청
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    //토큰 리프레시 시도
+    if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        // 리프레시 토큰 갱신을 위한 요청 (백엔드가 쿠키 갱신 처리)
-        await api.post("/auth/refresh", {}, { withCredentials: true });
+        const refreshResponse = await api.post("/auth/refresh");
+        const { accessToken: newAccessToken } = refreshResponse.data;
 
-        // 자동으로 새로운 JWT 쿠키가 갱신되므로, 원래 요청을 다시 보내기
-        return api(originalRequest); // 다시 원래 요청을 보냄
+        if (newAccessToken) {
+          useAuthStore.getState().setAccessToken(newAccessToken);
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          return api(originalRequest);
+        }
       } catch (refreshError) {
-        // 리프레시 토큰 갱신 실패 시, 로그아웃 처리
-        console.error("리프레시 토큰 갱신 실패", refreshError);
-        window.location.href = "/login"; // 로그인 페이지로 리다이렉트
+        useAuthStore.getState().clearAccessToken();
+        toast.warn("로그인이 필요합니다.");
+        window.location.href = "/login";
         return Promise.reject(refreshError);
       }
     }
 
-    return Promise.reject(error); // 401 외의 오류는 그대로 처리
+    //기타 에러들 처리하는 거 여기 있음
+    const isTokenRefresh = originalRequest?.url?.includes("/auth/token");
+
+    if ((status === 401 || status === 403) && !isTokenRefresh) {
+      toast.warn("로그인이 필요합니다.");
+      window.location.href = "/login";
+    }
+
+    return Promise.reject(error);
   }
 );
 

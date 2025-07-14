@@ -1,0 +1,45 @@
+.cartlist-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 70rem;
+  padding-top: 4rem;
+}
+
+.cartlist-header p {
+  margin-left: -2rem;
+  margin-top: -4rem;
+  text-align: left;
+  font-size: 3.2rem;
+  font-weight: 600;
+  line-height: 4rem;
+}
+
+.cartlist-header .highlight {
+  color: #007aff; /* 파란색 강조 */
+}
+
+.cartlist-empty {
+  margin-top: 13rem;
+  margin-left: 25rem;
+  text-align: center;
+}
+
+.empty-message {
+  color: #c1c1c1;
+  font-size: 2.4rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.add-schedule-btn {
+  width: 20rem;
+  height: 6rem;
+  background-color: #0066F9;
+  color: white;
+  border: none;
+  border-radius: 999px;
+  padding: 0.8rem 2rem;
+  font-size: 2rem;
+  cursor: pointer;
+}

@@ -3,7 +3,7 @@
 //쓰는 방법이 알고 싶다면 Router.js를 확인하면 된다잉
 import React, { useState, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import api from '../api/axios';
+import api from '../../api/axios';
 
 function RequireAuth({ children }) {
   const [isAuthed, setIsAuthed] = useState(null);

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Header from "../Header"; 
+import Header from "../common/Header";
 import ProgressStep from '../aiplan/ProgressStep';
 import '../../css/aiplan/AIName.css'; 
 

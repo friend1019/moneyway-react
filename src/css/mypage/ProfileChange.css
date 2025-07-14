@@ -4,7 +4,7 @@
   background-color: white;
   padding: 4rem;
   border-radius: 1rem;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: "Noto Sans KR", sans-serif;
 }
 
 .section {
@@ -22,7 +22,7 @@
 .upload-btn {
   background: none;
   border: none;
-  color: #307EF1;
+  color: #307ef1;
   font-size: 2rem;
   cursor: pointer;
   display: flex;
@@ -49,14 +49,30 @@ input[type="password"] {
 .change-btn {
   position: absolute;
   right: 0;
-  bottom: 0.2rem;
-  padding: 0.6rem 1.2rem;
-  font-size: 1.2rem;
-  background-color: #f1f1f1;
+  width: 15rem;
+  height: 5rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  background-color: #0066f9;
   border: 1px solid #ddd;
-  border-radius: 0.6rem;
-  color: #aaa;
+  border-radius: 1rem;
+  color: white;
   cursor: pointer;
+}
+
+.delete-btn {
+  position: absolute;
+  right: 0;
+  width: 15rem;
+  height: 5rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  background-color: #F02A2A;
+  border: 1px solid #ddd;
+  border-radius: 1rem;
+  color: white;
+  cursor: pointer;
+  margin-top: -4.5rem;
 }
 
 .submit-btn-wrap {
@@ -64,14 +80,23 @@ input[type="password"] {
 }
 
 .save-btn {
-  background-color: #0066F9;
+  background-color: #0066f9;
   color: white;
-  width: 20rem;
+  width: 15rem;
   height: 5rem;
   border: none;
-  border-radius: 2rem;
+  border-radius: 1rem;
   font-size: 1.8rem;
   font-weight: bold;
   cursor: pointer;
-  margin-top: 4rem;
+  margin-top: 8rem;
 }
+
+.preview-image {
+  width: 10rem;
+  height: 10rem;
+  border-radius: 2rem;
+  object-fit: cover;
+  margin-top: 1rem;
+}
+
