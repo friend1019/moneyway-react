@@ -6,7 +6,7 @@ import ProgressStep from '../aiplan/ProgressStep';
 import '../../css/aiplan/AIBudget.css'; 
 
 const AIBudget = () => {
-    const [budget, setBudget] = useState([200000, 800000]);
+    const [budget, setBudget] = useState([500000]);
     const navigate = useNavigate();
 
     const handleNext = () => {

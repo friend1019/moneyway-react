@@ -55,6 +55,7 @@ const ProfileChange = () => {
         <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
           <input
             type="text"
+            className="nickname-input"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
           />
@@ -89,14 +90,20 @@ const ProfileChange = () => {
         <label className="label">비밀번호 변경</label>
         <button
           className="change-btn"
-          onClick={() => navigate("/resetpassword")}
+          onClick={() => navigate("/changepassword")}
         >
           변경하러 가기
         </button>
       </div>
 
+      <div className="submit-btn-wrap">
+        <button className="save-btn" onClick={handleSave} disabled={isSaving}>
+          {isSaving ? "저장 중..." : "저장하기"}
+        </button>
+      </div>
+
       <div className="section">
-        <label className="label">회원 탈퇴</label>
+        <label className="label" style={{marginBottom:"3rem"}}>회원 탈퇴</label>
         <button
           className="delete-btn"
           onClick={async () => {
@@ -119,12 +126,6 @@ const ProfileChange = () => {
           }}
         >
           회원 탈퇴
-        </button>
-      </div>
-
-      <div className="submit-btn-wrap">
-        <button className="save-btn" onClick={handleSave} disabled={isSaving}>
-          {isSaving ? "저장 중..." : "저장하기"}
         </button>
       </div>
     </div>

@@ -37,7 +37,7 @@ const SearchMain = () => {
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const defaultCategory = queryParams.get("category") || "숙소";
+  const defaultCategory = queryParams.get("category") || "카페";
   const [category, setCategory] = useState(defaultCategory);
 
   const handlePlaceSelect = useCallback((place, showDetail = false) => {

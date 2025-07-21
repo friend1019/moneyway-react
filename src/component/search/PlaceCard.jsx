@@ -3,7 +3,7 @@ import '../../css/search/PlaceCard.css';
 import { FaHeart, FaStar, FaRegStar } from 'react-icons/fa';
 
 const PlaceCard = ({ place, onClick }) => {
-  const { title, category, address, status, rating, imageUrls = [] } = place;
+  const { title, categoryName, address, status, rating, imageUrls = [] } = place;
   // 별점 5개 생성
   const stars = [];
   for (let i = 1; i <= 5; i++) {
@@ -30,7 +30,7 @@ const PlaceCard = ({ place, onClick }) => {
       </div>
 
       <div className="card-subinfo">
-        <span className="place-category">{category}</span>
+        <span className="place-category">{categoryName}</span>
         <span className='place-section'>/</span>
         <span className="place-address">{address}</span>
       </div>

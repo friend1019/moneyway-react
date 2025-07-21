@@ -4,6 +4,7 @@ import Profile from "./Profile";
 import ProfileChange from "./ProfileChange";
 import MyArticles from "./MyArticles";
 import Scrap from "./Scarp";
+import Footer from "../common/Footer";
 import '../../css/mypage/MyPage.css';
 
 const MyPage = () => {
@@ -31,6 +32,7 @@ const MyPage = () => {
           {view === "edit" && <ProfileChange />}
         </div>
       </div>
+      <Footer />
     </>
   );
 };

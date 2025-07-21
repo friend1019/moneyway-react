@@ -1,54 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
+import { FiEdit } from "react-icons/fi";
+import "../../css/shopping/CartItem.css";
 
-const CartItem = ({ item, isBackground }) => {
+const CartItem = ({ item, isBackground, onDelete, onPriceSave }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [price, setPrice] = useState(item.price);
+
+  const handleSave = () => {
+    if (price >= 0) {
+      onPriceSave(item.id, price);
+      setIsEditing(false); // 저장 후 edit모드 종료
+    }
+  };
+
   return (
     <div
-      style={{
-        display: "flex",
-        width: "70rem",
-        height: "8rem",
-        alignItems: "center",
-        backgroundColor: isBackground ? "#F8F9FB" : "transparent",
-        padding: "1.2rem",
-        borderRadius: "1.2rem",
-        marginLeft: "40rem",
-      }}
+      className="cart-item-container"
+      style={{ backgroundColor: isBackground ? "white" : "transparent" }}
     >
       <img
         src={item.image}
         alt={item.name}
-        style={{
-          width: "5rem",
-          height: "5rem",
-          borderRadius: "0.8rem",
-          objectFit: "cover",
-          marginRight: "1rem",
-        }}
+        className="cart-item-image"
       />
-      <div style={{ flex: 1 }}>
-        <div
-          style={{ fontSize: "1.8rem", fontWeight: "bold", color: item.color }}
-        >
-          {item.name}
-        </div>
-        <div style={{ color: item.color, fontSize: "1.6rem", fontWeight:"lighter", marginTop: "0.2rem" }}>
-          {item.category}
-        </div>
+      <div className="cart-item-info">
+        <div className="cart-item-name">{item.name}</div>
+        <div className="cart-item-category">{item.category}</div>
+      </div>
+
+      <div className="cart-item-price">
+        {isEditing ? (
+          <>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(Number(e.target.value))}
+              className="cart-item-price-input"
+            />
+            <button className="cart-item-save" onClick={handleSave}>
+              저장
+            </button>
+          </>
+        ) : (
+          <div
+            className="cart-item-price-view"
+            onClick={() => setIsEditing(true)}
+            style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: "0.4rem" }}
+          >
+            <FiEdit />
+            <span>{price.toLocaleString()} ￦</span>
+          </div>
+        )}
       </div>
 
       <button
-        style={{
-          marginLeft: "1rem",
-          backgroundColor: "#E9EDF4",
-          border: "none",
-          borderRadius: "999px",
-          width: "3.2rem",
-          height: "3.2rem",
-          fontSize: "1.9rem",
-          fontWeight: "bold",
-          cursor: "pointer",
-        }}
-        onClick={() => console.log(`${item.name} 삭제`)}
+        className="cart-item-delete"
+        onClick={() => onDelete(item.id)}
       >
         ✕
       </button>

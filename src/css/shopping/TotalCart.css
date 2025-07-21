@@ -1,20 +1,20 @@
 .totalcart-container {
-  width: 63rem;
-  height: 80rem;
+  width: 55rem;
+  height: 70rem;
   border: 1px solid #bebebe;
-  border-radius: 1.2rem;
+  border-radius: 2rem;
   padding: 8rem;
   box-sizing: border-box;
   font-size: 2rem;
   background-color: white;
-  margin-right: 10rem;
+  margin-top: 11rem;
 }
 
 .totalcart-title {
   font-weight: bold;
   margin-bottom: 4rem;
-  margin-top: -2rem;
-  font-size: 3.2rem;
+  margin-top: -4rem;
+  font-size: 3rem;
 }
 
 .totalcart-list {
@@ -27,7 +27,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
 }
 
 .totalcart-icon {
@@ -55,6 +55,8 @@
   flex: 1;
   text-align: left;
   font-size: 2rem;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
 }
 
 .totalcart-item .count {
@@ -64,7 +66,7 @@
 .totalcart-total {
   display: flex;
   justify-content: space-between;
-  margin: 3rem 0 6rem;
+  margin: 2rem 0 4rem;
   padding-top: 4rem;
   border-top: 1px solid #ddd;
   font-weight: bold;
@@ -73,12 +75,98 @@
 
 .totalcart-button {
   width: 100%;
-  background-color: #d4e4ff;
+  background-color: #0066f9;
   color: white;
-  padding: 1rem;
+  padding: 0.8rem;
   border: none;
   border-radius: 999px;
-  font-size: 1.3rem;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.totalcart-button:disabled {
+  background-color: #d4e4ff;
+  color: #fff;
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+/* 내 플랜 팝업 */
+
+/* TotalCart.css 또는 Modal.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 1.2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.plan-selector .plan-item {
+  display: flex;
+  gap: 1.2rem;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.plan-selector .thumbnail {
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: 0.8rem;
+  object-fit: cover;
+}
+
+.plan-selector .title {
+  font-weight: 600;
+  font-size: 1.6rem;
+}
+
+.plan-selector .date {
+  font-size: 1.3rem;
+  color: gray;
+}
+
+.modal-content {
+  position: relative; /* 필수 */
+  background: white;
+  padding: 2rem;
+  border-radius: 1.2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 1.2rem;
+  right: 2rem;
+  font-size: 4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  z-index: 1000;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close-button:hover {
+  color: #000;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import '../../css/aiplan/ProgressStep.css'; 
 
-const ProgressStep = ({ currentStep, totalSteps = 4 }) => {
+const ProgressStep = ({ currentStep, totalSteps = 3 }) => {
     const goBack = () => {
         window.history.back();
     };

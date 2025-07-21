@@ -6,13 +6,11 @@ import { getPlacesByCategory } from "../../api/tourApi.js";
 
 import Header from "../common/Header";
 import Footer from "../common/Footer.jsx";
-import BudgetSlider from "../main/BudgetSlider";
 import HorizontalSlider from "../main/Slider";
-
+import PlanFormSection from "../aiplan/PlanFormSection";
 import PlaceDetailView from "../search/PlaceDetailView";
 
 import { ReactComponent as BriefcaseIcon } from "../../images/main/briefcase.svg";
-import jejuOceanImg from "../../images/main/jejuocean.png";
 import PlaneIslandImg from "../../images/main/fifth/airplane.svg";
 import Mandarin from "../../images/main/fifth/mandarin.svg";
 
@@ -25,24 +23,7 @@ import { ReactComponent as HoverFoodIcon } from "../../images/main/fifth/hover_r
 import { ReactComponent as HoverCafeIcon } from "../../images/main/fifth/hover_cafe.svg";
 import { ReactComponent as HoverActivityIcon } from "../../images/main/fifth/hover_activity.svg";
 
-import { ReactComponent as People } from "../../images/main/second/people.svg";
-import { ReactComponent as BasicPeople } from "../../images/main/second/basic_people.svg";
-import { ReactComponent as PlanButton } from "../../images/main/second/planbutton.svg";
-
 function Main() {
-  const [budget, setBudget] = useState([100000, 300000]);
-  const [tripDuration, setTripDuration] = useState(null);
-  const [isDurationPickerVisible, setIsDurationPickerVisible] = useState(false);
-  const durationOptions = [
-    "당일치기",
-    "1박 2일",
-    "2박 3일",
-    "3박 4일",
-  ];
-
-  const [personnel, setPersonnel] = useState(null);
-  const [isPersonnelPickerVisible, setPersonnelPickerVisible] = useState(false);
-  const personnelOptions = [1, 2, 3, 4];
 
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [editorPicksData, setEditorPicksData] = useState([]);
@@ -50,10 +31,6 @@ function Main() {
   const [selectedPlace, setSelectedPlace] = useState(null);
 
   const navigate = useNavigate();
-
-  const formatPersonnelDisplay = (p) => {
-    return p >= 4 ? "4명 이상" : `${p}명`;
-  };
 
   const categories = [
     {
@@ -85,7 +62,7 @@ function Main() {
   useEffect(() => {
     const fetchRecommendations = async () => {
       const data = await getPlacesByCategory("TOURIST_ATTRACTION");
-      const sliced = data.slice(0, 8).map((item, idx) => ({
+      const sliced = data.slice(13, 20).map((item, idx) => ({
         id: idx,
         image: item.imageUrls?.[0],
         title: item.title,
@@ -100,7 +77,7 @@ function Main() {
   useEffect(() => {
     const fetchEditorPicks = async () => {
       const data = await getPlacesByCategory("ACTIVITY");
-      const sliced = data.slice(0, 6).map((item, idx) => ({
+      const sliced = data.slice(1, 7).map((item, idx) => ({
         id: idx,
         image: item.imageUrls?.[0],
         title: item.title,
@@ -115,14 +92,10 @@ function Main() {
     <>
       <Header />
 
-      {/*첫번째 페이지*/}
+      {/* 1번째 페이지 */}
       <div className="FirstMain">
         <div className="visual-section">
           <div className="jeju-banner">
-            {/* <div className="banner-circles">
-              <div className="circle circle1"></div>
-              <div className="circle circle2"></div>
-            </div> */}
             <div className="banner-horizontal-line"></div>
             <div className="banner-text">
               <h1>
@@ -162,118 +135,10 @@ function Main() {
         </div>
       </div>
 
-      {/*두번째 페이지*/}
-      <div className="plan-form-wrapper">
-        <div className="plan-form-left">
-          <div className="plan-title-card">
-            <h2>예산과 일정을 입력해주세요</h2>
-          </div>
+      {/* 2번째 페이지 - 분리된 컴포넌트 */}
+      <PlanFormSection />
 
-          <BudgetSlider budget={budget} setBudget={setBudget} />
-
-          <div className="selector-container">
-            <div
-              className="selector-row"
-              onClick={() => {
-                setIsDurationPickerVisible(!isDurationPickerVisible);
-                setPersonnelPickerVisible(false);
-              }}
-            >
-              {tripDuration ? (
-                <People className="icon" />
-              ) : (
-                <BasicPeople className="icon" />
-              )}
-              <span className={!tripDuration ? "placeholder" : ""}>
-                {tripDuration || "여행 기간"}
-              </span>
-            </div>
-
-            {isDurationPickerVisible && (
-              <div className="selector-options">
-                {durationOptions.map((option) => (
-                  <div
-                    key={option}
-                    className={`selector-option-item ${
-                      tripDuration === option ? "selected" : ""
-                    }`}
-                    onClick={() => {
-                      setTripDuration(option);
-                      setIsDurationPickerVisible(false);
-                    }}
-                  >
-                    <People className="icon" />
-                    <span>{option}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="selector-container">
-            <div
-              className="selector-row"
-              onClick={() => {
-                setPersonnelPickerVisible(!isPersonnelPickerVisible);
-                setIsDurationPickerVisible(false);
-              }}
-            >
-              {personnel ? (
-                <People className="icon" />
-              ) : (
-                <BasicPeople className="icon" />
-              )}
-              <span className={!personnel ? "placeholder" : ""}>
-                {personnel ? formatPersonnelDisplay(personnel) : "인원"}
-              </span>
-            </div>
-
-            {isPersonnelPickerVisible && (
-              <div className="selector-options">
-                {personnelOptions.map((option) => (
-                  <div
-                    key={option}
-                    className={`selector-option-item ${
-                      personnel === option ? "selected" : ""
-                    }`}
-                    onClick={() => {
-                      setPersonnel(option);
-                      setPersonnelPickerVisible(false);
-                    }}
-                  >
-                    <People className="icon" />
-                    <span>{formatPersonnelDisplay(option)}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-          <button className="plan-submit">
-            플랜 생성
-            <PlanButton className="icon" />
-          </button>
-          <div className="plan-direct" onClick={() => navigate("/aiplan")}>
-            직접 계획할래요
-          </div>
-        </div>
-
-        <div className="plan-form-right">
-          <div className="plan-image-box">
-            <img
-              src={jejuOceanImg}
-              alt="JEJU a beautiful island"
-              className="plan-image"
-            />
-            <div className="plan-image-title">
-              <div>JEJU,</div>
-              <div>a beautiful island</div>
-              <span className="plan-title-bar"></span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/*3번째 페이지*/}
+      {/* 3번째 페이지 */}
       <div className="editor-pick">
         <section className="editor-section-container">
           <div className="editor-section-header">
@@ -297,7 +162,7 @@ function Main() {
         </section>
       </div>
 
-      {/*4번째 페이지*/}
+      {/* 4번째 페이지 */}
       <div className="recommendation">
         <section className="recommendation-section-container">
           <div className="recommendation-section-header">
@@ -307,7 +172,6 @@ function Main() {
           <HorizontalSlider>
             <div className="moneyway-cards-list">
               {recommendationsData.map((item) => (
-                // 선택된 장소 저장하는 onclick 추가했음 -지인-
                 <div
                   key={item.id}
                   className="recommendation-card"
@@ -320,7 +184,6 @@ function Main() {
                       className="card-image"
                     />
                   </div>
-
                   <div className="info-wrapper">
                     <h4 className="title">{item.title}</h4>
                     <div className="tags-wrapper">
@@ -338,7 +201,7 @@ function Main() {
         </section>
       </div>
 
-      {/*5번째 페이지*/}
+      {/* 5번째 페이지 */}
       <div className="landing-main-wrapper">
         <div className="landing-content">
           <h1 className="landing-title">저예산 제주 여행을 찾고 계신가요?</h1>
