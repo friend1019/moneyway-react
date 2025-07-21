@@ -16,7 +16,7 @@ const AIPeriod = () => {
     ];
 
     const handleNext = () => {
-        navigate('/ai-people'); 
+        navigate('/ai-name'); 
     };
 
     return (

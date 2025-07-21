@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom"; // ✅ 추가
 import AppRouter from "./Router";
 import api from "./api/axios";
 import useAuthStore from "./api/authStore.js";
@@ -10,34 +11,47 @@ window.authStore = useAuthStore;
 
 function App() {
   const { isInitialized, setInitialized, setAccessToken } = useAuthStore();
+  const location = useLocation();
 
   useEffect(() => {
     const tryAutoLogin = async () => {
+      if (location.pathname === "/login") {
+        setInitialized(true);
+        return;
+      }
+
       try {
-        const res = await api.post("/auth/token");
-        const { accessToken } = res.data;
-        console.log("자동 로그인 액세스토큰:", accessToken);
+        const res = await api.post("/auth/refresh");
+        const accessToken = res?.data?.accessToken;
+
         if (accessToken) {
           setAccessToken(accessToken);
+        } else {
+          useAuthStore.getState().clearAccessToken(); // ✅ 안정성 보완
         }
       } catch (error) {
-        console.log("자동 로그인 실패");
+        console.error("refresh 실패:", error);
+        useAuthStore.getState().clearAccessToken(); // ✅ 실패 시 명시적으로 비움
       } finally {
         setInitialized(true);
       }
     };
 
     tryAutoLogin();
-  }, [setAccessToken, setInitialized]);
+  }, [location.pathname]);
 
   if (!isInitialized) {
-    // 아직 자동 로그인 시도 중이면 로딩 표시
-    <LoadingSpinner />;
+    return <LoadingSpinner />;
   }
 
   return (
     <div className="App">
-      <ToastContainer position="bottom-center" autoClose={3000} newestOnTop={false} theme="colored"/>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={3000}
+        newestOnTop={false}
+        theme="colored"
+      />
       <AppRouter />
     </div>
   );

@@ -1,0 +1,83 @@
+.cart-item-container {
+  display: flex;
+  align-items: center;
+  background-color: #f8f9fb;
+  padding: 1.2rem 2rem;
+  border-radius: 1.2rem;
+  margin-bottom: 1.2rem;
+  width: 95%;
+}
+
+.cart-item-image {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 0.8rem;
+  object-fit: cover;
+  margin-right: 1.5rem;
+}
+
+.cart-item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-item-name {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #222;
+}
+
+.cart-item-category {
+  font-size: 1.4rem;
+  color: #666;
+  margin-top: 0.3rem;
+}
+
+.cart-item-delete {
+  background-color: #e9edf4;
+  border: none;
+  border-radius: 999px;
+  width: 3.2rem;
+  height: 3.2rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart-item-price {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 1.5rem;
+}
+
+.cart-item-price-input {
+  border-radius: 5rem;
+  border: 0.1rem solid black;
+  width: 8rem;
+  height: 2.4rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-left: auto;
+  text-align: center;
+}
+
+/* Chrome, Safari, Edge 화살표 없애는거 */
+.cart-item-price-input::-webkit-outer-spin-button,
+.cart-item-price-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cart-item-save {
+  background-color: white;
+  color: #307ef1;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}

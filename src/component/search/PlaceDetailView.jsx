@@ -1,5 +1,7 @@
 import React from "react";
 import "../../css/search/PlaceDetailView.css";
+import api from "../../api/axios.js";
+import { toast } from "react-toastify";
 import {
   FaArrowLeft,
   FaHeart,
@@ -12,7 +14,7 @@ import {
 const PlaceDetailView = ({ place, onBack }) => {
   const handleCopyAddress = () => {
     navigator.clipboard.writeText(place.address || "");
-    alert("주소가 복사되었습니다!");
+    toast.success("주소가 복사되었습니다!");
   };
 
   const handleShare = () => {
@@ -26,7 +28,21 @@ const PlaceDetailView = ({ place, onBack }) => {
         .catch((err) => console.log("공유 취소 또는 실패:", err));
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert("공유 링크가 복사되었습니다!");
+      toast.success("공유 링크가 복사되었습니다!");
+    }
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      console.log("추가할 placeId:", place.placeId);
+
+      await api.post("/cart", {
+        placeId: place.placeId,
+      });
+      toast.success("일정에 추가되었습니다!");
+    } catch (err) {
+      toast.error("추가 중 오류가 발생했습니다.");
+      console.error(err);
     }
   };
 
@@ -82,7 +98,9 @@ const PlaceDetailView = ({ place, onBack }) => {
           )}
         </div>
 
-        <button className="schedule-btn">일정 추가하기</button>
+        <button className="schedule-btn" onClick={handleAddToCart}>
+          장바구니에 추가하기
+        </button>
 
         <div className="info-section">
           <div className="info-row">

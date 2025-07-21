@@ -1,38 +1,11 @@
-//로딩 애니메이션이야 이거
-import React from 'react';
-import LogoWallet from '../../images/login/logoWallet.svg';
-
-const spinnerStyle = {
-  width: '4rem',
-  height: '4rem',
-  animation: 'spin 1s linear infinite',
-};
-
-const containerStyle = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  padding: '2rem',
-};
-
-const styleSheet = document.styleSheets[0];
-const keyframes = `
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}`;
-try {
-  if (styleSheet?.cssRules && ![...styleSheet.cssRules].some(rule => rule.name === 'spin')) {
-    styleSheet.insertRule(keyframes, styleSheet.cssRules.length);
-  }
-} catch (e) {
-  console.warn('keyframe 삽입 실패:', e);
-}
+import React from "react";
+import "../../css/common/LoadingSpinner.css";
+import LogoWallet from "../../images/login/logoWallet.svg";
 
 const LoadingSpinner = () => {
   return (
-    <div style={containerStyle}>
-      <img src={LogoWallet} alt="로딩 중" style={spinnerStyle} />
+    <div className="loading-spinner-container">
+      <img src={LogoWallet} alt="로딩 중" className="loading-spinner" />
     </div>
   );
 };

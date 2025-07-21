@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import SideMenu from "./SideMenu";
-import api from "../../api/axios"; // ✅ axios 인스턴스
+import api from "../../api/axios";
 
 import "../../css/common/Header.css";
 
@@ -12,7 +12,8 @@ import cartlogo from "../../images/header/cart.svg";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [nickname, setNickname] = useState("");
+  // const [nickname, setNickname] = useState("");
+  const [profileImage, setProfileImage] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -23,7 +24,8 @@ function Header() {
     const fetchUser = async () => {
       try {
         const res = await api.get("/mypage/me");
-        setNickname(res.data.nickname);
+        // setNickname(res.data.nickname);
+        setProfileImage(res.data.profileImageUrl); // ✅ 프로필 이미지 설정
         setIsLoggedIn(true);
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
@@ -44,18 +46,18 @@ function Header() {
               <img src={logo} alt="logo" />
             </Link>
 
-            {/* ✅ 로그인 시에만 문구 표시 (로고 바로 오른쪽) */}
+            {/* ✅ 로그인 시에만 문구 표시 (로고 바로 오른쪽)
             {!loading && isLoggedIn && (
               <span className="welcome-text">
                 <span className="nickname-text">{nickname}</span>님, 머니웨이에
                 오신걸 환영합니다!
               </span>
-            )}
+            )} */}
           </div>
 
           <nav className="navbar-container">
             <li className="nav-item">
-              <Link className="nav-link" to="/myplan">
+              <Link className="nav-link" to="/planlist">
                 <span className="myplan">내 계획</span>
               </Link>
             </li>
@@ -71,7 +73,15 @@ function Header() {
             </li>
             <li className="nav-item">
               <Link className="nav-link" to="/mypage">
-                <img src={account} alt="account" className="nav-icon" />
+                {!loading && isLoggedIn && profileImage ? (
+                  <img
+                    src={profileImage}
+                    alt="profile"
+                    className="nav-icon profile-image-header"
+                  />
+                ) : (
+                  <img src={account} alt="account" className="nav-icon" />
+                )}
               </Link>
             </li>
           </nav>
