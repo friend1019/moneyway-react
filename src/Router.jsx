@@ -17,7 +17,9 @@ import AIPeople from "./component/aiplan/AIPeople";
 import AIName from "./component/aiplan/AIName";
 import AIBudget from "./component/aiplan/AIBudget";
 
+// timetable 브랜치에서 추가된 부분
 import MyPlanPage from "./component/myplan/MyPlanPage";
+
 import CartMain from "./component/shopping/CartMain";
 
 import PlanList from "./component/common/PlanList";
@@ -29,6 +31,7 @@ import PostCreate from "./component/community/PostCreate";
 function AppRouter() {
   return (
     <Routes>
+      {/* 두 브랜치에 공통으로 있던 경로들. 마스터 브랜치의 {}는 제거했습니다. */}
       <Route path="/" element={<Main />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<Signup />} />
@@ -42,6 +45,7 @@ function AppRouter() {
       <Route path="/ai-period" element={<AIPeriod />} />
       <Route path="/ai-people" element={<AIPeople />} />
       <Route path="/ai-name" element={<AIName />} />
+
       <Route
         path="/mypage"
         element={
@@ -50,6 +54,7 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+      {/* timetable 브랜치에서 추가된 /myplan 경로 */}
       <Route
         path="/myplan"
         element={
@@ -58,6 +63,7 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+      {/* 두 브랜치에 공통으로 있던 나머지 ProtectedRoute 경로들. 마스터 브랜치의 {}는 제거했습니다. */}
       <Route
         path="/cart"
         element={
@@ -82,6 +88,7 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+      {/* 두 브랜치에 공통으로 있던 Community 경로들. 마스터 브랜치의 {}는 제거했습니다. */}
       <Route path="/community" element={<CommunityMain />} />
       <Route path="/community/create" element={<PostCreate />} />
     </Routes>
