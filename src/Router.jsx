@@ -10,11 +10,12 @@ import Signin from "./component/login/Signin";
 import ForgotPwd from "./component/login/ForgotPwd";
 import EmailCode from "./component/login/EmailCode";
 import ResetPassword from "./component/login/ResetPassword";
-
+import MyPlanPage from "./component/myplan/MyPlanPage"
 import AIPeriod from './component/aiplan/AIPeriod';
 import AIPeople from './component/aiplan/AIPeople';
 import AIName from './component/aiplan/AIName';
 import AIBudget from "./component/aiplan/AIBudget";
+
 
 function AppRouter() {
   return (
@@ -39,6 +40,7 @@ function AppRouter() {
         {<Route path="/ai-period" element={<AIPeriod />} />}
         {<Route path="/ai-people" element={<AIPeople />} />}
         {<Route path="/ai-name" element={<AIName />} />}
+        {<Route path="/myplan" element={<MyPlanPage />} />}
       </Routes>
     </Router>
   );
