@@ -42,7 +42,22 @@ function AppRouter() {
       <Route path="/ai-period" element={<AIPeriod />} />
       <Route path="/ai-people" element={<AIPeople />} />
       <Route path="/ai-name" element={<AIName />} />
-      <Route path="/myplan" element={<MyPlanPage />} />
+      <Route
+        path="/mypage"
+        element={
+          <ProtectedRoute>
+            <MyPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/myplan"
+        element={
+          <ProtectedRoute>
+            <MyPlanPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/cart"
         element={
