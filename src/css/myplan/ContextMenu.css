@@ -1,0 +1,27 @@
+/* 1rem = 16px 기준 */
+
+.context-menu {
+  position: fixed;
+  background-color: white;
+  border: 0.0625rem solid #ccc; /* 1px */
+  border-radius: 0.3125rem; /* 5px */
+  box-shadow: 0.125rem 0.125rem 0.3125rem rgba(0, 0, 0, 0.15); /* 2px 2px 5px */
+  z-index: 1000;
+  padding: 0.3125rem 0; /* 5px 0 */
+  font-size: 1.5rem; /* 14px */
+}
+
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.context-menu li {
+  padding: 0.5rem 0.9375rem; /* 8px 15px */
+  cursor: pointer;
+}
+
+.context-menu li:hover {
+  background-color: #f0f0f0;
+}

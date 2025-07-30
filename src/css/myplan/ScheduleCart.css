@@ -1,0 +1,49 @@
+.schedule-cart-card {
+    width: 100%;
+    background: #f6fff2;       /* 기본 연초록 (카테고리별로 동적 적용 가능) */
+    border-radius: 0.7rem;
+    padding: 1rem 1rem 0.75rem 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1.5px 8px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.33rem;
+    border: none;
+}
+
+.cart-category-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.09rem;
+}
+
+.cart-icon {
+    width: 3rem;
+    height: 3rem;
+    margin-right: 0.1rem;
+    margin-top: -0.11rem;
+}
+.cart-category-text {
+    color: #7ddc7e;
+    padding-left: 0.3rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+.cart-place-name {
+    margin-top: 0.04rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #101010;
+    line-height: 1.15;
+}
+
+.cart-price {
+    margin-top: 0.09rem;
+    font-size: 1.3rem;
+    color: #c3c3c3;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
