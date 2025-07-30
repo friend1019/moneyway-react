@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import '../../css/myplan/MyPlanPage.css';
-import Header from "../Header";
+import Header from "../common/Header";
 import Schedule from './Schedule';
 import ScheduleCart from './ScheduleCart';
 import LodgingCart from './LodgingCart'; 
