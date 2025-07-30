@@ -1,33 +1,91 @@
 import axios from "axios";
+import useAuthStore from "./authStore.js";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+let isRefreshing = false; // ✅ 중복 refresh 방지
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
 
 const api = axios.create({
-  baseURL: "https://moneyway-zg4x.onrender.com/api", // 서버 주소에 맞게 조정
-  withCredentials: true, // 쿠키 자동 포함
+  baseURL: "https://moneyway.cloud/api",
+  withCredentials: true,
 });
+
+api.interceptors.request.use(
+  (config) => {
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
 
-    // 401 Unauthorized -> 토큰 갱신 요청
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isTokenRefresh = originalRequest?.url?.includes("/auth/refresh");
+    const isLoginRequest = originalRequest?.url?.includes("/auth/login");
+
+    if (status === 401 && isTokenRefresh) {
+      useAuthStore.getState().clearAccessToken();
+      useAuthStore.getState().setInitialized(true); // ✅ 초기화는 여기서
+      return Promise.reject(error);
+    }
+
+    if (status === 401 && !originalRequest._retry && !isLoginRequest) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then((token) => {
+            originalRequest.headers["Authorization"] = `Bearer ${token}`;
+            return api(originalRequest);
+          })
+          .catch((err) => Promise.reject(err));
+      }
+
       originalRequest._retry = true;
-      try {
-        // 리프레시 토큰 갱신을 위한 요청 (백엔드가 쿠키 갱신 처리)
-        await api.post("/auth/refresh", {}, { withCredentials: true });
+      isRefreshing = true;
 
-        // 자동으로 새로운 JWT 쿠키가 갱신되므로, 원래 요청을 다시 보내기
-        return api(originalRequest); // 다시 원래 요청을 보냄
+      try {
+        const refreshResponse = await api.post("/auth/refresh");
+        const { accessToken: newAccessToken } = refreshResponse.data;
+
+        if (newAccessToken) {
+          useAuthStore.getState().setAccessToken(newAccessToken);
+          processQueue(null, newAccessToken);
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          return api(originalRequest);
+        }
+        // ✅ 수정된 catch 블록
       } catch (refreshError) {
-        // 리프레시 토큰 갱신 실패 시, 로그아웃 처리
-        console.error("리프레시 토큰 갱신 실패", refreshError);
-        window.location.href = "/login"; // 로그인 페이지로 리다이렉트
+        processQueue(refreshError, null);
+        const auth = useAuthStore.getState();
+        auth.clearAccessToken();
+        auth.setInitialized(true); // ✅ 여기 필수!
         return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
-    return Promise.reject(error); // 401 외의 오류는 그대로 처리
+    return Promise.reject(error);
   }
 );
 

@@ -16,7 +16,7 @@ import AIPeriod from "./component/aiplan/AIPeriod";
 import AIPeople from "./component/aiplan/AIPeople";
 import AIName from "./component/aiplan/AIName";
 import AIBudget from "./component/aiplan/AIBudget";
-import MyPlanPage from "./component/myplan/MyPlanPage"; // ✅ 꼭 있어야 함
+import MyPlanPage from "./component/myplan/MyPlanPage";
 import CartMain from "./component/shopping/CartMain";
 import PlanList from "./component/common/PlanList";
 import CreatePlan from "./component/aiplan/CreatePlan";
@@ -39,7 +39,6 @@ function AppRouter() {
       <Route path="/ai-period" element={<AIPeriod />} />
       <Route path="/ai-people" element={<AIPeople />} />
       <Route path="/ai-name" element={<AIName />} />
-
       <Route
         path="/mypage"
         element={

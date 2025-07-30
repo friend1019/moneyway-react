@@ -1,6 +1,11 @@
+// src/components/login/Signin.js
 import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "react-toastify";
 import LoginHeader from "./LoginHeader";
-import Header from "../Header";
+import Header from "../common/Header";
+import api from "../../api/axios";
+import useAuthStore from "../../api/authStore.js";
 import "../../css/login/Signin.css";
 import "../../css/login/Signup.css";
 import "../../css/login/LoginPage.css";
@@ -8,14 +13,20 @@ import "../../css/login/LoginPage.css";
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loginError, setLoginError] = useState("");
 
-  // 이메일 유효성 검사
-  const validateEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const { setAccessToken } = useAuthStore();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  //로그인 전 사용자가 보려던 경로 저장 (기본값은 '/')
+  const from = location.state?.from?.pathname || "/";
+
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePassword = (password) =>
+    /^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/.test(password);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -29,11 +40,8 @@ const Signin = () => {
     setLoginError("");
   };
 
-  // 로그인 버튼 활성화 조건
-  const canSubmit =
-    validateEmail(email) && password.length >= 8;
+  const canSubmit = validateEmail(email) && validatePassword(password);
 
-  // 로그인 처리 함수 (테스트용 모의)
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError("");
@@ -42,29 +50,38 @@ const Signin = () => {
       setEmailError("올바른 이메일 형식을 입력해주세요.");
       return;
     }
-    if (password.length < 8) {
-      setPasswordError("비밀번호는 8자 이상이어야 합니다.");
+    if (!validatePassword(password)) {
+      setPasswordError("8~16자, 특수문자(@$!%*?&)를 포함해야 합니다.");
       return;
     }
 
-    // 실제 API 호출 코드 자리
-    // 예시: const res = await axios.post('/api/login', { email, password });
+    try {
+      const response = await api.post("/auth/login", { email, password });
 
-    // 테스트용 임시: 계정 없다고 가정
-    const accountExists = false;
-
-    if (!accountExists) {
-      setLoginError("존재하지 않는 계정입니다.");
-      return;
+      const token = response.data?.tokenInfo?.accessToken;
+      if (token) {
+        setAccessToken(token); //Zustand에 저장
+        toast.success("로그인 성공!");
+        navigate(from, { replace: true }); //이전 페이지로 이동
+      } else {
+        console.error("❌ 토큰이 응답에 없음!", response.data);
+      }
+    } catch (err) {
+      const code = err.response?.data?.code;
+      if (code === "INVALID_PASSWORD") {
+        setPasswordError("비밀번호가 틀렸습니다.");
+      } else if (code === "USER_NOT_FOUND") {
+        setLoginError("존재하지 않는 계정입니다.");
+      } else {
+        setLoginError("로그인 중 오류가 발생했습니다.");
+      }
     }
-
-    // 로그인 성공 후 처리 (리다이렉트 등)
   };
 
   return (
     <>
       <Header />
-      <div className="container">
+      <div className="login-container">
         <div className="login-header">
           <LoginHeader text="로그인" />
         </div>
@@ -76,7 +93,9 @@ const Signin = () => {
               id="email"
               name="email"
               placeholder="moneyway@gmail.com"
-              className={`input-field ${emailError || loginError ? "error" : ""}`}
+              className={`input-field ${
+                emailError || loginError ? "error" : ""
+              }`}
               value={email}
               onChange={handleEmailChange}
             />
@@ -87,14 +106,15 @@ const Signin = () => {
               type="password"
               id="password"
               name="password"
-              placeholder="8자리 이상"
-              className={`input-field ${passwordError || loginError ? "error" : ""}`}
+              placeholder="8~16자 + 특수문자 포함"
+              className={`input-field ${
+                passwordError || loginError ? "error" : ""
+              }`}
               value={password}
               onChange={handlePasswordChange}
             />
             {passwordError && <p className="error-message">{passwordError}</p>}
 
-            {/* 로그인 실패 시 공통 에러 메시지 */}
             {loginError && !emailError && !passwordError && (
               <p className="error-message">{loginError}</p>
             )}
@@ -114,124 +134,3 @@ const Signin = () => {
 };
 
 export default Signin;
-
-
-// import React, { useState } from "react";
-// import axios from "axios"; // axios 임포트
-// import LoginHeader from "./LoginHeader";
-// import Header from "../Header";
-// import "../../css/login/Signin.css";
-// import "../../css/login/Signup.css";
-// import "../../css/login/LoginPage.css";
-
-// const Signin = () => {
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-
-//   const [emailError, setEmailError] = useState("");
-//   const [passwordError, setPasswordError] = useState("");
-//   const [loginError, setLoginError] = useState("");
-
-//   const validateEmail = (email) =>
-//     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-//   const handleEmailChange = (e) => {
-//     setEmail(e.target.value);
-//     setEmailError("");
-//     setLoginError("");
-//   };
-
-//   const handlePasswordChange = (e) => {
-//     setPassword(e.target.value);
-//     setPasswordError("");
-//     setLoginError("");
-//   };
-
-//   const canSubmit =
-//     validateEmail(email) && password.length >= 8;
-
-//   const handleLogin = async (e) => {
-//     e.preventDefault();
-//     setLoginError("");
-
-//     if (!validateEmail(email)) {
-//       setEmailError("올바른 이메일 형식을 입력해주세요.");
-//       return;
-//     }
-//     if (password.length < 8) {
-//       setPasswordError("비밀번호는 8자 이상이어야 합니다.");
-//       return;
-//     }
-
-//     try {
-//       await axios.post("/api/login", {
-//         email,
-//         password,
-//       });
-
-//       // 성공 처리: 예를 들어, 토큰 저장, 페이지 이동 등
-//       // console.log(response.data);
-//       alert("로그인 성공!");
-//       // 예: window.location.href = "/dashboard";
-
-//     } catch (error) {
-//       if (error.response && error.response.status === 401) {
-//         setLoginError("존재하지 않는 계정이거나 비밀번호가 틀렸습니다.");
-//       } else {
-//         setLoginError("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
-//       }
-//     }
-//   };
-
-//   return (
-//     <>
-//       <Header />
-//       <div className="container">
-//         <div className="login-header">
-//           <LoginHeader text="로그인" />
-//         </div>
-//         <div className="login-form">
-//           <form onSubmit={handleLogin}>
-//             <label htmlFor="email">이메일</label>
-//             <input
-//               type="email"
-//               id="email"
-//               name="email"
-//               placeholder="moneyway@gmail.com"
-//               className={`input-field ${emailError || loginError ? "error" : ""}`}
-//               value={email}
-//               onChange={handleEmailChange}
-//             />
-//             {emailError && <p className="error-message">{emailError}</p>}
-
-//             <label htmlFor="password">비밀번호</label>
-//             <input
-//               type="password"
-//               id="password"
-//               name="password"
-//               placeholder="8자리 이상"
-//               className={`input-field ${passwordError || loginError ? "error" : ""}`}
-//               value={password}
-//               onChange={handlePasswordChange}
-//             />
-//             {passwordError && <p className="error-message">{passwordError}</p>}
-
-//             {loginError && !emailError && !passwordError && (
-//               <p className="error-message">{loginError}</p>
-//             )}
-
-//             <button type="submit" className="btn-login" disabled={!canSubmit}>
-//               로그인
-//             </button>
-//           </form>
-
-//           <a href="/forgot-pwd" className="find-password-link">
-//             비밀번호 찾기
-//           </a>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default Signin;

@@ -1,4 +1,3 @@
-// SearchInput.jsx
 import React from 'react';
 
 const SearchInput = ({ searchTerm, setSearchTerm, onSubmit, onFocus }) => {

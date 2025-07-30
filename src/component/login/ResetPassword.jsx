@@ -1,101 +1,128 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"
-import Header from "../Header";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import api from "../../api/axios";
+import Header from "../common/Header";
 import logoWallet from "../../images/login/logoWallet.svg";
-import "../../css/login/Signin.css";
+import "../../css/login/ResetPassword.css";
 
 const ResetPassword = () => {
-    const navigate = useNavigate();
-    const [password, setPassword] = useState("");
-    const [passwordConfirm, setPasswordConfirm] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-    const [confirmError, setConfirmError] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const email = location.state?.email || ""; // 이메일은 필수
 
-    // 비밀번호 입력 변경 핸들러
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-        setPasswordError("");
-        setConfirmError("");
-    };
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
+  const [generalError, setGeneralError] = useState("");
 
-    // 비밀번호 확인 입력 변경 핸들러
-    const handleConfirmChange = (e) => {
-        setPasswordConfirm(e.target.value);
-        setConfirmError("");
-    };
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setPasswordError("");
+    setConfirmError("");
+    setGeneralError("");
+  };
 
-    const handleResetPassword = (e) => {
-        e.preventDefault();
-        let valid = true;
+  const handleConfirmChange = (e) => {
+    setPasswordConfirm(e.target.value);
+    setConfirmError("");
+    setGeneralError("");
+  };
 
-        // 1. 비밀번호 8자리 이상 체크
-        if (password.length < 8) {
-            setPasswordError("비밀번호는 8자 이상이어야 합니다.");
-            valid = false;
-        }
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
 
-        // 2. 비밀번호 일치 여부 체크
-        if (password !== passwordConfirm) {
-            setConfirmError("비밀번호가 일치하지 않습니다.");
-            valid = false;
-        }
+    const passwordRegex = /^(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$/;
+    let valid = true;
 
-        if (!valid) return;
+    if (!passwordRegex.test(password)) {
+      setPasswordError("8~16자, 특수문자(@$!%*?&)를 포함해야 합니다.");
+      valid = false;
+    }
 
-        // TODO: 실제 비밀번호 재설정 API 호출 및 후처리
-        alert("비밀번호가 성공적으로 재설정되었습니다.");
+    if (password !== passwordConfirm) {
+      setConfirmError("비밀번호가 일치하지 않습니다.");
+      valid = false;
+    }
 
+    if (!email) {
+      setGeneralError("이메일 정보가 없습니다. 인증부터 다시 진행해주세요.");
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    try {
+      const res = await api.patch("/users/password/reset", {
+        email: email,
+        newPassword: password,
+      });
+
+      if (res.data.message && res.data.message.includes("성공")) {
+        toast.success(res.data.message || "비밀번호가 성공적으로 변경되었습니다.");
         navigate("/login");
-    };
+      } else {
+        toast.error(res.data.message || "비밀번호 변경에 실패했습니다.");
+      }
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "비밀번호 변경 중 오류가 발생했습니다.";
+      setGeneralError(message);
+      console.error("❌ 서버 에러:", err.response?.data || err);
+    }
+  };
 
-    // 제출 가능 여부 (두 칸 모두 1자 이상 입력됐을 때)
-    const canSubmit = password.length > 0 && passwordConfirm.length > 0;
+  const canSubmit = password.length > 0 && passwordConfirm.length > 0;
 
-    return (
-        <>
-            <Header />
-            <div className="container">
-                <div className="forgot-pwd-header">
-                    <img src={logoWallet} alt="Wallet Logo" className="wallet-logo" style={{marginBottom:"5rem"}} />
-                </div>
-                <div className="login-form">
-                    <form onSubmit={handleResetPassword}>
-                        <label htmlFor="password">새 비밀번호 입력</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="8자리 이상"
-                            className={`input-field ${passwordError ? "error" : ""}`}
-                            value={password}
-                            onChange={handlePasswordChange}
-                        />
-                        {passwordError && <p className="error-message">{passwordError}</p>}
+  return (
+    <>
+      <Header />
+      <div className="reset-password-container">
+        <div className="reset-password-header">
+          <img
+            src={logoWallet}
+            alt="Wallet Logo"
+            className="wallet-logo"
+            style={{ marginBottom: "5rem" }}
+          />
+        </div>
+        <div className="reset-password-form">
+          <form onSubmit={handleResetPassword}>
+            <label htmlFor="password">새 비밀번호 입력</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="8자리 이상"
+              className={`reset-input-field ${passwordError ? "error" : ""}`}
+              value={password}
+              onChange={handlePasswordChange}
+            />
+            {passwordError && <p className="error-message">{passwordError}</p>}
 
-                        <label htmlFor="passwordConfirm">새 비밀번호 확인</label>
-                        <input
-                            type="password"
-                            id="passwordConfirm"
-                            name="passwordConfirm"
-                            placeholder="비밀번호 확인"
-                            className={`input-field ${confirmError ? "error" : ""}`}
-                            value={passwordConfirm}
-                            onChange={handleConfirmChange}
-                        />
-                        {confirmError && <p className="error-message">{confirmError}</p>}
+            <label htmlFor="passwordConfirm">새 비밀번호 확인</label>
+            <input
+              type="password"
+              id="passwordConfirm"
+              name="passwordConfirm"
+              placeholder="비밀번호 확인"
+              className={`reset-input-field ${confirmError ? "error" : ""}`}
+              value={passwordConfirm}
+              onChange={handleConfirmChange}
+            />
+            {confirmError && <p className="error-message">{confirmError}</p>}
 
-                        <button
-                            type="submit"
-                            className="btn-login"
-                            disabled={!canSubmit}
-                        >
-                            비밀번호 재설정
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </>
-    );
+            {generalError && <p className="error-message">{generalError}</p>}
+
+            <button type="submit" className="reset-btn" disabled={!canSubmit}>
+              비밀번호 재설정
+            </button>
+          </form>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default ResetPassword;

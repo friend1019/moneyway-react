@@ -1,0 +1,172 @@
+.totalcart-container {
+  width: 55rem;
+  height: 70rem;
+  border: 1px solid #bebebe;
+  border-radius: 2rem;
+  padding: 8rem;
+  box-sizing: border-box;
+  font-size: 2rem;
+  background-color: white;
+  margin-top: 11rem;
+}
+
+.totalcart-title {
+  font-weight: bold;
+  margin-bottom: 4rem;
+  margin-top: -4rem;
+  font-size: 3rem;
+}
+
+.totalcart-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.totalcart-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.totalcart-icon {
+  width: 5rem;
+  height: 5rem;
+  margin-right: 0.8rem;
+  flex-shrink: 0;
+}
+
+.totalcart-icon-placeholder {
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.8rem;
+  background-color: #eee;
+  color: #666;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.totalcart-item .label {
+  flex: 1;
+  text-align: left;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+}
+
+.totalcart-item .count {
+  font-weight: bold;
+}
+
+.totalcart-total {
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0 4rem;
+  padding-top: 4rem;
+  border-top: 1px solid #ddd;
+  font-weight: bold;
+  font-size: 2.4rem;
+}
+
+.totalcart-button {
+  width: 100%;
+  background-color: #0066f9;
+  color: white;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 999px;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.totalcart-button:disabled {
+  background-color: #d4e4ff;
+  color: #fff;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* 내 플랜 팝업 */
+
+/* TotalCart.css 또는 Modal.css */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 1.2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.plan-selector .plan-item {
+  display: flex;
+  gap: 1.2rem;
+  padding: 1rem;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.plan-selector .thumbnail {
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: 0.8rem;
+  object-fit: cover;
+}
+
+.plan-selector .title {
+  font-weight: 600;
+  font-size: 1.6rem;
+}
+
+.plan-selector .date {
+  font-size: 1.3rem;
+  color: gray;
+}
+
+.modal-content {
+  position: relative; /* 필수 */
+  background: white;
+  padding: 2rem;
+  border-radius: 1.2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-close-button {
+  position: absolute;
+  top: 1.2rem;
+  right: 2rem;
+  font-size: 4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  z-index: 1000;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close-button:hover {
+  color: #000;
+}

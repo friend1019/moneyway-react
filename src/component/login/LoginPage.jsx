@@ -1,9 +1,10 @@
 //로그인 진입 페이지
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../../css/login/LoginPage.css";
 import LoginHeader from "./LoginHeader";
-import Header from "../Header";
+import Header from "../common/Header";
 
 import kakaoIcon from "../../images/login/kakaoAuth.svg";
 import googleIcon from "../../images/login/googleAuth.svg";
@@ -14,7 +15,7 @@ const LoginPage = () => {
   //카카오 로그인
   const handleKakaoLogin = () => {
     window.location.href =
-      "http://192.168.208.20:8081/oauth2/authorization/kakao"; // 백엔드 카카오 로그인 URL
+      "https://moneyway-3zca.onrender.com/oauth2/authorization/kakao"; // 백엔드 카카오 로그인 URL
   };
 
   const goSignup = () => {
@@ -28,7 +29,7 @@ const LoginPage = () => {
   return (
     <>
       <Header />
-      <div className="container">
+      <div className="login-container">
         <div className="login-header">
           <LoginHeader text="가입" />
         </div>
@@ -36,16 +37,23 @@ const LoginPage = () => {
           <div className="auth-header">간편가입 하기 😎</div>
 
           <div className="social-buttons">
-            <button className="social-btn kakao-btn">
+            {/* 카카오 로그인 버튼 */}
+            <button className="social-btn kakao-btn" onClick={handleKakaoLogin}>
               <img
                 src={kakaoIcon}
                 alt="카카오 로그인"
-                style={{ width: "5.6rem", height: "5.6rem", objectFit: "contain" }}
+                style={{
+                  width: "5.6rem",
+                  height: "5.6rem",
+                  objectFit: "contain",
+                }}
               />
             </button>
+
+            {/* (향후) 구글 로그인 버튼 - 아직 구현 안 됐으면 제외 가능 */}
             <button
               className="social-btn google-btn"
-              onClick={handleKakaoLogin}
+              onClick={() => toast.info("준비 중입니다!")}
             >
               <img
                 src={googleIcon}

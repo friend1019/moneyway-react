@@ -1,8 +1,8 @@
 .footer {
   width: 100%;
   bottom : 0;
-  background-color: #F2F4F8;
-  height: 8rem;
+  background-color: #F6F6F6;
+  height: 6rem;
   display: flex;             
   align-items: center;         
   justify-content: center;
@@ -13,4 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.footer-logo img{
+  width: 15rem;
 }

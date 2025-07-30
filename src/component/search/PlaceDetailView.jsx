@@ -1,35 +1,20 @@
-import React from 'react';
-import '../../css/search/PlaceDetailView.css';
+import React from "react";
+import "../../css/search/PlaceDetailView.css";
+import api from "../../api/axios.js";
+import { toast } from "react-toastify";
 import {
   FaArrowLeft,
   FaHeart,
-  FaClock,
-  FaStar,
   FaPhone,
   FaMapMarkerAlt,
   FaShareAlt,
   FaCopy,
-} from 'react-icons/fa';
-
-const CATEGORY_NAME_MAP = {
-  RESTAURANT: '식당',
-  ATTRACTION: '관광지',
-  ACTIVITY: '액티비티',
-  ACCOMMODATION: '숙소',
-};
-
-const SIGUNGU_NAME_MAP = {
-  '3': '서귀포시',
-  '4': '제주시',
-};
+} from "react-icons/fa";
 
 const PlaceDetailView = ({ place, onBack }) => {
-  const tags = place.tag?.split(',').map(tag => tag.trim()).filter(Boolean) || [];
-  const categoryName = CATEGORY_NAME_MAP[place.category] || place.category || '기타';
-
   const handleCopyAddress = () => {
-    navigator.clipboard.writeText(place.address || '');
-    alert('주소가 복사되었습니다!');
+    navigator.clipboard.writeText(place.address || "");
+    toast.success("주소가 복사되었습니다!");
   };
 
   const handleShare = () => {
@@ -37,13 +22,27 @@ const PlaceDetailView = ({ place, onBack }) => {
       navigator
         .share({
           title: place.title,
-          text: '제주 여행지 추천!',
+          text: "제주 여행지 추천!",
           url: window.location.href,
         })
-        .catch((err) => console.log('공유 취소 또는 실패:', err));
+        .catch((err) => console.log("공유 취소 또는 실패:", err));
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('공유 링크가 복사되었습니다!');
+      toast.success("공유 링크가 복사되었습니다!");
+    }
+  };
+
+  const handleAddToCart = async () => {
+    try {
+      console.log("추가할 placeId:", place.placeId);
+
+      await api.post("/cart", {
+        placeId: place.placeId,
+      });
+      toast.success("일정에 추가되었습니다!");
+    } catch (err) {
+      toast.error("추가 중 오류가 발생했습니다.");
+      console.error(err);
     }
   };
 
@@ -58,20 +57,8 @@ const PlaceDetailView = ({ place, onBack }) => {
           <div className="title-section">
             <h2>{place.title}</h2>
             <div className="meta">
-              <span className="category">{categoryName}</span>
-              <span className="rating">
-                {[1, 2, 3, 4, 5].map(i => (
-                  <FaStar key={i} color={i <= place.rating ? '#ffc107' : '#ddd'} />
-                ))}
-              </span>
+              <span className="category">{place.categoryName}</span>
             </div>
-            {tags.length > 0 && (
-              <div className="tag-section">
-                {tags.map((tag, i) => (
-                  <span key={i} className="tag-chip">{tag}</span>
-                ))}
-              </div>
-            )}
           </div>
 
           <div className="like-section">
@@ -81,7 +68,7 @@ const PlaceDetailView = ({ place, onBack }) => {
         </div>
 
         <div className="image-section">
-          {[0].map(i => (
+          {[0].map((i) => (
             <div className="image-card" key={i}>
               {place.imageUrls?.[i] ? (
                 <img src={place.imageUrls[i]} alt={`img-${i}`} />
@@ -94,41 +81,35 @@ const PlaceDetailView = ({ place, onBack }) => {
 
         <div className="action-buttons">
           <button onClick={handleCopyAddress}>
-            <FaCopy style={{ marginRight: '6px' }} />
+            <FaCopy style={{ marginRight: "6px" }} />
             주소 복사
           </button>
           <button onClick={handleShare}>
-            <FaShareAlt style={{ marginRight: '6px' }} />
+            <FaShareAlt style={{ marginRight: "6px" }} />
             공유
           </button>
           {place.phone && (
-            <a href={`tel:${place.phone}`} style={{ textDecoration: 'none' }}>
+            <a href={`tel:${place.phone}`} style={{ textDecoration: "none" }}>
               <button>
-                <FaPhone style={{ marginRight: '6px' }} />
+                <FaPhone style={{ marginRight: "6px" }} />
                 전화걸기
               </button>
             </a>
           )}
         </div>
 
-        <button className="schedule-btn">일정 추가하기</button>
+        <button className="schedule-btn" onClick={handleAddToCart}>
+          장바구니에 추가하기
+        </button>
 
         <div className="info-section">
-          {place.sigungucode && SIGUNGU_NAME_MAP[place.sigungucode] && (
-            <div className="info-row">
-              <FaMapMarkerAlt className="info-icon" />
-              <div>
-                <div className="info-title">지역</div>
-                <div className="info-desc">{SIGUNGU_NAME_MAP[place.sigungucode]}</div>
-              </div>
-            </div>
-          )}
-
           <div className="info-row">
             <FaMapMarkerAlt className="info-icon" />
             <div>
               <div className="info-title">주소</div>
-              <div className="info-desc">{place.address || '주소 정보 없음'}</div>
+              <div className="info-desc">
+                {place.address || "주소 정보 없음"}
+              </div>
             </div>
           </div>
 
@@ -138,7 +119,10 @@ const PlaceDetailView = ({ place, onBack }) => {
               <div>
                 <div className="info-title">전화번호</div>
                 <div className="info-desc">
-                  <a href={`tel:${place.phone}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                  <a
+                    href={`tel:${place.phone}`}
+                    style={{ color: "inherit", textDecoration: "none" }}
+                  >
                     {place.phone}
                   </a>
                 </div>
@@ -146,34 +130,35 @@ const PlaceDetailView = ({ place, onBack }) => {
             </div>
           )}
 
-          {place.useTime && (
+          {place.priceInfo && (
             <div className="info-row">
-              <FaClock className="info-icon" />
+              <FaMapMarkerAlt className="info-icon" />
               <div>
-                <div className="info-title">운영시간</div>
-                <div className="info-desc">
-                  {place.useTime.split('<br>').map((line, idx) => (
-                    <div key={idx}>{line}</div>
-                  ))}
-                </div>
+                <div className="info-title">요금 정보</div>
+                <div className="info-desc">{place.priceInfo}</div>
               </div>
             </div>
           )}
 
-          {place.overview && (
+          {place.menu && (
             <div className="info-row">
-              <FaClock className="info-icon" />
+              <FaMapMarkerAlt className="info-icon" />
+              <div>
+                <div className="info-title">메뉴</div>
+                <div className="info-desc">{place.menu}</div>
+              </div>
+            </div>
+          )}
+
+          {place.description && (
+            <div className="info-row">
+              <FaMapMarkerAlt className="info-icon" />
               <div>
                 <div className="info-title">장소 소개</div>
-                <div className="info-desc">
-                  {place.overview.split('<br>').map((line, idx) => (
-                    <div key={idx}>{line}</div>
-                  ))}
-                </div>
+                <div className="info-desc">{place.description}</div>
               </div>
             </div>
           )}
-
         </div>
       </div>
     </>

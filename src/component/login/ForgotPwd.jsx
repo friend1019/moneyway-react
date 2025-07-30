@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import Header from "../Header";
+import { toast } from "react-toastify";
+import api from "../../api/axios";
+import Header from "../common/Header";
 import "../../css/login/ForgotPwd.css";
 import logoWallet from "../../images/login/logoWallet.svg";
 
@@ -13,8 +14,7 @@ const ForgotPwd = () => {
   const [generalError, setGeneralError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validateEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -34,16 +34,19 @@ const ForgotPwd = () => {
     setGeneralError("");
 
     try {
-      const response = await axios.post("/api/forgot-password", { email });
+      await api.post("/users/password/send-code", { email });
 
-      if (response.data.exists === false) {
+      toast.success("비밀번호 재설정 코드가 이메일로 발송되었습니다.");
+      navigate("/emailcode", { state: { email } });
+    } catch (error) {
+      const code = error.response?.data?.code;
+
+      if (code === "USER_NOT_FOUND") {
         setGeneralError("가입된 계정이 없습니다.");
       } else {
-        alert("비밀번호 재설정 코드가 이메일로 발송되었습니다.");
-        navigate("/emailcode");
+        setGeneralError("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
       }
-    } catch (error) {
-      setGeneralError("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+
       console.error(error);
     } finally {
       setIsSubmitting(false);
@@ -53,7 +56,7 @@ const ForgotPwd = () => {
   return (
     <>
       <Header />
-      <div className="container">
+      <div className="login-container">
         <div className="forgot-pwd-header">
           <img src={logoWallet} alt="Wallet Logo" className="wallet-logo" />
           <h1 style={{ fontSize: "3.6rem", fontWeight: "bold" }}>
@@ -71,7 +74,9 @@ const ForgotPwd = () => {
               id="email"
               name="email"
               placeholder="moneyway@gmail.com"
-              className={`input-field ${emailError || generalError ? "error" : ""}`}
+              className={`input-field ${
+                emailError || generalError ? "error" : ""
+              }`}
               value={email}
               onChange={handleEmailChange}
             />
@@ -79,7 +84,11 @@ const ForgotPwd = () => {
             {generalError && !emailError && (
               <p className="error-message">{generalError}</p>
             )}
-            <button type="submit" className="btn-emailcode" disabled={isSubmitting}>
+            <button
+              type="submit"
+              className="btn-emailcode"
+              disabled={isSubmitting}
+            >
               이메일로 코드 받기
             </button>
           </form>
