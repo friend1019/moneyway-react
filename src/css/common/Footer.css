@@ -1,20 +1,25 @@
+/* =============================
+   Footer 레이아웃 및 구조
+============================= */
 .footer {
   width: 100%;
-  bottom : 0;
+  bottom: 0;
   background-color: #F6F6F6;
   height: 6rem;
-  display: flex;             
-  align-items: center;         
-  justify-content: center;
-}
-
-.footer-logo{
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.footer-logo img{
+/* =============================
+   Footer 로고
+============================= */
+.footer-logo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.footer-logo img {
   width: 15rem;
 }

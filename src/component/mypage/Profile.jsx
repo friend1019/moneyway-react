@@ -1,32 +1,14 @@
-import { useEffect, useState } from "react";
+// src/components/mypage/Profile.jsx
 import { useNavigate } from "react-router-dom";
 import { MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
-import api from "../../api/axios";
-import useAuthStore from "../../api/authStore";
+import useUserStore from "../../api/userStore"; // ✅ Zustand 유저 스토어
 import "../../css/mypage/Profile.css";
-import LoadingSpinner from "../common/LoadingSpinner";
+import api from "../../api/axios";
 
 const Profile = ({ onEditClick }) => {
-  const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
-  const { clearAccessToken } = useAuthStore();
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await api.get("/mypage/me");
-        console.log("🎯 유저 정보 응답:", res.data);
-
-        setUserInfo(res.data);
-      } catch (err) {
-        console.error("내 정보 불러오기 실패:", err);
-        navigate("/login");
-      }
-    };
-
-    fetchProfile();
-  }, [navigate]);
+  const { user, logout } = useUserStore(); // ✅ logout 사용
 
   const handleLogout = async () => {
     try {
@@ -34,26 +16,23 @@ const Profile = ({ onEditClick }) => {
     } catch (err) {
       console.warn("로그아웃 API 실패:", err);
     } finally {
-      clearAccessToken();
-      toast.success("로그아웃 되었습니다.");
+      logout(); // ✅ 상태 + localStorage 초기화
       navigate("/");
-      window.location.reload();
+      toast.success("로그아웃 되었습니다.");
     }
   };
-
-  if (!userInfo) return <LoadingSpinner />;
 
   return (
     <div className="profilecard-container">
       <div className="profile-image">
-        {userInfo.profileImageUrl ? (
-          <img src={userInfo.profileImageUrl} alt="프로필 이미지" />
+        {user.profileImageUrl ? (
+          <img src={user.profileImageUrl} alt="프로필 이미지" />
         ) : (
           <div className="placeholder-image">👤</div>
         )}
       </div>
       <div className="nickname">
-        <p>{userInfo.nickname}</p>
+        <p>{user.nickname}</p>
       </div>
       <div className="info-fix">
         <button onClick={onEditClick}>

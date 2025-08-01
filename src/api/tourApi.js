@@ -16,7 +16,7 @@ export const isValidJejuCoordinate = (lat, lng) => {
 // 명세서에 맞는 카테고리 매핑
 export const getCategoryFromName = (name) => {
   const mapping = {
-    맛집: "RESTAURANT",
+    식당: "RESTAURANT",
     카페: "CAFE",
     숙소: "ACCOMMODATION",
     관광지: "TOURIST_ATTRACTION",
@@ -54,10 +54,13 @@ export const mapPlace = (item) => {
 };
 
 // ✅ 1. 카테고리별 조회 (with page)
-export const getPlacesByCategory = async (category, page = 1) => {
+export const getPlacesByCategory = async (category) => {
   try {
     const { data } = await api.get(`/places`, {
-      params: { category, page },
+      params: {
+        category,
+        size: 500, // ✅ 여기를 꼭 명시
+      },
     });
     return Array.isArray(data.content)
       ? data.content.map(mapPlace).filter(Boolean)

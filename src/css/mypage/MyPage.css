@@ -14,7 +14,6 @@
     gap: 10rem;
     background-color: white;
     padding: 3rem 60rem;
-    position: relative;
 }
 
 .nav-bar button {
@@ -34,5 +33,4 @@
 }
 
 .sub-container{
-    margin-top: -30rem;
 }

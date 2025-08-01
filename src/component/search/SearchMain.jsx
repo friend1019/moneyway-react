@@ -1,17 +1,26 @@
-// ✅ SearchMain.jsx - 페이지네이션 적용 버전
-
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "../common/Header";
 import "../../css/search/SearchMain.css";
 import "../../css/search/list-wrapper-scroll.css";
 import PlaceListView from "./PlaceListView";
-import InfiniteScrollSentinel from "./InfiniteScrollSentinel";
 import PlaceDetailView from "./PlaceDetailView";
 import SearchPlaceBox from "./SearchPlaceBox";
 import CategorySelector from "./CategorySelector";
 import SearchInput from "./SearchInput";
-import { getPlacesByCategory, searchPlacesByKeyword, isValidJejuCoordinate } from "../../api/tourApi";
+import { getPlacesByCategory, searchPlacesByKeyword } from "../../api/tourApi";
+
+// ✅ 위경도 유효성 검사 함수 (지도 마커용)
+const isValidJejuCoordinate = (lat, lng) => {
+  return (
+    !isNaN(lat) &&
+    !isNaN(lng) &&
+    lat >= 33.0 &&
+    lat <= 34.0 &&
+    lng >= 126.0 &&
+    lng <= 127.0
+  );
+};
 
 const CATEGORY_MAP = {
   관광지: "TOURIST_ATTRACTION",
@@ -32,8 +41,6 @@ const SearchMain = () => {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -104,30 +111,20 @@ const SearchMain = () => {
     });
   }, []);
 
-  const loadPlaces = useCallback(async (currentPage = 1) => {
+  const loadPlaces = useCallback(async () => {
     try {
       const categoryCode = CATEGORY_MAP[category];
-      let data = await getPlacesByCategory(categoryCode, currentPage);
-      if (category === "카페") {
-        data = data.filter(
-          (p) =>
-            (p.title && p.title.includes("카페")) ||
-            (p.description && p.description.includes("카페")) ||
-            (p.menu && p.menu.includes("카페"))
-        );
-      }
-      setPlaces((prev) => currentPage === 1 ? data : [...prev, ...data]);
-      setHasMore(data.length >= 20);
+      const data = await getPlacesByCategory(categoryCode);
+      console.log(`📦 ${category} 전체 개수:`, data.length);
+      setPlaces(data);
     } catch (err) {
       console.error("카테고리별 관광지 로딩 실패:", err);
     }
   }, [category]);
 
   useEffect(() => {
-    setPage(1);
-    setHasMore(true);
     setPlaces([]);
-    loadPlaces(1);
+    loadPlaces();
   }, [category, loadPlaces]);
 
   useEffect(() => {
@@ -135,6 +132,7 @@ const SearchMain = () => {
 
     if (clustererRef.current) clustererRef.current.clear();
 
+    // ✅ 유효한 좌표만 마커 생성
     const newMarkers = places
       .filter((p) => isValidJejuCoordinate(p.latitude, p.longitude))
       .map((place) => {
@@ -146,6 +144,11 @@ const SearchMain = () => {
         });
         return marker;
       });
+
+    if (newMarkers.length === 0) {
+      console.warn("⚠️ 유효한 좌표를 가진 장소가 없어 마커를 표시할 수 없습니다.");
+      return;
+    }
 
     const clusterer = new window.kakao.maps.MarkerClusterer({
       map,
@@ -211,17 +214,6 @@ const SearchMain = () => {
                 <PlaceListView
                   places={places}
                   onSelect={(place) => handlePlaceSelect(place, true)}
-                />
-                <InfiniteScrollSentinel
-                  onIntersect={() => {
-                    if (hasMore) {
-                      const nextPage = page + 1;
-                      setPage(nextPage);
-                      loadPlaces(nextPage);
-                    }
-                  }}
-                  loading={false}
-                  hasMore={hasMore}
                 />
               </div>
             </>

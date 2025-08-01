@@ -1,17 +1,15 @@
 import React, { useEffect } from "react";
-import { useLocation } from "react-router-dom"; // ✅ 추가
+import { useLocation } from "react-router-dom";
 import AppRouter from "./Router";
 import api from "./api/axios";
-import useAuthStore from "./api/authStore.js";
+import useUserStore from "./api/userStore.js"; // ✅ 통합 상태 관리
 import LoadingSpinner from "./component/common/LoadingSpinner.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-window.authStore = useAuthStore;
-
 function App() {
-  const { isInitialized, setInitialized, setAccessToken } = useAuthStore();
   const location = useLocation();
+  const { isInitialized, setInitialized, clearUser } = useUserStore(); // ✅ authStore 제거
 
   useEffect(() => {
     const tryAutoLogin = async () => {
@@ -21,24 +19,18 @@ function App() {
       }
 
       try {
-        const res = await api.post("/auth/refresh");
-        const accessToken = res?.data?.accessToken;
-
-        if (accessToken) {
-          setAccessToken(accessToken);
-        } else {
-          useAuthStore.getState().clearAccessToken(); // ✅ 안정성 보완
-        }
+        await api.post("/auth/refresh");
+        // ✅ refreshToken은 쿠키에 있으므로 별도 처리 불필요
       } catch (error) {
         console.error("refresh 실패:", error);
-        useAuthStore.getState().clearAccessToken(); // ✅ 실패 시 명시적으로 비움
+        clearUser(); // ✅ 상태 초기화
       } finally {
         setInitialized(true);
       }
     };
 
     tryAutoLogin();
-  }, [location.pathname]);
+  }, [location.pathname, setInitialized, clearUser]);
 
   if (!isInitialized) {
     return <LoadingSpinner />;

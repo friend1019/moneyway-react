@@ -1,3 +1,6 @@
+/* =============================
+   LoadingSpinner 레이아웃
+============================= */
 .loading-spinner-container {
   display: flex;
   justify-content: center;
@@ -5,6 +8,9 @@
   padding: 2rem;
 }
 
+/* =============================
+   스피너 애니메이션
+============================= */
 .loading-spinner {
   width: 4rem;
   height: 4rem;
