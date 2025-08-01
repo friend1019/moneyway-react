@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import '../../css/myplan/MyPlanPage.css';
-import Header from "../Header";
+import Header from "../common/Header";
 import Schedule from './Schedule';
 import ScheduleCart from './ScheduleCart';
-import LodgingCart from './LodgingCart'; 
+import LodgingCart from './LodgingCart';
 import ContextMenu from './ContextMenu';
 import api from "../../api/axios";
 
@@ -46,6 +46,7 @@ const MyPlanPage = () => {
   const [titleInput, setTitleInput] = useState('');
   const [currentPlanIndex, setCurrentPlanIndex] = useState(0);
 
+  // 메뉴 위치가 카드 기준으로 잡히게 하기 위해 ref 추가
   const [menuState, setMenuState] = useState({
     visible: false,
     position: { x: 0, y: 0 },
@@ -65,10 +66,7 @@ const MyPlanPage = () => {
     setLoading(false);
   };
 
-  // 페이지 진입 시 자동 불러오기 (버튼 없어도 됨)
-  useEffect(() => {
-    fetchCartItems();
-  }, []);
+  useEffect(() => { fetchCartItems(); }, []);
 
   // 사용 일수 계산
   const lastUsedDayNum = Math.max(
@@ -77,16 +75,24 @@ const MyPlanPage = () => {
       .filter(day => (dailySchedules[day] && dailySchedules[day].length > 0))
       .map(day => parseInt(day.replace('Day ', '')))
   );
+  // 기본 0박 0일로 표시
   const planDurationStr =
-    lastUsedDayNum > 0 ? `${lastUsedDayNum - 1}박 ${lastUsedDayNum}일` : '1박 2일';
+    lastUsedDayNum > 0 ? `${lastUsedDayNum - 1}박 ${lastUsedDayNum}일` : '0박 0일';
 
   // duration 드래그 조정 (0.5 단위)
   const onDurationDrag = (item, day, newDuration) => {
     if (isNaN(newDuration) || newDuration < 0.5) return;
+    // 겹침이면 상태 변경 없이 return
+    const updatedItem = { ...item, duration: newDuration };
+    const filtered = dailySchedules[day].filter(d => d.id !== updatedItem.id);
+    if (isOverlapping(updatedItem, filtered)) {
+      alert('해당 시간에는 이미 다른 일정이 있습니다.');
+      return;
+    }
     setDailySchedules(prev => ({
       ...prev,
       [day]: prev[day].map(d =>
-        d.id === item.id ? { ...d, duration: newDuration } : d
+        d.id === item.id ? updatedItem : d
       )
     }));
   };
@@ -120,7 +126,7 @@ const MyPlanPage = () => {
         id: Date.now(),
         name: draggedItem.placeName,
         cost: draggedItem.price,
-        category: '액티비티',
+        category: draggedItem.category,
         time: time,
         duration: 1
       };
@@ -152,15 +158,23 @@ const MyPlanPage = () => {
   const closeMenu = useCallback(() => {
     setMenuState(prev => ({ ...prev, visible: false }));
   }, []);
+  
+  // 카드의 ref를 받아와서 위치를 계산
   const handleContextMenu = (event, item, day) => {
     event.preventDefault();
+    // 타겟 기준 상대적 위치(카드 바로 아래)로 띄움
+    const rect = event.currentTarget.getBoundingClientRect();
     setMenuState({
       visible: true,
-      position: { x: event.clientX, y: event.clientY },
+      position: {
+        x: rect.left,
+        y: rect.top + rect.height + window.scrollY + 4, // 아래로 살짝 띄우기
+      },
       selectedItem: item,
       day: day,
     });
   };
+
   const handleDeleteItem = () => {
     const { selectedItem, day } = menuState;
     if (!selectedItem || !day) return;
@@ -179,7 +193,7 @@ const MyPlanPage = () => {
 
   useEffect(() => {
     const allItems = Object.values(dailySchedules).flat();
-    const totalCost = allItems.reduce((sum, item) => sum + item.cost, 0);
+    const totalCost = allItems.reduce((sum, item) => sum + (item.cost || 0), 0);
     setPlanDetails(prevDetails => ({
       ...prevDetails,
       usedBudget: totalCost
@@ -258,7 +272,6 @@ const MyPlanPage = () => {
     }
   };
 
-  // 마운트시 목록 조회, 인덱스 바뀔 때 상세 조회
   useEffect(() => { fetchPlanList(); }, []);
   useEffect(() => {
     if (planList.length > 0) fetchPlanDetail(planList[currentPlanIndex].id);
@@ -272,25 +285,29 @@ const MyPlanPage = () => {
   };
 
   const handleSave = async () => {
-    // dailySchedules → places DTO 변환
+    const validCartIds = new Set(cartItems.map(item => item.cartId));
     const places = [];
     Object.entries(dailySchedules).forEach(([day, items]) => {
       const dayNumber = parseInt(day.replace('Day ', ''));
       items.forEach(item => {
+        if (!item.cartId || !validCartIds.has(item.cartId)) return;
         const [h, m] = item.time.split(':').map(Number);
         const startMin = h * 60 + m;
         const endMin = startMin + Math.round(item.duration * 60);
         const endH = Math.floor(endMin / 60);
         const endM = endMin % 60;
         places.push({
-          cartId: item.cartId || item.id,
+          cartId: item.cㅗartId,
           dayNumber,
           startTime: item.time + ':00',
           endTime: `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}:00`,
         });
       });
     });
-
+    if (places.length === 0) {
+      alert('스케줄에 추가된 일정이 없습니다!');
+      return;
+    }
     const payload = {
       title: planDetails.title,
       totalPrice: planDetails.totalBudget,
@@ -324,6 +341,7 @@ const MyPlanPage = () => {
     }
   };
 
+  // 메뉴 항목
   const menuItems = [
     { label: '일정 상세보기', action: handleViewDetails },
     { label: '삭제하기', action: handleDeleteItem },
@@ -350,9 +368,7 @@ const MyPlanPage = () => {
     <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>
       <Header />
       <div className='myplan-page-container'>
-        {/* 좌측: 숙소 카트 (cartItems만 넘김, 내부에서 '숙소'만 필터) */}
         {isEditMode ? <LodgingCart cartItems={cartItems} /> : <div className="side-card-container-placeholder"></div>}
-        {/* 중앙: 시간표 */}
         <div className="center-column">
           <div className='schedule-header'>
             <div className="plan-sequence">
@@ -367,7 +383,6 @@ const MyPlanPage = () => {
             ) : (
               <button className='edit-button' onClick={handleEdit}>수정하기</button>
             )}
-
           </div>
           <div className='schedule-main-container'>
             <Schedule
@@ -394,12 +409,11 @@ const MyPlanPage = () => {
             />
           </div>
         </div>
-        {/* 우측: 일정 카트 */}
         {isEditMode ? <ScheduleCart cartItems={cartItems} /> : <div className="side-card-container-placeholder"></div>}
       </div>
       {isEditMode && menuState.visible && (
-        <ContextMenu 
-          position={menuState.position} 
+        <ContextMenu
+          position={menuState.position}
           items={menuItems}
           onClose={closeMenu}
         />

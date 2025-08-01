@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
-import api from '../../api/axios'; // axios 인스턴스
 import '../../css/myplan/Schedule.css';
 
 import hotelIcon from "../../images/shopping/hotel.svg";
@@ -39,7 +38,7 @@ const getCategoryIcon = (categoryName) => {
 const toCssCategory = (category) => category ? category.replace(/[ /]/g, '-') : '';
 
 const ScheduleItem = ({
-  item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated
+  item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated, onContextMenu
 }) => {
   const [isHover, setIsHover] = useState(false);
   const [dragType, setDragType] = useState(null); // 'top' | 'bottom' | null
@@ -77,21 +76,11 @@ const ScheduleItem = ({
     zIndex: 2, cursor: isEditMode ? 'grab' : 'default', background: 'none'
   };
 
-
-  const handleContextMenu = async (e) => {
-    e.preventDefault();
+  // 여기서 confirm/alert 제거, onContextMenu만 호출
+  const handleContextMenu = (e) => {
     if (!isEditMode) return;
-    if (!window.confirm('이 일정을 삭제하시겠습니까?')) return;
-    try {
-      if (item.cartId) {
-        await api.delete(`/cart/${item.cartId}`);
-      }
-      if (onItemDeleted) onItemDeleted(item, day);
-    } catch {
-      alert('삭제 실패');
-    }
+    if (onContextMenu) onContextMenu(e, item, day);
   };
-
 
   const handleDragStart = (e, type) => {
     e.preventDefault(); e.stopPropagation();
@@ -113,16 +102,7 @@ const ScheduleItem = ({
         : startDuration + offsetHalf;
       newDuration = Math.max(0.5, Math.round(newDuration * 2) / 2);
       if (newDuration !== item.duration) {
-        // PATCH /api/cart/{cartId}, { price }
-        if (item.cartId) {
-          api.patch(`/cart/${item.cartId}`, { price: item.cost }) // 실제로는 duration이나 가격 등 서버 필드 맞게 수정
-            .then(() => {
-              if (onItemUpdated) onItemUpdated({ ...item, duration: newDuration }, day);
-            })
-            .catch(() => alert('수정 실패'));
-        } else {
-          if (onItemUpdated) onItemUpdated({ ...item, duration: newDuration }, day);
-        }
+        if (onItemUpdated) onItemUpdated({ ...item, duration: newDuration }, day);
       }
     };
     const handleUp = () => {
@@ -347,6 +327,7 @@ const Schedule = ({
                     isEditMode={isEditMode}
                     onItemDeleted={handleItemDeleted}
                     onItemUpdated={handleItemUpdated}
+                    onContextMenu={onContextMenu}
                   />
                 ))}
               </div>
