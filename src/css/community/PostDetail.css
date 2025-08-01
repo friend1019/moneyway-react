@@ -1,0 +1,625 @@
+/* =============================
+   전체 배경/카드/리스트
+============================= */
+.post-detail-container-all {
+  min-height: 50rem;
+  background-color: #f6f6f6;
+  padding: 2rem;
+}
+.post-detail-container {
+  width: 55%;
+  background-color: #fff;
+  border-radius: 2rem;
+  padding: 4rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 0.2rem 0.6rem rgba(0, 0, 0, 0.05);
+  overflow: visible;
+  margin: 0 auto;
+}
+.post-list-card {
+  margin: 0 auto 2rem auto;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+.post-list-card:hover {
+  transform: translateY(-0.2rem);
+}
+
+/* =============================
+   이미지/썸네일
+============================= */
+.post-images {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.post-images img {
+  width: 100%;
+  max-width: 48%;
+  border-radius: 1.2rem;
+  object-fit: cover;
+}
+
+/* =============================
+   헤더/작성자/예산
+============================= */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+.writer-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.writer-info img {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+}
+.writer-meta .writer-line {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+.nickname {
+  font-weight: 600;
+  font-size: 2rem;
+}
+.created-at {
+  font-size: 1.2rem;
+  color: #888;
+}
+.challenge-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+.challenge-icon {
+  font-size: 1.7em;
+}
+.challenge-true {
+  color: #0066f9;
+}
+.challenge-false {
+  color: #c1c1c1;
+}
+.budget {
+  background: #fff;
+  padding: 1rem 2.5rem;
+  border: 0.1rem solid #d9d9d9;
+  border-radius: 1.2rem;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+.budget-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* =============================
+   본문/제목/텍스트
+============================= */
+.post-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  border-bottom: 0.1rem solid #eee;
+  padding-bottom: 1.5rem;
+}
+.post-content {
+  white-space: pre-line;
+  line-height: 1.6;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* =============================
+   좋아요/댓글/스크랩/액션
+============================= */
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: flex-end;
+  padding-bottom: 2rem;
+  border-bottom: 0.1rem solid #eee;
+  position: relative;
+}
+.post-actions button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #444;
+}
+.post-actions .delete-btn-posts {
+  margin-left: auto;
+  color: #d9534f;
+  background-color: #fff;
+  border: 0.1rem solid #d9534f;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.6rem;
+  font-size: 0.875rem;
+}
+.icon {
+  margin-right: 0.4rem;
+  font-size: 3rem;
+  vertical-align: middle;
+}
+.liked {
+  color: #e74c3c;
+}
+.scrapped {
+  color: #f8d93f;
+}
+
+/* =============================
+   드롭다운/메뉴
+============================= */
+.post-menu-wrapper {
+  margin-left: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.menu-button {
+  background: none;
+  border: none;
+  font-size: 2.5rem;
+  cursor: pointer;
+  padding: 0 1rem;
+  color: #444;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 3rem;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.6rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  white-space: nowrap;
+}
+.dropdown-menu div {
+  padding: 0.6rem 1rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.dropdown-menu div:hover {
+  background-color: #f1f1f1;
+}
+.comment-menu-wrapper {
+  position: relative;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+.comment-menu-wrapper .menu-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  color: #444;
+}
+.comment-menu-wrapper .dropdown-menu {
+  position: absolute;
+  top: 2.5rem;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.6rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+.comment-menu-wrapper .dropdown-menu div {
+  padding: 0.6rem 1rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.comment-menu-wrapper .dropdown-menu div:hover {
+  background-color: #f1f1f1;
+}
+
+/* =============================
+   댓글/댓글 입력
+============================= */
+.comments-section {
+}
+.comment {
+  display: flex;
+  gap: 1rem;
+  padding: 1.8rem 0.3rem;
+  border-bottom: 0.1rem solid #eee;
+  position: relative;
+}
+.comment img {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+}
+.comment-body {
+  flex: 1;
+}
+.comment-header {
+  display: flex;
+  gap: 0.7rem;
+  font-size: 1.7rem;
+  margin-bottom: 0.7rem;
+  color: #000;
+  font-weight: bold;
+  position: relative;
+}
+.comment-date {
+  margin-top: 0.6rem;
+  font-size: 1rem;
+  font-weight: 300;
+  color: #c1c1c1;
+}
+.comment-nickname {
+  font-weight: bold;
+  color: #000;
+}
+.comment p {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #000;
+}
+.comment p:empty::before {
+  content: "삭제된 댓글입니다";
+  color: #aaa;
+}
+.comment-input-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.comment-profile-left {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.comment-input-box {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 2rem;
+  padding: 1.1rem 1.7rem;
+  font-size: 2rem;
+  outline: none;
+}
+.comment-submit-btn {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  font-size: 1.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.writer-meta .writer-line {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.writer-info img {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+}
+
+.nickname {
+  font-weight: 600;
+  font-size: 2rem;
+}
+
+.created-at {
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.challenge-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.challenge-icon {
+  font-size: 1.7em;
+}
+
+.challenge-true {
+  color: #0066f9;
+}
+
+.challenge-false {
+  color: #c1c1c1;
+}
+
+.budget {
+  background: white;
+  padding: 1rem 2.5rem;
+  border: 0.1rem solid #d9d9d9;
+  border-radius: 1.2rem;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+/* 제목 */
+.post-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  border-bottom: 0.1rem solid #eee;
+  padding-bottom: 1.5rem;
+}
+
+/* 본문 텍스트 */
+.post-content {
+  white-space: pre-line;
+  line-height: 1.6;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* 이미지들 */
+.post-images {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.post-images img {
+  width: 100%;
+  max-width: 48%;
+  border-radius: 1.2rem;
+  object-fit: cover;
+}
+
+/* 좋아요, 댓글, 스크랩 등 버튼 */
+.post-actions {
+  display: flex;
+  justify-content: flex-end; /* 오른쪽 정렬 핵심 */
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 2rem;
+  border-bottom: 0.1rem solid #eee;
+}
+
+.post-actions button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #444;
+}
+
+.post-actions .delete-btn-posts {
+  margin-left: auto;
+  color: #d9534f;
+  background-color: #fff;
+  border: 0.1rem solid #d9534f;
+  padding: 0.4rem 0.8rem;
+  border-radius: 0.6rem;
+  font-size: 0.875rem;
+}
+
+.icon {
+  margin-right: 0.4rem;
+  font-size: 3rem;
+  vertical-align: middle;
+}
+
+.liked {
+  color: #e74c3c;
+}
+
+.scrapped {
+  color: #f8d93f;
+}
+
+/* 댓글 영역 */
+.comments-section {
+}
+
+.comment {
+  display: flex;
+  gap: 1rem;
+  padding: 1.8rem 0.3rem;
+  border-bottom: 0.1rem solid #eee;
+  position: relative;
+}
+
+.comment img {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+}
+
+.comment-body {
+  flex: 1;
+}
+
+.comment-header {
+  display: flex;
+  gap: 0.7rem;
+  font-size: 1.7rem;
+  margin-bottom: 0.7rem;
+  color: black;
+  font-weight: bold;
+  position: relative;
+}
+
+.comment-date {
+  margin-top: 0.6rem;
+  font-size: 1rem;
+  font-weight: 300;
+  color: #c1c1c1;
+}
+
+.comment-nickname {
+  font-weight: bold;
+  color: black;
+}
+
+.comment p {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: black;
+}
+
+.comment p:empty::before {
+  content: "삭제된 댓글입니다";
+  color: #aaa;
+}
+
+/* 댓글 입력창 */
+.comment-input-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.comment-profile-left {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-input-box {
+  flex: 1;
+  border: 1px solid #ddd;
+  border-radius: 2rem;
+  padding: 1.1rem 1.7rem;
+  font-size: 2rem;
+  outline: none;
+}
+
+.comment-submit-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 4rem;
+  height: 4rem;
+  font-size: 1.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 2rem;
+  border-bottom: 0.1rem solid #eee;
+  position: relative; /* 드롭다운 위치 기준점 */
+}
+
+.post-menu-wrapper {
+  margin-left: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  font-size: 2.5rem;
+  cursor: pointer;
+  padding: 0 1rem;
+  color: #444;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 3rem;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 0.6rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.1);
+  z-index: 100;
+
+  white-space: nowrap; /* 텍스트가 한 줄로 표시되도록 */
+}
+
+.dropdown-menu div {
+  padding: 0.6rem 1rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.dropdown-menu div:hover {
+  background-color: #f1f1f1;
+}
+
+.comment-menu-wrapper {
+  position: relative;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.comment-menu-wrapper .menu-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  color: #444;
+}
+
+.comment-menu-wrapper .dropdown-menu {
+  position: absolute;
+  top: 2.5rem;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 0.6rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.comment-menu-wrapper .dropdown-menu div {
+  padding: 0.6rem 1rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.comment-menu-wrapper .dropdown-menu div:hover {
+  background-color: #f1f1f1;
+}
+
+.budget-label {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}

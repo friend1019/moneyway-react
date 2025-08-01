@@ -1,9 +1,137 @@
+/* =============================
+   전체 레이아웃/컨테이너
+============================= */
 .community-container {
-    background-color: #F6F6F6;
+  background-color: #f6f6f6;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
   min-height: 66rem;
   padding: 2rem;
+}
+.community-post-button-wrapper {
+  background-color: #f6f6f6;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+.create-post-btn {
+  background-color: #0066f9;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 1rem 2rem;
+  margin-top: 2rem;
+  margin-right: 30rem;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* =============================
+   헤더/드롭다운 그룹
+============================= */
+.community-header {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+.list-dropdown-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 80rem;
+}
+.list-dropdown-title {
+  margin-left: -5rem;
+}
+.list-dropdown-title p {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #c1c1c1;
+  margin: 0;
+}
+.list-dropdown-left p {
+  font-size: 2rem;
+  color: #c1c1c1;
+  margin: 0;
+}
+.list-dropdown-right {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: -4rem;
+  margin-right: -7rem;
+}
+.list-dropdown-group p {
+  font-size: 1.4rem;
+  color: #c1c1c1;
+}
+.list-dropdown {
+  position: relative;
+}
+.list-dropdown-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.list-dropdown-btn span {
+  font-size: 1.3rem;
+  color: #000;
+}
+.list-dropdown-btn span.icon {
+  font-size: 1.2rem;
+  margin-bottom: 2.6rem;
+}
+
+/* =============================
+   드롭다운 메뉴/리스트
+============================= */
+.list-dropdown-menu {
+  position: absolute;
+  top: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.6rem;
+  padding: 0.5rem;
+  box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.1);
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  z-index: 999;
+  width: max-content;
+}
+.list-dropdown:hover .list-dropdown-menu {
+  display: flex;
+}
+.list-dropdown-menu div {
+  font-size: 1.3rem;
+  padding: 1rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  white-space: nowrap;
+  border-bottom: #c1c1c1 0.1rem solid;
+}
+.list-dropdown-menu div:hover {
+  background-color: #f5f5f5;
+}
+
+/* =============================
+   게시글 리스트 컨테이너
+============================= */
+.post-list-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }

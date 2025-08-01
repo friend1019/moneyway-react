@@ -24,6 +24,8 @@ import CreatePlan from "./component/aiplan/CreatePlan";
 
 import CommunityMain from "./component/community/CommunityMain";
 import PostCreate from "./component/community/PostCreate";
+import PostDetail from "./component/community/PostDetail";
+import PostEditForm from "./component/community/PostEditForm";
 
 function AppRouter() {
   return (
@@ -46,7 +48,16 @@ function AppRouter() {
         }
       />
       {<Route path="/search" element={<Search />} />}
-      {<Route path="/aiplan" element={<AIBudget />} />}
+      {
+        <Route
+          path="/aiplan"
+          element={
+            <ProtectedRoute>
+              <AIBudget />
+            </ProtectedRoute>
+          }
+        />
+      }
       {<Route path="/ai-period" element={<AIPeriod />} />}
       {<Route path="/ai-people" element={<AIPeople />} />}
       {<Route path="/ai-name" element={<AIName />} />}
@@ -83,7 +94,10 @@ function AppRouter() {
       }
 
       {<Route path="/community" element={<CommunityMain />} />}
-      {<Route path="/community/create" element={<PostCreate />} />}
+      {<Route path="/posts/create" element={<PostCreate />} />}
+      {<Route path="/posts/:postId" element={<PostDetail />} />}
+      <Route path="/posts/:postId/edit" element={<PostEditForm />} />
+      {/* Catch-all route for 404 */}
     </Routes>
   );
 }

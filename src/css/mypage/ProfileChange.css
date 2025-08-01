@@ -1,15 +1,33 @@
 .profile-change-container {
+  min-height: 51rem;
   width: 60rem;
   margin: 0 auto;
   background-color: white;
   padding: 4rem;
   border-radius: 1rem;
   font-family: "Noto Sans KR", sans-serif;
+  margin-bottom: 4rem;
 }
 
 .section {
   position: relative;
   margin-bottom: 3rem;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  margin: 2rem 2rem 2rem 0;
+  margin-left: -6rem;
+  display: flex;
+  align-items: center;
+  color: #333; /* 필요시 색상 조절 */
+}
+
+.back-btn:hover {
+  color: #2176ff; /* hover 시 색상 강조 (선택사항) */
 }
 
 .label {
@@ -65,7 +83,7 @@
   height: 5rem;
   font-size: 1.8rem;
   font-weight: bold;
-  background-color: #F02A2A;
+  background-color: #f02a2a;
   border: 1px solid #ddd;
   border-radius: 1rem;
   color: white;

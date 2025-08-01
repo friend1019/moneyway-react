@@ -1,14 +1,19 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { FaImage } from "react-icons/fa6";
 import { FaTrophy } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
-import useUserStore from "../../api/userStore"; // ✅ Zustand 유저 상태
+import useUserStore from "../../api/userStore";
 import "../../css/community/PostCreateForm.css";
+import Header from "../common/Header";
+import Footer from "../common/Footer";
+import HomeButton from "./HomeButton";
 
-const PostCreateForm = () => {
-  const { user } = useUserStore(); // ✅ 전역 상태에서 유저 정보 접근
+const PostEditForm = () => {
+  const { postId } = useParams();
+  const navigate = useNavigate();
+  const { user } = useUserStore();
   const profileImg = user?.profileImageUrl;
 
   const [title, setTitle] = useState("");
@@ -18,7 +23,30 @@ const PostCreateForm = () => {
   const [isChallenge, setIsChallenge] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
-  const navigate = useNavigate();
+
+  // 게시글 데이터 불러오기
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const res = await api.get(`/posts/${postId}`);
+        const data = res.data;
+        setTitle(data.title || "");
+        setContent(data.content || "");
+        setIsChallenge(data.isChallenge || false);
+        setThumbnailUrl(data.thumbnailUrl || "");
+        setImageUrls(data.imageUrls || []);
+        if (data.totalCost != null) {
+          setBudgetEnabled(true);
+          setTotalCost(data.totalCost.toString());
+        }
+      } catch (err) {
+        console.error("게시글 불러오기 실패", err);
+        toast.error("게시글 정보를 불러오지 못했습니다.");
+      }
+    };
+
+    fetchPost();
+  }, [postId]);
 
   const handleSubmit = async () => {
     try {
@@ -31,18 +59,12 @@ const PostCreateForm = () => {
         imageUrls,
       };
 
-      await api.post("/posts", body);
-      toast.success("글이 등록되었습니다!");
-      setBudgetEnabled(false);
-      setTotalCost(0);
-      setIsChallenge(false);
-      setThumbnailUrl("");
-      setImageUrls([]);
-      navigate("/community");
+      await api.patch(`/posts/${postId}`, body);
+      toast.success("게시글이 수정되었습니다!");
+      navigate(`/posts/${postId}`);
     } catch (err) {
-      console.error("글 등록 실패", err);
-      const message = err.response?.data?.message || "글 등록에 실패했습니다.";
-      toast.error(message);
+      console.error("게시글 수정 실패", err);
+      toast.error("게시글 수정에 실패했습니다.");
     }
   };
 
@@ -50,6 +72,8 @@ const PostCreateForm = () => {
 
   return (
     <>
+      <Header />
+      <HomeButton showBack={true} />
       <div className="post-form-whole-wrapper">
         <div className="post-form-wrapper">
           <div className="post-header-create">
@@ -99,7 +123,6 @@ const PostCreateForm = () => {
           <div className="divider" />
 
           <div className="post-footer">
-            {/* 왼쪽: 예산 */}
             <div className="budget-group">
               <label className="budget-checkbox">
                 <input
@@ -122,7 +145,6 @@ const PostCreateForm = () => {
               />
             </div>
 
-            {/* 오른쪽: 이미지 + 공유 */}
             <div className="action-group">
               <input
                 type="file"
@@ -135,7 +157,7 @@ const PostCreateForm = () => {
                   const newUrls = files.map((file) =>
                     URL.createObjectURL(file)
                   );
-                  setImageUrls((prev) => [...prev, ...newUrls].slice(0, 10)); // 최대 10개
+                  setImageUrls((prev) => [...prev, ...newUrls].slice(0, 10));
                 }}
               />
               <label htmlFor="image-upload" className="upload-btn">
@@ -147,7 +169,7 @@ const PostCreateForm = () => {
                 onClick={handleSubmit}
                 disabled={!isFormValid}
               >
-                공유하기 ↑
+                수정하기 ✓
               </button>
             </div>
           </div>
@@ -174,8 +196,9 @@ const PostCreateForm = () => {
           )}
         </div>
       </div>
+      <Footer />
     </>
   );
 };
 
-export default PostCreateForm;
+export default PostEditForm;

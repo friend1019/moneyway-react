@@ -1,55 +1,60 @@
 /* Profile.css */
 
 .profilecard-container {
-    width: 27rem;
-    height: 35rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-bottom: 0;
-    padding-top: 2rem;
-    background-color: #f7f7f7;
-    border-radius: 2.5rem;
+  width: 20rem;
+  height: 27rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 5rem;
+  background-color: white;
+  border-radius: 2.5rem;
+
+  position: absolute; /* ✅ 겹침을 가능하게 만듦 */
+  top: 6rem; /* 원하는 위치에 고정 */
+  left: 6rem; /* 왼쪽에서 조금 떨어지게 */
+  z-index: 0; /* ✅ 다른 요소보다 위에 위치 */
+  box-shadow: 0 0.8rem 2rem rgba(0, 0, 0, 0.1); /* ✅ 시각적으로 뜬 느낌 */
 }
 
 .profile-image img {
-    width: 11rem;
-    height: 11rem;
-    font-size: 8rem;
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center;
-    margin-top: 1.5rem;
+  width: 8rem;
+  height: 8rem;
+  font-size: 8rem;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  margin-top: 1.5rem;
 }
 
 .nickname p {
-    font-size: 3.2rem;
-    font-weight: bold;
-    margin-bottom: 2.2rem;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 2.2rem;
 }
 
 .info-fix button {
-    width: 20rem;
-    height: 5rem;
-    background-color: #0066F9;
-    color: white;
-    border: none;
-    border-radius: 2rem;
-    font-size: 1.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
+  width: 13rem;
+  height: 4rem;
+  background-color: #0066f9;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .logout-btn button {
-    background: none;
-    color: #307EF1;
-    border: none;
-    font-size: 1.8rem;
-    text-decoration: none;
-    cursor: pointer;
+  background: none;
+  color: #307ef1;
+  border: none;
+  font-size: 1.5rem;
+  text-decoration: none;
+  cursor: pointer;
 }

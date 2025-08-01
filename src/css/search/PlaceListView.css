@@ -1,91 +1,110 @@
-/* PlaceListView.css */
+
+/* =============================
+   검색 바 영역
+============================= */
 .search-bar {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    position: relative;
+  display: flex;
+  align-items: center;
+  position: relative;
+  margin-bottom: 1rem;
 }
+
 
 .search-bar input {
-    width: 30rem;
-    height: 4.3rem;
-    padding-left: 2rem;
-    border-radius: 1rem;
-    border: 0.1rem solid #E2E2E2;
-    box-shadow: 0px 0.4rem 0.4rem rgba(0, 0, 0, 0.25);
-    font-size: 1.6rem;
-    font-weight: bold;
+  width: 30rem;
+  height: 4.3rem;
+  padding-left: 2rem;
+  border-radius: 1rem;
+  border: 0.1rem solid #e2e2e2;
+  box-shadow: 0 0.4rem 0.4rem rgba(0,0,0,0.25);
+  font-size: 1.6rem;
+  font-weight: bold;
 }
+
 
 .search-bar input:focus {
-    outline: none;
+  outline: none;
 }
+
 
 .search-button {
-    position: absolute;
-    right: 11rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    cursor: pointer;
+  position: absolute;
+  right: 11rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
+
 
 .search-icon {
-    font-size: 1.8rem;
-    color: #757575;
+  font-size: 1.8rem;
+  color: #757575;
 }
+
 
 .filter-btn {
-    margin-left: 2rem;
-    background: transparent;
-    border: none;
-    cursor: pointer;
+  margin-left: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
 }
+
 
 .filter-icon {
-    font-size: 1.8rem;
-    color: #757575;
+  font-size: 1.8rem;
+  color: #757575;
 }
 
+
+/* 안내 텍스트 */
 .intro-text {
-    font-size: 1.6rem;
-    margin-top: 3rem;
-    color: #7F7F7F;
+  font-size: 1.6rem;
+  margin-top: 3rem;
+  color: #7f7f7f;
 }
 
+
+/* 카테고리 버튼 영역 */
 .category-buttons {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 1rem;
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
 }
+
 
 .category-btn {
-    padding: 0.5rem 1.0rem;
-    border-radius: 9999px;
-    border: 1px solid #93c5fd;
-    background: white;
-    color: #3b82f6;
-    font-weight: 600;
-    cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: 1px solid #93c5fd;
+  background: #fff;
+  color: #3b82f6;
+  font-weight: 600;
+  cursor: pointer;
 }
+
 
 .category-btn:hover {
-    background-color: #7bb9ff;
+  background-color: #7bb9ff;
 }
+
 
 .category-divider {
-    border: none;
-    border-top: 0.1px solid #C1C1C1;
-    margin: 3rem 0;
+  border: none;
+  border-top: 0.1px solid #c1c1c1;
+  margin: 3rem 0;
 }
 
+
+/* 장소 리스트 영역 */
 .place-list {
-    display: flex;
-    flex-direction: column;
-    margin-left: -3rem;
+  display: flex;
+  flex-direction: column;
+  margin-left: -3rem;
 }
+
 
 .highlight-blue {
-    color: #0066F9;
+  color: #0066f9;
 }
