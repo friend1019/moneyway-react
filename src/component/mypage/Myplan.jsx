@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import "../../css/mypage/MyPlan.css";
 
-const MyPlan = () => {
+const MyPlan = ({ onClose }) => {
   const [plans, setPlans] = useState([]);
   const navigate = useNavigate();
 
@@ -33,9 +33,14 @@ const MyPlan = () => {
     return `${startDate} ~ ${endDate}`;
   };
 
+  const handleAddPlanClick = () => {
+    if (onClose) onClose();          // 모달 닫기
+    navigate("/myplan");             // ✅ MyPlanPage로 바로 이동
+  };
+
   return (
     <div className="myplan-container">
-      {plans.map((plan, index) => (
+      {plans.map((plan) => (
         <div className="plan-card" key={plan.planId}>
           <div className="plan-info">
             <img src={plan.thumbnailUrl} alt="썸네일" className="thumbnail" />
@@ -62,7 +67,7 @@ const MyPlan = () => {
         </div>
       ))}
 
-      <div className="add-plan-box" onClick={() => navigate("/create-plan")}>
+      <div className="add-plan-box" onClick={handleAddPlanClick}>
         <div className="plus-icon">+</div>
       </div>
     </div>

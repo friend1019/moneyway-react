@@ -81,24 +81,15 @@
 /* 일정카드 기본 */
 .schedule-item,
 .schedule-item-card {
-  position: absolute;
-  left: 0; right: 0;
-  margin: 0;
-  box-sizing: border-box;
-  border-radius: 1.2rem;
-  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  background: #fff; /* 기본값, 카테고리에 따라 동적으로 바꿈 */
+  padding: 0.8rem 1.2rem 0.8rem 1.2rem;
+  border: none;
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  align-items: flex-start;
-  justify-content: flex-start ;
-  gap: 0.2rem;
-  box-shadow: 0 2px 8px rgba(50,70,90,0.06);
-  border: none;
-  font-size: 1.3rem;
-  cursor: grab;
-  z-index: 5;
-   margin: 0; 
+  justify-content: flex-start;
+  position: absolute;  /* position: absolute; 있어야 겹치지 않고 칸에 딱 맞게! */
 }
 .schedule-item.숙소, .schedule-item-card.숙소 { background: #e7f5ff;  }
 .schedule-item.식당, .schedule-item-card.식당 { background: #fff0f6;  }
