@@ -16,7 +16,6 @@ import AIPeriod from "./component/aiplan/AIPeriod";
 import AIPeople from "./component/aiplan/AIPeople";
 import AIName from "./component/aiplan/AIName";
 import AIBudget from "./component/aiplan/AIBudget";
-import MyPlanPage from "./component/myplan/MyPlanPage";
 import CartMain from "./component/shopping/CartMain";
 import PlanList from "./component/common/PlanList";
 import CreatePlan from "./component/aiplan/CreatePlan";
@@ -24,6 +23,8 @@ import CommunityMain from "./component/community/CommunityMain";
 import PostCreate from "./component/community/PostCreate";
 import PostDetail from "./component/community/PostDetail";
 import PostEditForm from "./component/community/PostEditForm";
+
+import MyPlanPage from "./component/myplan/MyPlanPage";
 
 function AppRouter() {
   return (
@@ -99,6 +100,17 @@ function AppRouter() {
       {<Route path="/posts/create" element={<PostCreate />} />}
       {<Route path="/posts/:postId" element={<PostDetail />} />}
       <Route path="/posts/:postId/edit" element={<PostEditForm />} />
+
+      {
+        <Route
+          path="/schedule"
+          element={
+            <ProtectedRoute>
+              <MyPlanPage />
+            </ProtectedRoute>
+          }
+        />
+      }
       {/* Catch-all route for 404 */}
     </Routes>
   );

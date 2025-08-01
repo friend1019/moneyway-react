@@ -79,7 +79,7 @@ const PlanFormSection = () => {
           <PlanButton className="icon" />
         </button>
 
-        <div className="plan-direct" onClick={() => navigate("/create-plan")}>
+        <div className="plan-direct" onClick={() => navigate("/schedule")}> 
           직접 계획할래요
         </div>
       </div>

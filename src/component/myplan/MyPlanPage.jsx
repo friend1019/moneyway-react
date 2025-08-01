@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import '../../css/myplan/MyPlanPage.css';
-import Header from "../Header";
+import Header from "../common/Header";
 import Schedule from './Schedule';
 import ScheduleCart from './ScheduleCart';
 import LodgingCart from './LodgingCart'; 
@@ -78,7 +78,9 @@ const MyPlanPage = () => {
       .map(day => parseInt(day.replace('Day ', '')))
   );
   const planDurationStr =
-    lastUsedDayNum > 0 ? `${lastUsedDayNum - 1}박 ${lastUsedDayNum}일` : '1박 2일';
+    lastUsedDayNum === 1 ? '당일치기'
+    : lastUsedDayNum > 0 ? `${lastUsedDayNum - 1}박 ${lastUsedDayNum}일`
+    : '1박 2일';
 
   // duration 드래그 조정 (0.5 단위)
   const onDurationDrag = (item, day, newDuration) => {
