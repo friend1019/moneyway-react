@@ -16,6 +16,7 @@ const getCartStyle = (category = "") => {
   if (category.includes("식당")) return { icon: foodIcon, color: "#fa5252", bg: "#fff6f3" };
   if (category.includes("카페")) return { icon: cafeIcon, color: "#fab005", bg: "#fffbe4" };
   if (category.includes("숙소")) return { icon: hotelIcon, color: "#339af0", bg: "#e8f5fa" };
+  // '관광', '관광지', '관광명소' 모두 인식
   if (category.includes("관광")) return { icon: tourIcon, color: "#845ef7", bg: "#f4f2fd" };
   return { icon: activityIcon, color: "#7ddc7e", bg: "#f6fff2" };
 };
@@ -63,7 +64,6 @@ const ScheduleCart = ({ cartItems: initialCartItems = [] }) => {
   const [cartItems, setCartItems] = useState(initialCartItems);
   const [loading, setLoading] = useState(false);
 
-  // 최초 mount 시 자동 불러오기 원하면 useEffect에서 handleFetchCart();
   useEffect(() => {
     setCartItems(initialCartItems);
   }, [initialCartItems]);
@@ -85,6 +85,9 @@ const ScheduleCart = ({ cartItems: initialCartItems = [] }) => {
     setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
   };
 
+  // 숙소가 아닌 항목만 필터링
+  const nonLodgingItems = cartItems.filter(item => !item.category?.includes("숙소"));
+
   return (
     <div className="side-card-container">
       <h3>일정 카드</h3>
@@ -92,10 +95,10 @@ const ScheduleCart = ({ cartItems: initialCartItems = [] }) => {
         {loading ? "불러오는 중..." : "카드 불러오기"}
       </button>
       <div className="cart-list">
-        {cartItems.length === 0 && (
+        {nonLodgingItems.length === 0 && (
           <p className="empty-text">일정 카드가 없습니다</p>
         )}
-        {cartItems.map((item) => {
+        {nonLodgingItems.map((item) => {
           const { icon, color, bg } = getCartStyle(item.category || "액티비티");
           return (
             <DraggableCartItem key={item.cartId || item.id} item={item} onDelete={handleDelete}>
