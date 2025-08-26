@@ -77,7 +77,9 @@ const MyPlanPage = () => {
   );
   // 기본 0박 0일로 표시
   const planDurationStr =
-    lastUsedDayNum > 0 ? `${lastUsedDayNum - 1}박 ${lastUsedDayNum}일` : '0박 0일';
+    lastUsedDayNum === 1 ? '당일치기'
+    : lastUsedDayNum > 0 ? `${lastUsedDayNum - 1}박 ${lastUsedDayNum}일`
+    : '1박 2일';
 
   // duration 드래그 조정 (0.5 단위)
   const onDurationDrag = (item, day, newDuration) => {

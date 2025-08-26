@@ -67,7 +67,7 @@ const MyPlan = ({ onClose }) => {
         </div>
       ))}
 
-      <div className="add-plan-box" onClick={handleAddPlanClick}>
+      <div className="add-plan-box" onClick={() => navigate("/schedule")}>
         <div className="plus-icon">+</div>
       </div>
     </div>
