@@ -39,6 +39,7 @@ function AppRouter() {
       <Route path="/ai-period" element={<AIPeriod />} />
       <Route path="/ai-people" element={<AIPeople />} />
       <Route path="/ai-name" element={<AIName />} />
+      
       <Route
         path="/mypage"
         element={
@@ -47,6 +48,10 @@ function AppRouter() {
           </ProtectedRoute>
         }
       />
+
+       {/* 🔹 개발용 테스트 라우트 (로그인 체크 없이 접근 가능) */}
+       <Route path="/test/myplan" element={<MyPlanPage />} />
+       
       <Route
         path="/myplan"
         element={

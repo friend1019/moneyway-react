@@ -8,7 +8,6 @@ import LodgingCart from './LodgingCart';
 import ContextMenu from './ContextMenu';
 import api from "../../api/axios";
 
-// 겹침 검사(30분 단위, 끝-시작 붙는 건 OK)
 const isOverlapping = (newSchedule, existingSchedules) => {
   const getSlotIndex = (time) => {
     const [h, m] = time.split(':').map(Number);
