@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import "../../css/main/Main.css";
 import { getPlacesByCategory } from "../../api/tourApi.js";
+import api from "../../api/axios"; // ✅ 추천 게시글 가져올 때 사용
 
-import Header from "../common/Header";
-import Footer from "../common/Footer.jsx";
 import HorizontalSlider from "../main/Slider";
 import PlanFormSection from "../aiplan/PlanFormSection";
 import PlaceDetailView from "../search/PlaceDetailView";
@@ -24,9 +23,12 @@ import { ReactComponent as HoverCafeIcon } from "../../images/main/fifth/hover_c
 import { ReactComponent as HoverActivityIcon } from "../../images/main/fifth/hover_activity.svg";
 
 function Main() {
-
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [editorPicksData, setEditorPicksData] = useState([]);
+
+  // ✅ 커뮤니티 추천 게시글(썸네일+제목)
+  const [editorPosts, setEditorPosts] = useState([]);
+
+  // 기존 추천 명소
   const [recommendationsData, setRecommendationsData] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
 
@@ -59,39 +61,66 @@ function Main() {
     },
   ];
 
+  // ✅ “이달의 여행 구경하기” → 커뮤니티 추천 게시글로 대체
+  useEffect(() => {
+    const fetchRecommendedPosts = async () => {
+      try {
+        // 1) 리스트 가져오기 (페이지 사이즈는 넉넉히)
+        const res = await api.get("/posts", { params: { page: 0, size: 60 } });
+        // API 형태 유연 대응 (content 배열이거나, 바로 배열이거나)
+        const list = Array.isArray(res.data?.content)
+          ? res.data.content
+          : Array.isArray(res.data)
+          ? res.data
+          : [];
+
+        // 2) 간단 추천 스코어: likeCount*2 + scrapCount (백엔드 정렬이 있으면 그걸로 교체 가능)
+        const ranked = list
+          .map((p) => ({
+            ...p,
+            _score: (p.likeCount ?? 0) * 2 + (p.scrapCount ?? 0),
+          }))
+          .sort((a, b) => b._score - a._score)
+          .slice(0, 10)
+          .map((p, idx) => ({
+            id: p.postId ?? p.id ?? idx,
+            title: p.title,
+            image: p.imageUrls?.[0] || p.thumbnailUrl || null,
+          }));
+
+        setEditorPosts(ranked);
+      } catch (err) {
+        console.error("추천 게시글 로드 실패:", err);
+        setEditorPosts([]);
+      }
+    };
+
+    fetchRecommendedPosts();
+  }, []);
+
+  // 기존 “추천 명소” 유지
   useEffect(() => {
     const fetchRecommendations = async () => {
-      const data = await getPlacesByCategory("TOURIST_ATTRACTION");
-      const sliced = data.slice(13, 20).map((item, idx) => ({
-        id: idx,
-        image: item.imageUrls?.[0],
-        title: item.title,
-        tags: [item.categoryName],
-        ...item,
-      }));
-      setRecommendationsData(sliced);
+      try {
+        const data = await getPlacesByCategory("TOURIST_ATTRACTION");
+        const sliced = data.slice(13, 20).map((item, idx) => ({
+          id: idx,
+          image: item.imageUrls?.[0],
+          title: item.title,
+          tags: [item.categoryName],
+          ...item,
+        }));
+        setRecommendationsData(sliced);
+      } catch (e) {
+        console.error("추천 명소 로드 실패:", e);
+        setRecommendationsData([]);
+      }
     };
     fetchRecommendations();
   }, []);
 
-  useEffect(() => {
-    const fetchEditorPicks = async () => {
-      const data = await getPlacesByCategory("ACTIVITY");
-      const sliced = data.slice(1, 7).map((item, idx) => ({
-        id: idx,
-        image: item.imageUrls?.[0],
-        title: item.title,
-        type: item.categoryName,
-      }));
-      setEditorPicksData(sliced);
-    };
-    fetchEditorPicks();
-  }, []);
-
   return (
     <>
-      <Header />
-
       {/* 1번째 페이지 */}
       <div className="FirstMain">
         <div className="visual-section">
@@ -138,23 +167,42 @@ function Main() {
       {/* 2번째 페이지 - 분리된 컴포넌트 */}
       <PlanFormSection />
 
-      {/* 3번째 페이지 */}
+      {/* 3번째 페이지 — ✅ 커뮤니티 추천 게시글 */}
       <div className="editor-pick">
         <section className="editor-section-container">
           <div className="editor-section-header">
             <p className="editor-section-subtitle">Editor's Pick</p>
             <h2 className="editor-section-title">이달의 여행 구경하기</h2>
           </div>
+
           <HorizontalSlider>
             <div className="editor-cards-list">
-              {editorPicksData.map((item) => (
-                <div key={item.id} className="editor-pick-card">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="card-image"
-                  />
-                  <div className="card-title">{item.title}</div>
+              {editorPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="editor-pick-card"
+                  onClick={() => navigate(`/posts/${post.id}`)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" ? navigate(`/posts/${post.id}`) : null
+                  }
+                  title={post.title}
+                >
+                  {/* 썸네일 */}
+                  {post.image ? (
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="card-image"
+                    />
+                  ) : (
+                    <div className="card-image card-image--placeholder">
+                      썸네일 없음
+                    </div>
+                  )}
+                  {/* 제목 */}
+                  <div className="card-title">{post.title}</div>
                 </div>
               ))}
             </div>
@@ -162,7 +210,7 @@ function Main() {
         </section>
       </div>
 
-      {/* 4번째 페이지 */}
+      {/* 4번째 페이지 — 추천 명소(기존 유지) */}
       <div className="recommendation">
         <section className="recommendation-section-container">
           <div className="recommendation-section-header">
@@ -262,8 +310,6 @@ function Main() {
           />
         </div>
       </div>
-
-      <Footer />
 
       {selectedPlace && (
         <div

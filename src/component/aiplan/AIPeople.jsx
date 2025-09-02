@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Header from "../common/Header";
 import ProgressSteps from '../aiplan/ProgressStep';
 import '../../css/aiplan/AIPeople.css'; 
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +21,6 @@ const AIPeople = () => {
 
     return (
         <>
-            <Header />
             <div className="page-container">
                 <ProgressSteps currentStep={3} />
 

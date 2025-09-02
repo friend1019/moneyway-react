@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../api/axios";
-import Header from "../common/Header";
 import logoWallet from "../../images/login/logoWallet.svg";
 import "../../css/login/ResetPassword.css";
 
@@ -77,7 +76,6 @@ const ResetPassword = () => {
 
   return (
     <>
-      <Header />
       <div className="reset-password-container">
         <div className="reset-password-header">
           <img

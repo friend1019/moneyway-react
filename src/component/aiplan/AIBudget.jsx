@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
-import Header from "../common/Header";
 import BudgetSlider from "../main/BudgetSlider";
 import ProgressStep from '../aiplan/ProgressStep';
 import '../../css/aiplan/AIBudget.css'; 
@@ -15,7 +14,6 @@ const AIBudget = () => {
 
     return (
         <>
-            <Header />
             <div className="page-container">
                 <ProgressStep currentStep={1} />
                 <div className="content-container">

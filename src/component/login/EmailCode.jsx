@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../api/axios";
-import Header from "../common/Header";
 import logoWallet from "../../images/login/logoWallet.svg";
 
 const EmailCode = () => {
@@ -59,7 +58,6 @@ const EmailCode = () => {
 
   return (
     <>
-      <Header />
       <div className="login-container">
         <div className="forgot-pwd-header">
           <img src={logoWallet} alt="Wallet Logo" className="wallet-logo" />

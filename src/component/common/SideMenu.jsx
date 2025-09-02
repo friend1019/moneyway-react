@@ -1,21 +1,57 @@
 // src/components/common/SideMenu.jsx
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import useUserStore from "../../api/userStore";
 import api from "../../api/axios";
 import "../../css/common/SideMenu.css";
 
+const SLIDE_MS = 350; // CSS transition 시간과 반드시 동일
+
 const SideMenu = ({ onClose }) => {
   const navigate = useNavigate();
-  const { user, logout } = useUserStore(); // ✅ logout 사용
+  const { user, logout } = useUserStore();
   const isLoggedIn = !!user;
+
+  // 슬라이드 인/아웃 제어
+  const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
+
+  // mount 후 한 프레임 뒤 open → 트랜지션 동작
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setOpen(true));
+    // 스크롤 잠금
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      cancelAnimationFrame(id);
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+  const startClose = useCallback(() => {
+    if (closing) return;
+    setOpen(false);
+    setClosing(true);
+    setTimeout(() => {
+      onClose?.(); // 애니메이션 끝나고 부모에게 언마운트 요청
+    }, SLIDE_MS);
+  }, [closing, onClose]);
+
+  // ESC로 닫기
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && startClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [startClose]);
 
   const handleLogout = async () => {
     try {
-      await api.post("/auth/logout"); // ✅ 서버에 로그아웃 요청
-      logout(); // ✅ Zustand + localStorage 초기화
+      await api.post("/auth/logout");
+      logout();
       navigate("/");
       toast.success("로그아웃 되었습니다.");
+      startClose();
     } catch (err) {
       console.error("로그아웃 에러:", err);
       toast.error("로그아웃 중 오류가 발생했습니다.");
@@ -23,9 +59,23 @@ const SideMenu = ({ onClose }) => {
   };
 
   return (
-    <div className="side-menu-overlay show" onClick={onClose}>
-      <div className="side-menu" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>
+    <>
+      {/* 오버레이 */}
+      <div
+        className={`side-menu-overlay ${open && !closing ? "open" : ""}`}
+        onClick={startClose}
+        aria-hidden="true"
+      />
+
+      {/* 패널 */}
+      <aside
+        className={`side-menu ${open && !closing ? "open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="사이드 메뉴"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="close-btn" onClick={startClose} aria-label="닫기">
           ×
         </button>
 
@@ -42,38 +92,44 @@ const SideMenu = ({ onClose }) => {
                 <div className="profile-circle" />
               )}
               <div className="nickname">{user.nickname}</div>
-              <div className="logout" onClick={handleLogout}>
+              <button className="logout" onClick={handleLogout}>
                 로그아웃
-              </div>
+              </button>
             </>
           ) : (
             <div className="logged-out">
-              <div
+              <button
                 className="login-btn-ham"
                 onClick={() => {
                   navigate("/login");
-                  onClose();
+                  startClose();
                 }}
               >
                 로그인하세요
-              </div>
+              </button>
             </div>
           )}
         </div>
 
         <ul className="menu-list">
           <li>
-            <Link to="/aiplan">AI 플랜 생성</Link>
+            <Link to="/aiplan" onClick={startClose}>
+              AI 플랜 생성
+            </Link>
           </li>
           <li>
-            <Link to="/create-plan">나만의 플랜 생성</Link>
+            <Link to="/create-plan" onClick={startClose}>
+              나만의 플랜 생성
+            </Link>
           </li>
           <li>
-            <Link to="/community">커뮤니티</Link>
+            <Link to="/community" onClick={startClose}>
+              커뮤니티
+            </Link>
           </li>
         </ul>
-      </div>
-    </div>
+      </aside>
+    </>
   );
 };
 

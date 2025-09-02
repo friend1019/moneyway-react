@@ -33,11 +33,6 @@ const MyPlan = ({ onClose }) => {
     return `${startDate} ~ ${endDate}`;
   };
 
-  const handleAddPlanClick = () => {
-    if (onClose) onClose();          // 모달 닫기
-    navigate("/myplan");             // ✅ MyPlanPage로 바로 이동
-  };
-
   return (
     <div className="myplan-container">
       {plans.map((plan) => (

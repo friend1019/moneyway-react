@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import Header from "../common/Header";
 import "../../css/search/SearchMain.css";
 import "../../css/search/list-wrapper-scroll.css";
 import PlaceListView from "./PlaceListView";
@@ -47,50 +46,81 @@ const SearchMain = () => {
   const defaultCategory = queryParams.get("category") || "카페";
   const [category, setCategory] = useState(defaultCategory);
 
-  const handlePlaceSelect = useCallback((place, showDetail = false) => {
-    if (showDetail) {
-      setSelectedPlace(place);
-      return;
-    }
+  // 🔧 오버레이 생성 유틸
+  const showOverlay = useCallback(
+    (place, position) => {
+      if (!map) return;
 
-    if (!map || !place.latitude || !place.longitude) return;
+      // 기존 오버레이 제거
+      if (overlayRef.current) overlayRef.current.setMap(null);
 
-    const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
-    map.setLevel(4);
-    map.panTo(position);
+      const content = document.createElement("div");
+      content.className = "custom-overlay-card";
+      content.innerHTML = `
+        <div style="background:white; border-radius:8px; border:2px solid #2d6cff; padding:10px; width:180px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+          ${
+            place.imageUrls?.[0]
+              ? `<img src="${place.imageUrls[0]}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;" />`
+              : ""
+          }
+          <div style="margin-top:6px; font-size:14px; font-weight:bold; color:#2d6cff;">${place.title}</div>
+          <button id="detail-btn" style="margin-top:8px; width:100%; background:#2d6cff; color:white; border:none; border-radius:4px; padding:6px 0; cursor:pointer;">
+            자세히 보기
+          </button>
+        </div>
+      `;
 
-    if (overlayRef.current) overlayRef.current.setMap(null);
+      const overlay = new window.kakao.maps.CustomOverlay({ position, content, yAnchor: 1 });
+      overlay.setMap(map);
+      overlayRef.current = overlay;
 
-    const content = document.createElement("div");
-    content.className = "custom-overlay-card";
-    content.innerHTML = `
-      <div style="background:white; border-radius:8px; border:2px solid #2d6cff; padding:10px; width:180px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
-        ${
-          place.imageUrls?.[0]
-            ? `<img src="${place.imageUrls[0]}" style="width:100%; height:80px; object-fit:cover; border-radius:4px;" />`
-            : ""
+      // 버튼 이벤트 연결
+      setTimeout(() => {
+        const btn = document.getElementById("detail-btn");
+        if (btn) {
+          btn.onclick = () => {
+            setSelectedPlace(place);
+            overlay.setMap(null);
+          };
         }
-        <div style="margin-top:6px; font-size:14px; font-weight:bold; color:#2d6cff;">${place.title}</div>
-        <button id="detail-btn" style="margin-top:8px; width:100%; background:#2d6cff; color:white; border:none; border-radius:4px; padding:6px 0; cursor:pointer;">
-          자세히 보기
-        </button>
-      </div>
-    `;
+      }, 0);
+    },
+    [map]
+  );
 
-    const overlay = new window.kakao.maps.CustomOverlay({ position, content, yAnchor: 1 });
-    overlay.setMap(map);
-    overlayRef.current = overlay;
+  // ✅ 단일 진입 함수: 옵션으로 동작 제어
+  const handlePlaceSelect = useCallback(
+    (place, opts = {}) => {
+      const {
+        showDetail = false,   // 상세 열기
+        panMap = true,        // 지도 이동/확대
+        overlay = false,      // 오버레이 표시
+        zoomLevel = 4,        // 이동 시 레벨
+      } = opts;
 
-    setTimeout(() => {
-      const btn = document.getElementById("detail-btn");
-      if (btn) {
-        btn.onclick = () => {
-          setSelectedPlace(place);
-          overlay.setMap(null);
-        };
+      const hasCoord =
+        isValidJejuCoordinate(place?.latitude, place?.longitude);
+
+      if (map && panMap && hasCoord) {
+        const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
+        map.setLevel(zoomLevel);
+        map.panTo(position);
+
+        if (overlay) {
+          showOverlay(place, position);
+        } else if (overlayRef.current) {
+          // 리스트에서 상세로 바로 들어갈 때는 오버레이 제거
+          overlayRef.current.setMap(null);
+          overlayRef.current = null;
+        }
       }
-    }, 0);
-  }, [map]);
+
+      if (showDetail) {
+        setSelectedPlace(place);
+      }
+    },
+    [map, showOverlay]
+  );
 
   const handleBack = () => {
     setSelectedPlace(null);
@@ -140,7 +170,8 @@ const SearchMain = () => {
         const marker = new window.kakao.maps.Marker({ position });
         marker._placeData = place;
         window.kakao.maps.event.addListener(marker, "click", () => {
-          handlePlaceSelect(place);
+          // 마커 클릭: 지도 이동 + 오버레이
+          handlePlaceSelect(place, { panMap: true, overlay: true, showDetail: false, zoomLevel: 4 });
         });
         return marker;
       });
@@ -182,7 +213,6 @@ const SearchMain = () => {
   return (
     <>
       <div className="map-header">
-        <Header />
       </div>
       <div className="map-container">
         <div className={`category-container ${selectedPlace ? "detail-mode" : ""}`}>
@@ -200,7 +230,9 @@ const SearchMain = () => {
                 {searchTerm && (
                   <SearchPlaceBox
                     results={searchResults}
-                    onSelect={(place) => handlePlaceSelect(place, true)}
+                    onSelect={(place) =>
+                      handlePlaceSelect(place, { showDetail: true, panMap: true, overlay: false, zoomLevel: 4 })
+                    }
                   />
                 )}
               </div>
@@ -213,7 +245,9 @@ const SearchMain = () => {
               <div key={category} className="list-wrapper fade-in">
                 <PlaceListView
                   places={places}
-                  onSelect={(place) => handlePlaceSelect(place, true)}
+                  onSelect={(place) =>
+                    handlePlaceSelect(place, { showDetail: true, panMap: true, overlay: false, zoomLevel: 4 })
+                  }
                 />
               </div>
             </>

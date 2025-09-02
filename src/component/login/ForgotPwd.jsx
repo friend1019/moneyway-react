@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import api from "../../api/axios";
-import Header from "../common/Header";
 import "../../css/login/ForgotPwd.css";
 import logoWallet from "../../images/login/logoWallet.svg";
 
@@ -55,7 +54,6 @@ const ForgotPwd = () => {
 
   return (
     <>
-      <Header />
       <div className="login-container">
         <div className="forgot-pwd-header">
           <img src={logoWallet} alt="Wallet Logo" className="wallet-logo" />

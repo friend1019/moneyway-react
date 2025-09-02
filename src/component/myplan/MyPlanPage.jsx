@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import '../../css/myplan/MyPlanPage.css';
-import Header from "../common/Header";
 import Schedule from './Schedule';
 import ScheduleCart from './ScheduleCart';
 import LodgingCart from './LodgingCart';
@@ -38,7 +37,6 @@ const MyPlanPage = () => {
     'Day 4': []
   });
   const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [isEditingBudget, setIsEditingBudget] = useState(false);
   const [budgetInput, setBudgetInput] = useState('');
   const [isEditMode, setIsEditMode] = useState(true);
@@ -46,7 +44,7 @@ const MyPlanPage = () => {
   const [titleInput, setTitleInput] = useState('');
   const [currentPlanIndex, setCurrentPlanIndex] = useState(0);
 
-  // 메뉴 위치가 카드 기준으로 잡히게 하기 위해 ref 추가
+  // 컨텍스트 메뉴 상태
   const [menuState, setMenuState] = useState({
     visible: false,
     position: { x: 0, y: 0 },
@@ -56,14 +54,12 @@ const MyPlanPage = () => {
 
   // cart 불러오기 (한 번만 호출)
   const fetchCartItems = async () => {
-    setLoading(true);
     try {
       const res = await api.get('/cart');
       setCartItems(res.data.cartItems || []);
     } catch {
       alert('카트 불러오기 실패');
     }
-    setLoading(false);
   };
 
   useEffect(() => { fetchCartItems(); }, []);
@@ -84,7 +80,6 @@ const MyPlanPage = () => {
   // duration 드래그 조정 (0.5 단위)
   const onDurationDrag = (item, day, newDuration) => {
     if (isNaN(newDuration) || newDuration < 0.5) return;
-    // 겹침이면 상태 변경 없이 return
     const updatedItem = { ...item, duration: newDuration };
     const filtered = dailySchedules[day].filter(d => d.id !== updatedItem.id);
     if (isOverlapping(updatedItem, filtered)) {
@@ -112,7 +107,7 @@ const MyPlanPage = () => {
       const newScheduleItem = {
         ...draggedItem,
         id: Date.now(),
-        time: time,
+        time,
         duration: 1,
       };
       if (isOverlapping(newScheduleItem, dailySchedules[day] || [])) {
@@ -129,7 +124,7 @@ const MyPlanPage = () => {
         name: draggedItem.placeName,
         cost: draggedItem.price,
         category: draggedItem.category,
-        time: time,
+        time,
         duration: 1
       };
       if (isOverlapping(newScheduleItem, dailySchedules[day] || [])) {
@@ -161,10 +156,8 @@ const MyPlanPage = () => {
     setMenuState(prev => ({ ...prev, visible: false }));
   }, []);
   
-  // 카드의 ref를 받아와서 위치를 계산
   const handleContextMenu = (event, item, day) => {
     event.preventDefault();
-    // 타겟 기준 상대적 위치(카드 바로 아래)로 띄움
     const rect = event.currentTarget.getBoundingClientRect();
     setMenuState({
       visible: true,
@@ -173,7 +166,7 @@ const MyPlanPage = () => {
         y: rect.top + rect.height + window.scrollY + 4, // 아래로 살짝 띄우기
       },
       selectedItem: item,
-      day: day,
+      day,
     });
   };
 
@@ -186,6 +179,7 @@ const MyPlanPage = () => {
     }));
     closeMenu();
   };
+
   const handleViewDetails = () => {
     const { selectedItem } = menuState;
     if (!selectedItem) return;
@@ -193,6 +187,7 @@ const MyPlanPage = () => {
     closeMenu();
   };
 
+  // 사용 예산 합계 업데이트
   useEffect(() => {
     const allItems = Object.values(dailySchedules).flat();
     const totalCost = allItems.reduce((sum, item) => sum + (item.cost || 0), 0);
@@ -204,7 +199,7 @@ const MyPlanPage = () => {
 
   // 예산 편집
   const handleBudgetClick = () => {
-    setBudgetInput(planDetails.totalBudget);
+    setBudgetInput(String(planDetails.totalBudget ?? 0));
     setIsEditingBudget(true);
   };
   const handleBudgetChange = (e) => {
@@ -248,7 +243,6 @@ const MyPlanPage = () => {
       data.places.forEach(place => {
         const day = `Day ${place.dayNumber}`;
         if (!newSchedules[day]) newSchedules[day] = [];
-        // duration(시간) 계산
         const [sh, sm] = place.startTime.split(':').map(Number);
         const [eh, em] = place.endTime.split(':').map(Number);
         const startMin = sh * 60 + sm;
@@ -299,7 +293,7 @@ const MyPlanPage = () => {
         const endH = Math.floor(endMin / 60);
         const endM = endMin % 60;
         places.push({
-          cartId: item.cㅗartId,
+          cartId: item.cartId, // ✅ 오타 수정
           dayNumber,
           startTime: item.time + ':00',
           endTime: `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}:00`,
@@ -368,7 +362,6 @@ const MyPlanPage = () => {
 
   return (
     <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>
-      <Header />
       <div className='myplan-page-container'>
         {isEditMode ? <LodgingCart cartItems={cartItems} /> : <div className="side-card-container-placeholder"></div>}
         <div className="center-column">

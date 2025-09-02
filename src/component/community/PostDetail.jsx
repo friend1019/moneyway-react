@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../../css/community/PostDetail.css";
-import Header from "../common/Header";
-import Footer from "../common/Footer";
+// ...existing code...
 import HomeButton from "./HomeButton";
 import useUserStore from "../../api/userStore";
 import api from "../../api/axios";
@@ -17,6 +16,8 @@ import {
   FaRegBookmark,
   FaArrowUp,
   FaEllipsisH,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
 
 const PostDetail = () => {
@@ -31,7 +32,7 @@ const PostDetail = () => {
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [commentMenuOpen, setCommentMenuOpen] = useState(null);
 
-  // 날짜 배열 [YYYY, MM, DD, hh, mm, ss, ...] → "2025.07.24 20:03" 형식 문자열
+  // ⏱ 날짜 배열 [YYYY, MM, DD, hh, mm, ss, ...] → "2025.07.24 20:03"
   const formatDateTime = (arr) => {
     if (!Array.isArray(arr) || arr.length < 6) return "";
     const [year, month, day, hour, minute] = arr;
@@ -43,13 +44,10 @@ const PostDetail = () => {
     try {
       const res = await api.get(`/comments/post/${postId}`);
       const raw = res.data || [];
-
-      // liked처럼 필드 매핑해주기
       const parsedComments = raw.map((c) => ({
         ...c,
-        isMine: c.mine, // ✅ 댓글도 isMine으로 맞춰줘야 조건문에서 감지됨
+        isMine: c.mine,
       }));
-
       setComments(parsedComments);
     } catch (err) {
       console.error("댓글 조회 실패:", err);
@@ -61,15 +59,14 @@ const PostDetail = () => {
     try {
       const res = await api.get(`/posts/${postId}`);
       const raw = res.data;
-
       const parsedPost = {
         ...raw,
         isLiked: raw.liked,
         isScrapped: raw.scrapped,
         isMine: raw.mine,
         isChallenge: raw.challenge,
+        imageUrls: Array.isArray(raw.imageUrls) ? raw.imageUrls : [],
       };
-
       setPost(parsedPost);
     } catch (err) {
       console.error("게시글 조회 실패:", err);
@@ -87,7 +84,7 @@ const PostDetail = () => {
   const handleToggleLike = async () => {
     try {
       await api.post(`/posts/${postId}/like`);
-      await fetchPost(); // ← 반드시 기다려야 UI 반영됨
+      await fetchPost();
     } catch (err) {
       console.error("좋아요 실패:", err);
       toast.error("좋아요 처리에 실패했습니다.");
@@ -97,7 +94,7 @@ const PostDetail = () => {
   const handleToggleScrap = async () => {
     try {
       await api.post(`/posts/${postId}/scrap`);
-      await fetchPost(); // ← 이 부분도 await 필요
+      await fetchPost();
     } catch (err) {
       console.error("스크랩 실패:", err);
       toast.error("스크랩 처리에 실패했습니다.");
@@ -142,6 +139,35 @@ const PostDetail = () => {
     }
   };
 
+  // =========================
+  // 이미지 캐러셀 상태/로직
+  // =========================
+  const [imgPage, setImgPage] = useState(0);
+  const IMAGES_PER_PAGE = 2;
+
+  const imageUrls = post?.imageUrls ?? [];
+  const totalImages = imageUrls.length;
+  const totalPages = Math.ceil(totalImages / IMAGES_PER_PAGE);
+
+  const canPrev = imgPage > 0;
+  const canNext = imgPage < totalPages - 1;
+
+  const handlePrev = () => {
+    if (canPrev) setImgPage((p) => p - 1);
+  };
+
+  const handleNext = () => {
+    if (canNext) setImgPage((p) => p + 1);
+  };
+
+  const startIdx = imgPage * IMAGES_PER_PAGE;
+  const visibleImages = imageUrls.slice(startIdx, startIdx + IMAGES_PER_PAGE);
+
+  // 이미지 수 바뀌면 첫 페이지로
+  useEffect(() => {
+    setImgPage(0);
+  }, [totalImages]);
+
   if (!post) {
     return (
       <div>
@@ -152,7 +178,6 @@ const PostDetail = () => {
 
   return (
     <>
-      <Header />
       <HomeButton showBack={true} />
       <div className="post-detail-container-all">
         <div className="post-detail-container">
@@ -176,12 +201,12 @@ const PostDetail = () => {
               </div>
             </div>
 
-            {/* 오른쪽 영역: 예산 → 점3개 메뉴 순으로 배치 */}
+            {/* 오른쪽: 예산 → 점3개 메뉴 */}
             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
               <span style={{ fontSize: "1.5rem", fontWeight: 600 }}>
                 여행 예산
               </span>
-              <div className="budget">₩ {post.totalCost.toLocaleString()}</div>
+              <div className="budget">₩ {post.totalCost?.toLocaleString?.()}</div>
 
               {post.isMine && (
                 <div className="post-menu-wrapper">
@@ -207,11 +232,62 @@ const PostDetail = () => {
           <h1 className="post-title">{post.title}</h1>
           <div className="post-content">{post.content}</div>
 
-          <div className="post-images">
-            {post.imageUrls.map((url, idx) => (
-              <img key={idx} src={url} alt={`img-${idx}`} />
-            ))}
-          </div>
+          {/* =========================
+              이미지 캐러셀
+             ========================= */}
+          {totalImages > 0 && (
+            <div className="post-images-carousel">
+              <div className="carousel-track">
+                {visibleImages.map((url, idx) => (
+                  <div
+                    className="carousel-item"
+                    key={`${startIdx + idx}-${url}`}
+                  >
+                    <img
+                      src={url}
+                      alt={`post-img-${startIdx + idx}`}
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* 3장 이상일 때만 화살표/도트 */}
+              {totalImages > IMAGES_PER_PAGE && (
+                <>
+                  <button
+                    className={`carousel-arrow left ${canPrev ? "" : "disabled"}`}
+                    onClick={handlePrev}
+                    aria-label="이전 이미지"
+                    disabled={!canPrev}
+                  >
+                    <FaChevronLeft />
+                  </button>
+                  <button
+                    className={`carousel-arrow right ${canNext ? "" : "disabled"}`}
+                    onClick={handleNext}
+                    aria-label="다음 이미지"
+                    disabled={!canNext}
+                  >
+                    <FaChevronRight />
+                  </button>
+
+                  <div className="carousel-dots">
+                    {Array.from({ length: totalPages }).map((_, i) => (
+                      <span
+                        key={i}
+                        className={`dot ${i === imgPage ? "active" : ""}`}
+                        onClick={() => setImgPage(i)}
+                        role="button"
+                        aria-label={`${i + 1} 페이지로 이동`}
+                        tabIndex={0}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
 
           <div className="post-actions">
             <button onClick={handleToggleLike}>
@@ -252,17 +328,6 @@ const PostDetail = () => {
                         <button
                           className="menu-button"
                           onClick={() => {
-                            console.log("버튼 클릭됨", c.commentId); // ✅ 클릭 확인용
-                            console.log(
-                              "c.commentId:",
-                              c.commentId,
-                              typeof c.commentId
-                            );
-                            console.log(
-                              "commentMenuOpen:",
-                              commentMenuOpen,
-                              typeof commentMenuOpen
-                            );
                             setCommentMenuOpen(
                               commentMenuOpen === Number(c.commentId)
                                 ? null
@@ -273,17 +338,13 @@ const PostDetail = () => {
                           <FaEllipsisH />
                         </button>
                         {commentMenuOpen === c.commentId && (
-                          <>
-                            {console.log("✅ 드롭다운 렌더링됨", c.commentId)}
-
-                            <div className="dropdown-menu">
-                              <div
-                                onClick={() => handleDeleteComment(c.commentId)}
-                              >
-                                삭제하기
-                              </div>
+                          <div className="dropdown-menu">
+                            <div
+                              onClick={() => handleDeleteComment(c.commentId)}
+                            >
+                              삭제하기
                             </div>
-                          </>
+                          </div>
                         )}
                       </div>
                     )}
@@ -321,7 +382,6 @@ const PostDetail = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };
