@@ -90,3 +90,43 @@
 .post-back-btn { }
 .home-btn { }
 .write-btn { }  /* “글쓰기(+)” 버튼도 공통 스타일 사용 */
+
+.side-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* 오버레이: 완전히 덮는 강한 색상 */
+.side-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #307ef1;             /* 파란색 전체 덮음 */
+  transform: translateX(100%);     /* 오른쪽 바깥에서 시작 */
+  transition: transform 0.35s ease-out; /* 좀 더 느리고 확실하게 */
+  z-index: -1;                     /* 아이콘 위로 덮고 싶으면 0 */
+}
+
+/* 호버 시 오른쪽 → 왼쪽으로 확 덮음 */
+.side-btn:hover::before {
+  transform: translateX(0);
+}
+
+/* 아이콘 색상도 반전되게 */
+.side-btn {
+  color: #307ef1;
+  transition: color 0.25s ease;
+}
+.side-btn:hover {
+  color: #fff;                     /* 흰색으로 반전 */
+}
+
+/* 눌림/포커스 효과는 그대로 */
+.side-btn:active {
+  transform: translateY(-1px) scale(0.96);
+}
+.side-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 0.28rem rgba(48, 126, 241, 0.45);
+}
