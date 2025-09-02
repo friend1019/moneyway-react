@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import "../../css/community/CommunityMain.css";
-// ...existing code...
 import PostListForm from "./PostListForm";
 import HomeButton from "./HomeButton";
 
 const CommunityMain = () => {
   const [sortOption, setSortOption] = useState("LATEST");
-  const [filterOption, setFilterOption] = useState("ALL");
 
   return (
     <>
@@ -19,38 +17,22 @@ const CommunityMain = () => {
               <p>타임라인</p>
             </div>
 
-            {/* 오른쪽: 최신순 + 전체보기 */}
-            <div className="list-dropdown-right">
-              <div className="list-dropdown">
-                <button className="list-dropdown-btn">
-                  <span className="label">{getSortLabel(sortOption)}</span>
-                  <span className="icon">▼</span>
-                </button>
-                <div className="list-dropdown-menu">
-                  <div onClick={() => setSortOption("LATEST")}>최신순</div>
-                  <div onClick={() => setSortOption("LIKES")}>좋아요순</div>
-                </div>
-              </div>
-
-              <div className="list-dropdown">
-                <button className="list-dropdown-btn">
-                  <span className="label">
-                    {filterOption === "ALL" ? "전체보기" : "챌린지 참여"}
-                  </span>
-                  <span className="icon">▼</span>
-                </button>
-                <div className="list-dropdown-menu">
-                  <div onClick={() => setFilterOption("ALL")}>전체보기</div>
-                  <div onClick={() => setFilterOption("CHALLENGE")}>
-                    챌린지 참여
-                  </div>
-                </div>
+            {/* 오른쪽: 최신순 + 좋아요순 */}
+            <div className="list-dropdown">
+              <button className="list-dropdown-btn">
+                <span className="label">{getSortLabel(sortOption)}</span>
+                <span className="icon">▼</span>
+              </button>
+              <div className="list-dropdown-menu">
+                <div onClick={() => setSortOption("LATEST")}>최신순</div>
+                <div onClick={() => setSortOption("LIKES")}>좋아요순</div>
               </div>
             </div>
           </div>
         </div>
+
         <div className="post-list-container">
-          <PostListForm sort={sortOption} filter={filterOption} />
+          <PostListForm sort={sortOption} />
         </div>
       </div>
     </>

@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "../../css/community/PostDetail.css";
-// ...existing code...
 import HomeButton from "./HomeButton";
 import useUserStore from "../../api/userStore";
 import api from "../../api/axios";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { toast } from "react-toastify";
 import {
-  FaTrophy,
   FaHeart,
   FaRegHeart,
   FaRegCommentAlt,
@@ -32,12 +30,13 @@ const PostDetail = () => {
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [commentMenuOpen, setCommentMenuOpen] = useState(null);
 
-  // ⏱ 날짜 배열 [YYYY, MM, DD, hh, mm, ss, ...] → "2025.07.24 20:03"
+  // ⏱ [YYYY, MM, DD, hh, mm, ss] → "2025.07.24 20:03"
   const formatDateTime = (arr) => {
     if (!Array.isArray(arr) || arr.length < 6) return "";
     const [year, month, day, hour, minute] = arr;
     const pad = (n) => String(n).padStart(2, "0");
     return `${year}.${pad(month)}.${pad(day)} ${pad(hour)}:${pad(minute)}`;
+    // 초까지 쓰려면 :${pad(arr[5])} 추가
   };
 
   const fetchComments = useCallback(async () => {
@@ -64,7 +63,6 @@ const PostDetail = () => {
         isLiked: raw.liked,
         isScrapped: raw.scrapped,
         isMine: raw.mine,
-        isChallenge: raw.challenge,
         imageUrls: Array.isArray(raw.imageUrls) ? raw.imageUrls : [],
       };
       setPost(parsedPost);
@@ -152,21 +150,13 @@ const PostDetail = () => {
   const canPrev = imgPage > 0;
   const canNext = imgPage < totalPages - 1;
 
-  const handlePrev = () => {
-    if (canPrev) setImgPage((p) => p - 1);
-  };
-
-  const handleNext = () => {
-    if (canNext) setImgPage((p) => p + 1);
-  };
+  const handlePrev = () => { if (canPrev) setImgPage((p) => p - 1); };
+  const handleNext = () => { if (canNext) setImgPage((p) => p + 1); };
 
   const startIdx = imgPage * IMAGES_PER_PAGE;
   const visibleImages = imageUrls.slice(startIdx, startIdx + IMAGES_PER_PAGE);
 
-  // 이미지 수 바뀌면 첫 페이지로
-  useEffect(() => {
-    setImgPage(0);
-  }, [totalImages]);
+  useEffect(() => { setImgPage(0); }, [totalImages]);
 
   if (!post) {
     return (
@@ -190,13 +180,7 @@ const PostDetail = () => {
                   <span className="created-at">
                     {post.createdAt && formatDateTime(post.createdAt)}
                   </span>
-                  <span
-                    className={`challenge-label ${
-                      post.isChallenge ? "challenge-true" : "challenge-false"
-                    }`}
-                  >
-                    <FaTrophy className="challenge-icon" /> Challenge
-                  </span>
+                  {/* ✅ 챌린지 배지 제거 */}
                 </div>
               </div>
             </div>
@@ -239,15 +223,8 @@ const PostDetail = () => {
             <div className="post-images-carousel">
               <div className="carousel-track">
                 {visibleImages.map((url, idx) => (
-                  <div
-                    className="carousel-item"
-                    key={`${startIdx + idx}-${url}`}
-                  >
-                    <img
-                      src={url}
-                      alt={`post-img-${startIdx + idx}`}
-                      loading="lazy"
-                    />
+                  <div className="carousel-item" key={`${startIdx + idx}-${url}`}>
+                    <img src={url} alt={`post-img-${startIdx + idx}`} loading="lazy" />
                   </div>
                 ))}
               </div>
@@ -317,12 +294,8 @@ const PostDetail = () => {
                 <img src={c.writerInfo.profileImageUrl} alt="commenter" />
                 <div className="comment-body">
                   <div className="comment-header">
-                    <span className="comment-nickname">
-                      {c.writerInfo.nickname}
-                    </span>
-                    <span className="comment-date">
-                      {formatDateTime(c.createdAt)}
-                    </span>
+                    <span className="comment-nickname">{c.writerInfo.nickname}</span>
+                    <span className="comment-date">{formatDateTime(c.createdAt)}</span>
                     {c.isMine && (
                       <div className="comment-menu-wrapper">
                         <button
@@ -339,9 +312,7 @@ const PostDetail = () => {
                         </button>
                         {commentMenuOpen === c.commentId && (
                           <div className="dropdown-menu">
-                            <div
-                              onClick={() => handleDeleteComment(c.commentId)}
-                            >
+                            <div onClick={() => handleDeleteComment(c.commentId)}>
                               삭제하기
                             </div>
                           </div>
@@ -357,11 +328,7 @@ const PostDetail = () => {
 
           <div className="comment-input-row">
             {myProfileImg && (
-              <img
-                src={myProfileImg}
-                alt="me"
-                className="comment-profile-left"
-              />
+              <img src={myProfileImg} alt="me" className="comment-profile-left" />
             )}
             <input
               type="text"

@@ -4,7 +4,6 @@ import "../../css/community/PostDetail.css";
 import api from "../../api/axios";
 import { toast } from "react-toastify";
 import {
-  FaTrophy,
   FaHeart,
   FaRegHeart,
   FaRegCommentAlt,
@@ -26,28 +25,27 @@ const PostListForm = ({ sort = "LATEST", filter = "ALL" }) => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        // ✅ 챌린지 필터 파라미터 제거
         const params = { sort };
-        if (filter === "CHALLENGE") {
-          params.challengeOnly = true;
-        }
 
         const res = await api.get("/posts", { params });
-        const parsedPosts = (res.data.content || []).map((p) => ({
+        const parsedPosts = (res.data?.content || []).map((p) => ({
           ...p,
           isLiked: p.liked,
           isScrapped: p.scrapped,
           isMine: p.mine,
-          isChallenge: p.challenge,
+          // ✅ isChallenge 매핑 삭제
         }));
 
         setPosts(parsedPosts);
       } catch (err) {
         console.error("게시글 목록 조회 실패:", err);
+        toast.error("게시글 목록을 불러오지 못했습니다.");
       }
     };
 
     fetchPosts();
-  }, [sort, filter]);
+  }, [sort, filter]); // filter prop은 그대로 두되, 챌린지 분기는 사용 안 함
 
   const handleToggleLike = async (e, postId) => {
     e.preventDefault();
@@ -110,14 +108,7 @@ const PostListForm = ({ sort = "LATEST", filter = "ALL" }) => {
                   <span className="created-at">
                     {formatDateTime(post.createdAt)}
                   </span>
-                  <span
-                    className={`challenge-label ${
-                      post.isChallenge ? "challenge-true" : "challenge-false"
-                    }`}
-                  >
-                    <FaTrophy className="challenge-icon" />
-                    Challenge
-                  </span>
+                  {/* ✅ 챌린지 배지 완전 제거 */}
                 </div>
               </div>
             </div>
