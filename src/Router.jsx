@@ -1,3 +1,4 @@
+import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Search from "./component/search/SearchMain";
@@ -23,35 +24,27 @@ import CommunityMain from "./component/community/CommunityMain";
 import PostCreate from "./component/community/PostCreate";
 import PostDetail from "./component/community/PostDetail";
 import PostEditForm from "./component/community/PostEditForm";
-
 import MyPlanPage from "./component/myplan/MyPlanPage";
+
+import AppLayout from "./component/common/AppLayout"; // ✅ 레이아웃
 
 function AppRouter() {
   return (
     <Routes>
-      <Route path="/" element={<Main />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<Signup />} />
-      <Route path="/signin" element={<Signin />} />
-      <Route path="/forgot-pwd" element={<ForgotPwd />} />
-      <Route path="/emailcode" element={<EmailCode />} />
-      <Route path="/resetpassword" element={<ResetPassword />} />
-      <Route path="/changepassword" element={<ChangePassword />} />
-      <Route path="/search" element={<Search />} />
-      <Route path="/aiplan" element={<AIBudget />} />
-      <Route path="/ai-period" element={<AIPeriod />} />
-      <Route path="/ai-people" element={<AIPeople />} />
-      <Route path="/ai-name" element={<AIName />} />
-      <Route
-        path="/mypage"
-        element={
-          <ProtectedRoute>
-            <MyPage />
-          </ProtectedRoute>
-        }
-      />
-      {<Route path="/search" element={<Search />} />}
-      {
+      {/* ✅ 이 레이아웃 안의 Outlet만 애니메이션, Header/Footers는 고정 */}
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Main />} />
+
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/signin" element={<Signin />} />
+        <Route path="/forgot-pwd" element={<ForgotPwd />} />
+        <Route path="/emailcode" element={<EmailCode />} />
+        <Route path="/resetpassword" element={<ResetPassword />} />
+        <Route path="/changepassword" element={<ChangePassword />} />
+
+        <Route path="/search" element={<Search />} />
+
         <Route
           path="/aiplan"
           element={
@@ -60,12 +53,19 @@ function AppRouter() {
             </ProtectedRoute>
           }
         />
-      }
-      {<Route path="/ai-period" element={<AIPeriod />} />}
-      {<Route path="/ai-people" element={<AIPeople />} />}
-      {<Route path="/ai-name" element={<AIName />} />}
+        <Route path="/ai-period" element={<AIPeriod />} />
+        <Route path="/ai-people" element={<AIPeople />} />
+        <Route path="/ai-name" element={<AIName />} />
 
-      {
+        <Route
+          path="/mypage"
+          element={
+            <ProtectedRoute>
+              <MyPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/cart"
           element={
@@ -74,8 +74,7 @@ function AppRouter() {
             </ProtectedRoute>
           }
         />
-      }
-      {
+
         <Route
           path="/planlist"
           element={
@@ -84,8 +83,7 @@ function AppRouter() {
             </ProtectedRoute>
           }
         />
-      }
-      {
+
         <Route
           path="/create-plan"
           element={
@@ -94,14 +92,12 @@ function AppRouter() {
             </ProtectedRoute>
           }
         />
-      }
 
-      {<Route path="/community" element={<CommunityMain />} />}
-      {<Route path="/posts/create" element={<PostCreate />} />}
-      {<Route path="/posts/:postId" element={<PostDetail />} />}
-      <Route path="/posts/:postId/edit" element={<PostEditForm />} />
+        <Route path="/community" element={<CommunityMain />} />
+        <Route path="/posts/create" element={<PostCreate />} />
+        <Route path="/posts/:postId" element={<PostDetail />} />
+        <Route path="/posts/:postId/edit" element={<PostEditForm />} />
 
-      {
         <Route
           path="/schedule"
           element={
@@ -110,8 +106,7 @@ function AppRouter() {
             </ProtectedRoute>
           }
         />
-      }
-      {/* Catch-all route for 404 */}
+      </Route>
     </Routes>
   );
 }

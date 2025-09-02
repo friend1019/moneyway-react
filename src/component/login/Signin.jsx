@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoginHeader from "./LoginHeader";
-import Header from "../common/Header";
 import api from "../../api/axios";
 import useUserStore from "../../api/userStore";
 import "../../css/login/Signin.css";
@@ -81,7 +80,6 @@ const Signin = () => {
 
   return (
     <>
-      <Header />
       <div className="login-container">
         <div className="login-header">
           <LoginHeader text="로그인" />

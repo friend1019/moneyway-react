@@ -3,14 +3,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import "../../css/login/LoginPage.css";
 import LoginHeader from "./LoginHeader";
-import Header from "../common/Header";
 import LoadingSpinner from "../common/LoadingSpinner";
 import useUserStore from "../../api/userStore";
 import api from "../../api/axios";
 // useAuthStore import 제거 (accessToken은 userStore에서 관리)
 
 import kakaoIcon from "../../images/login/kakaoAuth.svg";
-import googleIcon from "../../images/login/googleAuth.svg";
+// import googleIcon from "../../images/login/googleAuth.svg";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -78,7 +77,6 @@ const LoginPage = () => {
   if (isLoading) {
     return (
       <>
-        <Header />
         <div className="login-loading-container">
           <LoadingSpinner />
           <p style={{ textAlign: "center", marginTop: "1rem" }}>
@@ -91,7 +89,6 @@ const LoginPage = () => {
 
   return (
     <>
-      <Header />
       <div className="login-container">
         <div className="login-header">
           <LoginHeader text="가입" />
@@ -111,7 +108,7 @@ const LoginPage = () => {
                 }}
               />
             </button>
-
+{/* 
             <button
               className="social-btn google-btn"
               onClick={() => toast.info("준비 중입니다!")}
@@ -121,7 +118,7 @@ const LoginPage = () => {
                 alt="구글 로그인"
                 style={{ width: "8rem", height: "8rem", objectFit: "contain" }}
               />
-            </button>
+            </button> */}
           </div>
 
           <button className="email-btn" onClick={goSignup}>

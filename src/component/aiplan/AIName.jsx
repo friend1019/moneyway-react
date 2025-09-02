@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Header from "../common/Header";
 import ProgressStep from '../aiplan/ProgressStep';
 import '../../css/aiplan/AIName.css'; 
 
@@ -12,7 +11,6 @@ const AIPlanName = () => {
 
     return (
         <>
-            <Header />
             <div className="page-container">
                 <ProgressStep currentStep={4} />
 

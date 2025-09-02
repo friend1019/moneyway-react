@@ -6,8 +6,6 @@ import { toast } from "react-toastify";
 import api from "../../api/axios";
 import useUserStore from "../../api/userStore";
 import "../../css/community/PostCreateForm.css";
-import Header from "../common/Header";
-import Footer from "../common/Footer";
 import HomeButton from "./HomeButton";
 
 const PostEditForm = () => {
@@ -72,7 +70,6 @@ const PostEditForm = () => {
 
   return (
     <>
-      <Header />
       <HomeButton showBack={true} />
       <div className="post-form-whole-wrapper">
         <div className="post-form-wrapper">
@@ -196,7 +193,6 @@ const PostEditForm = () => {
           )}
         </div>
       </div>
-      <Footer />
     </>
   );
 };

@@ -1,28 +1,16 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "../../css/community/CommunityMain.css";
-import Header from "../common/Header";
-import Footer from "../common/Footer";
+// ...existing code...
 import PostListForm from "./PostListForm";
 import HomeButton from "./HomeButton";
 
 const CommunityMain = () => {
   const [sortOption, setSortOption] = useState("LATEST");
   const [filterOption, setFilterOption] = useState("ALL");
-  const navigate = useNavigate();
 
   return (
     <>
-      <Header />
       <HomeButton />
-      <div className="community-post-button-wrapper">
-        <button
-          className="create-post-btn"
-          onClick={() => navigate("/posts/create")}
-        >
-          글 작성하기
-        </button>
-      </div>
       <div className="community-container">
         <div className="community-header">
           <div className="list-dropdown-group">
@@ -65,7 +53,6 @@ const CommunityMain = () => {
           <PostListForm sort={sortOption} filter={filterOption} />
         </div>
       </div>
-      <Footer />
     </>
   );
 };

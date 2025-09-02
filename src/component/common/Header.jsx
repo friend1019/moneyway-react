@@ -1,5 +1,5 @@
 // src/components/common/Header.jsx
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
 import SideMenu from "./SideMenu";
 import useUserStore from "../../api/userStore";
@@ -19,6 +19,10 @@ function Header() {
   const hasProfileImage = !!user?.profileImageUrl;
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // 현재 경로가 "/cart"면 hover 효과 활성화
+  const hoverEnabled = location.pathname.startsWith("/cart");
 
   const handleProtectedRoute = (path) => {
     if (isLoggedIn) {
@@ -29,7 +33,7 @@ function Header() {
   };
 
   return (
-    <div className="header">
+    <div className={`header ${hoverEnabled ? "hover-enabled" : ""}`}>
       <header className="header-top">
         <div className="header-top-container">
           <div className="logo-area">
@@ -40,7 +44,10 @@ function Header() {
 
           <nav className="navbar-container">
             <li className="nav-item">
-              <button className="nav-link" onClick={() => handleProtectedRoute("/planlist")}>
+              <button
+                className="nav-link"
+                onClick={() => handleProtectedRoute("/planlist")}
+              >
                 <span className="myplan">내 계획</span>
               </button>
             </li>
@@ -52,13 +59,19 @@ function Header() {
             </li>
 
             <li className="nav-item">
-              <button className="nav-link" onClick={() => handleProtectedRoute("/cart")}>
+              <button
+                className="nav-link"
+                onClick={() => handleProtectedRoute("/cart")}
+              >
                 <img src={cartlogo} alt="cart" className="nav-icon" />
               </button>
             </li>
 
             <li className="nav-item">
-              <button className="nav-link" onClick={() => handleProtectedRoute("/mypage")}>
+              <button
+                className="nav-link"
+                onClick={() => handleProtectedRoute("/mypage")}
+              >
                 {isLoggedIn && hasProfileImage ? (
                   <img
                     src={user.profileImageUrl}
