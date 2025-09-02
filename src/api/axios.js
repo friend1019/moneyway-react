@@ -1,63 +1,111 @@
 import axios from "axios";
-import useUserStore from "./userStore.js"; // 사용자 상태 관리
-import "react-toastify/dist/ReactToastify.css";
+import useUserStore from "./userStore.js";
 
-let isRefreshing = false; // 중복 refresh 방지
+let isRefreshing = false;
 let failedQueue = [];
 
+// 대기열 관리
 const processQueue = (error, token = null) => {
   failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
+    if (error) prom.reject(error);
+    else prom.resolve(token);
   });
   failedQueue = [];
 };
 
+// 토큰 파싱 유틸
+const parseJwt = (token) => {
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch {
+    return null;
+  }
+};
+
+// exp 기반 만료 임박 체크 (기본 90초 이내면 true)
+const willExpireSoon = (token, thresholdSec = 90) => {
+  const payload = parseJwt(token);
+  if (!payload?.exp) return true;
+  const now = Math.floor(Date.now() / 1000);
+  return payload.exp - now <= thresholdSec;
+};
+
+let refreshPromise = null; // refresh 요청 싱글톤화
+
+// refresh 요청 함수
+const doRefresh = async () => {
+  if (!refreshPromise) {
+    refreshPromise = api
+      .post("/auth/refresh", null, { headers: { Authorization: undefined } })
+      .then((res) => {
+        const newAccess = res.data?.accessToken;
+        if (!newAccess) throw new Error("No accessToken returned");
+
+        // zustand + localStorage 업데이트
+        const userStore = useUserStore.getState();
+        const prevUser = userStore.user || {};
+        const newUser = { ...prevUser, accessToken: newAccess };
+        userStore.setUser(newUser);
+        localStorage.setItem("user", JSON.stringify(newUser));
+
+        return newAccess;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+};
+
 const api = axios.create({
   baseURL: "https://moneyway.cloud/api",
-  withCredentials: true, // refreshToken 쿠키를 포함하기 위해 필요
+  withCredentials: true,
 });
 
+// 요청 인터셉터
 api.interceptors.request.use(
-  (config) => {
-    let token = null;
-    try {
-      // zustand persist에 저장된 유저에서 accessToken 추출
-      token = useUserStore.getState().user?.accessToken;
+  async (config) => {
+    const isRefresh = config.url?.includes("/auth/refresh");
+    if (isRefresh) {
+      // refresh 요청은 Authorization 제거
+      if (config.headers?.Authorization) delete config.headers.Authorization;
+      return config;
+    }
 
-      // 새로고침 직후 등에서 zustand에 없을 경우 localStorage fallback
-      if (!token) {
-        const userStr = localStorage.getItem("user");
-        const userObj = userStr ? JSON.parse(userStr) : null;
-        token = userObj?.accessToken;
+    // 현재 토큰 가져오기
+    let token =
+      useUserStore.getState().user?.accessToken ||
+      JSON.parse(localStorage.getItem("user") || "{}")?.accessToken;
+
+    // 만료 임박이면 사전 refresh
+    if (token && willExpireSoon(token, 90)) {
+      try {
+        token = await doRefresh();
+      } catch (e) {
+        // refresh 실패 → 세션 정리
+        useUserStore.getState().clearUser();
+        localStorage.removeItem("user");
+        return Promise.reject(e);
       }
-    } catch (e) {
-      // JSON 파싱 오류 등 무시
     }
 
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
 );
 
+// 응답 인터셉터 (lazy refresh)
 api.interceptors.response.use(
-  (response) => response,
+  (res) => res,
   async (error) => {
     const originalRequest = error.config;
     const status = error.response?.status;
-
     const isTokenRefresh = originalRequest?.url?.includes("/auth/refresh");
     const isLoginRequest = originalRequest?.url?.includes("/auth/login");
 
     if (status === 401 && isTokenRefresh) {
-      // refresh 자체 실패 시 사용자 상태 초기화
+      // refresh 자체 실패 → 세션 종료
       useUserStore.getState().clearUser();
       localStorage.removeItem("user");
       return Promise.reject(error);
@@ -69,7 +117,7 @@ api.interceptors.response.use(
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            originalRequest.headers["Authorization"] = `Bearer ${token}`;
+            originalRequest.headers.Authorization = `Bearer ${token}`;
             return api(originalRequest);
           })
           .catch((err) => Promise.reject(err));
@@ -79,22 +127,12 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        // refreshToken은 쿠키에 있으므로 body 없이 요청
-        const refreshResponse = await api.post("/auth/refresh");
-        const { accessToken: newAccessToken } = refreshResponse.data;
+        const newAccessToken = await doRefresh();
+        if (!newAccessToken) throw new Error("Refresh failed");
 
-        if (newAccessToken) {
-          const userStore = useUserStore.getState();
-          const prevUser = userStore.user || {};
-          const newUser = { ...prevUser, accessToken: newAccessToken };
-
-          userStore.setUser(newUser);
-          localStorage.setItem("user", JSON.stringify(newUser));
-
-          processQueue(null, newAccessToken);
-          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          return api(originalRequest);
-        }
+        processQueue(null, newAccessToken);
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
         useUserStore.getState().clearUser();
