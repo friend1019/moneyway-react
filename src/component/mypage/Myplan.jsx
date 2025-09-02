@@ -37,7 +37,6 @@ const MyPlan = ({ onClose }) => {
         const res = await api.get("/plans");
         const list = Array.isArray(res.data) ? res.data : [];
 
-        // 🔒 정규화: 필드명 차이(totalPrice ↔ totalBudget), 숫자/날짜 안전화, 썸네일 기본값
         const normalized = list.map((p) => ({
           ...p,
           id: p.planId ?? p.id, // 키 보정
