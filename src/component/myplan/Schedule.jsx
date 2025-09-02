@@ -8,7 +8,6 @@ import activityIcon from "../../images/shopping/activity.svg";
 import foodIcon from "../../images/shopping/food.svg";
 import shoppingIcon from "../../images/shopping/shopping.svg";
 import tourIcon from "../../images/shopping/tour.svg";
-import plusArrow from '../../images/myplan/plus-arrow.svg';
 
 const CATEGORY_ORDER = [
   { name: "숙소", icon: hotelIcon },
@@ -40,11 +39,6 @@ const toCssCategory = (category) => category ? category.replace(/[ /]/g, '-') : 
 const ScheduleItem = ({
   item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated, onContextMenu
 }) => {
-  const [isHover, setIsHover] = useState(false);
-  const [dragType, setDragType] = useState(null); // 'top' | 'bottom' | null
-  const [startY, setStartY] = useState(null);
-  const [startDuration, setStartDuration] = useState(null);
-
   const uniqueId = item.id || item.cartId || item.placeId;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -55,13 +49,13 @@ const ScheduleItem = ({
 
   function getTimeTop(time) {
     const [h, m] = time.split(':').map(Number);
-    return ((h - 8) + (m >= 30 ? 0.5 : 0)) * 10; // 1칸=10rem, 0.5칸=5rem
+    return ((h - 8) + (m >= 30 ? 0.5 : 0)) * 10; // 30분 단위 위치 계산, 1시간=10rem
   }
 
-  // 카드 위치 및 크기
+  // 카드 위치 및 크기 (duration에 따라 동적 크기, 최소 반칸)
   const style = {
     top: `${getTimeTop(item.time)}rem`,
-    height: `${item.duration * slotHeight}px`,
+    height: `${(item.duration || 1) * 10}rem`, // duration에 따른 높이, 0.5시간=5rem(반칸)
     left: 0,
     right: 0,
     margin: 0,
@@ -76,48 +70,10 @@ const ScheduleItem = ({
     zIndex: 2, cursor: isEditMode ? 'grab' : 'default', background: 'none'
   };
 
-  // 여기서 confirm/alert 제거, onContextMenu만 호출
   const handleContextMenu = (e) => {
     if (!isEditMode) return;
     if (onContextMenu) onContextMenu(e, item, day);
   };
-
-  const handleDragStart = (e, type) => {
-    e.preventDefault(); e.stopPropagation();
-    setDragType(type);
-    setStartY(e.clientY);
-    setStartDuration(item.duration);
-    document.body.style.cursor = "ns-resize";
-  };
-
-  useEffect(() => {
-    if (!dragType) return;
-    const handleMove = (e) => {
-      if (startY === null) return;
-      const deltaY = e.clientY - startY;
-      const slotHalf = slotHeight / 2;
-      let offsetHalf = Math.round(deltaY / slotHalf) * 0.5;
-      let newDuration = dragType === "top"
-        ? startDuration - offsetHalf
-        : startDuration + offsetHalf;
-      newDuration = Math.max(0.5, Math.round(newDuration * 2) / 2);
-      if (newDuration !== item.duration) {
-        if (onItemUpdated) onItemUpdated({ ...item, duration: newDuration }, day);
-      }
-    };
-    const handleUp = () => {
-      setDragType(null);
-      setStartY(null);
-      setStartDuration(null);
-      document.body.style.cursor = "";
-    };
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("mouseup", handleUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mouseup", handleUp);
-    };
-  }, [dragType, startY, startDuration, item, day, onItemUpdated, slotHeight]);
 
   return (
     <div
@@ -126,35 +82,7 @@ const ScheduleItem = ({
       {...attributes}
       className={`schedule-item schedule-item-card ${toCssCategory(item.category)}`}
       onContextMenu={handleContextMenu}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
     >
-      {isEditMode && isHover && (
-        <>
-          <button
-            className="resize-btn top"
-            style={{
-              position: 'absolute', top: '-14px', left: '50%',
-              transform: 'translate(-50%, 0) rotate(180deg)', zIndex: 20
-            }}
-            tabIndex={-1}
-            onMouseDown={e => handleDragStart(e, "top")}
-          >
-            <img src={plusArrow} alt="minus" style={{ width: 22 }} />
-          </button>
-          <button
-            className="resize-btn bottom"
-            style={{
-              position: 'absolute', bottom: '-14px', left: '50%',
-              transform: 'translate(-50%, 0)', zIndex: 20
-            }}
-            tabIndex={-1}
-            onMouseDown={e => handleDragStart(e, "bottom")}
-          >
-            <img src={plusArrow} alt="plus" style={{ width: 22 }} />
-          </button>
-        </>
-      )}
       <div
         className="item-content"
         {...(isEditMode ? listeners : {})}
@@ -165,12 +93,11 @@ const ScheduleItem = ({
           <span className="item-category-name">{item.category}</span>
         </div>
         <div className="item-name">{item.placeName || item.name}</div>
-        <div className="item-cost">₩ {item.cost ? item.cost.toLocaleString() : (item.price ? item.price.toLocaleString() : 0)}</div>
+        <div className="item-cost">₩ {(item.cost || item.price || 0).toLocaleString()}</div>
       </div>
     </div>
   );
 };
-
 
 const Schedule = ({
   planDetails,
@@ -208,7 +135,7 @@ const Schedule = ({
     }));
   };
 
-  // 일정 수정 콜백(duration)
+  // 일정 수정 콜백 (더 이상 duration 수정 불가)
   const handleItemUpdated = (updatedItem, day) => {
     setSchedules(prev => ({
       ...prev,
@@ -252,18 +179,18 @@ const Schedule = ({
               <span className="alert-icon">⚠️</span>
               <span>
                 <span className="budget-over-amount">
-                  ₩{(planDetails.usedBudget - planDetails.totalBudget).toLocaleString()}
+                  ₩{((planDetails.usedBudget || 0) - (planDetails.totalBudget || 0)).toLocaleString()}
                 </span>
                 &nbsp;초과되었습니다.
               </span>
               <span className="used-budget-bubble">
-                ₩ {planDetails.usedBudget.toLocaleString()}
+                ₩ {(planDetails.usedBudget || 0).toLocaleString()}
               </span>
             </div>
           ) : (
-            <div className='used-budget'>
-              ₩ {planDetails.usedBudget.toLocaleString()}
-            </div>
+              <div className='used-budget'>
+                ₩ {(planDetails.usedBudget || 0).toLocaleString()}
+              </div>
           )}
 
           <div className={
@@ -292,11 +219,10 @@ const Schedule = ({
                 onBlur={onBudgetBlur}
                 onKeyDown={onBudgetKeyDown}
                 className="budget-input"
-                isEditMode={isEditMode}
               />
             ) : (
               <span onClick={onBudgetClick} className="budget-amount-clickable">
-                ₩ {planDetails.totalBudget ? planDetails.totalBudget.toLocaleString() : '0'}
+                ₩ {(planDetails.totalBudget || 0).toLocaleString()}
               </span>
             )}
           </div>
@@ -314,7 +240,10 @@ const Schedule = ({
           {days.map(day => (
             <div key={day} className='day-column'>
               <div className='header-cell'>{day}</div>
-              <div className="planner-content-wrapper" style={{ position: 'relative', minHeight: slotHeight * timeSlots.length }}>
+              <div className="planner-content-wrapper" style={{ 
+                position: 'relative', 
+                minHeight: `${timeSlots.length * 10}rem` // 1시간 단위이므로 10rem씩
+              }}>
                 {timeSlots.map(time => (
                   <DroppablePlannerCell key={time} day={day} time={time} />
                 ))}

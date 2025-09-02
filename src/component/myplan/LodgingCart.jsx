@@ -25,8 +25,10 @@ function DraggableLodgingItem({ item, children }) {
 }
 
 const LodgingCart = ({ cartItems = [] }) => {
-  // 여기서 '숙소'만 필터!
-  const lodgingItems = cartItems.filter(item => item.category === '숙소');
+  // Filter only lodging items ('숙소' category)
+  const lodgingItems = cartItems.filter(item => 
+    item.category === '숙소' || item.category?.includes('숙소')
+  );
 
   return (
     <div className='side-card-container'>
@@ -44,8 +46,10 @@ const LodgingCart = ({ cartItems = [] }) => {
                   숙소
                 </span>
               </div>
-              <div className="cart-place-name">{item.placeName || item.name}</div>
-              <div className="cart-price">₩ {item.price?.toLocaleString()}</div>
+              <div className="cart-place-name">
+                {item.placeName || item.name || item.title}
+              </div>
+              <div className="cart-price">₩ {(item.price || 0).toLocaleString()}</div>
             </div>
           </DraggableLodgingItem>
         ))}

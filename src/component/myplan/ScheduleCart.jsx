@@ -60,7 +60,7 @@ function DraggableCartItem({ item, children, onDelete }) {
   );
 }
 
-const ScheduleCart = ({ cartItems: initialCartItems = [] }) => {
+const ScheduleCart = ({ cartItems: initialCartItems = [], dailySchedules = {} }) => {
   const [cartItems, setCartItems] = useState(initialCartItems);
   const [loading, setLoading] = useState(false);
 
@@ -68,13 +68,31 @@ const ScheduleCart = ({ cartItems: initialCartItems = [] }) => {
     setCartItems(initialCartItems);
   }, [initialCartItems]);
 
-  // 서버에서 카트 목록 불러오기
+  // 서버에서 카트 목록 불러오기 (스케줄에 추가된 아이템은 제외)
   const handleFetchCart = async () => {
     setLoading(true);
     try {
       const res = await api.get("/cart");
-      setCartItems(res.data.cartItems || []);
-    } catch {
+      const newCartItems = res.data.cartItems || [];
+      
+      // 현재 스케줄에 있는 cartId들을 수집
+      const scheduledCartIds = new Set();
+      Object.values(dailySchedules || {}).forEach(dayItems => {
+        (dayItems || []).forEach(item => {
+          if (item.cartId) {
+            scheduledCartIds.add(item.cartId);
+          }
+        });
+      });
+      
+      // 스케줄에 없는 아이템들만 필터링
+      const filteredItems = newCartItems.filter(item => 
+        !scheduledCartIds.has(item.cartId)
+      );
+      
+      setCartItems(filteredItems);
+    } catch (error) {
+      console.error('카드 불러오기 실패:', error);
       alert("카드 불러오기 실패");
     }
     setLoading(false);
@@ -113,11 +131,7 @@ const ScheduleCart = ({ cartItems: initialCartItems = [] }) => {
                   {item.placeName || item.name || item.title}
                 </div>
                 <div className="cart-price">
-                  {item.price !== undefined
-                    ? `₩ ${item.price.toLocaleString()}`
-                    : item.cost !== undefined
-                    ? `₩ ${item.cost.toLocaleString()}`
-                    : null}
+                  ₩ {(item.price || item.cost || 0).toLocaleString()}
                 </div>
               </div>
             </DraggableCartItem>

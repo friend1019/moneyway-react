@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 window.authStore = useAuthStore;
 
 function App() {
+  
   const { isInitialized, setInitialized, setAccessToken } = useAuthStore();
   const location = useLocation();
 
@@ -54,6 +55,7 @@ function App() {
       />
       <AppRouter />
     </div>
+    
   );
 }
 

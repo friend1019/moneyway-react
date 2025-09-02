@@ -49,8 +49,6 @@ function AppRouter() {
         }
       />
 
-       {/* 🔹 개발용 테스트 라우트 (로그인 체크 없이 접근 가능) */}
-       <Route path="/test/myplan" element={<MyPlanPage />} />
        
       <Route
         path="/myplan"
