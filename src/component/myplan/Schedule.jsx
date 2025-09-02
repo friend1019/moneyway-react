@@ -12,7 +12,7 @@ import tourIcon from "../../images/shopping/tour.svg";
 const CATEGORY_ORDER = [
   { name: "숙소", icon: hotelIcon },
   { name: "식당", icon: foodIcon },
-  { name: "관광명소", icon: tourIcon },
+  { name: "관광지", icon: tourIcon },
   { name: "액티비티/체험", icon: activityIcon },
   { name: "카페", icon: cafeIcon },
   { name: "쇼핑", icon: shoppingIcon },
@@ -37,7 +37,7 @@ const getCategoryIcon = (categoryName) => {
 const toCssCategory = (category) => category ? category.replace(/[ /]/g, '-') : '';
 
 const ScheduleItem = ({
-  item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated, onContextMenu
+  item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated, onContextMenu, timeSlotsLength,
 }) => {
   const uniqueId = item.id || item.cartId || item.placeId;
 
@@ -49,22 +49,32 @@ const ScheduleItem = ({
 
   function getTimeTop(time) {
     const [h, m] = time.split(':').map(Number);
-    return ((h - 8) + (m >= 30 ? 0.5 : 0)) * 10; // 30분 단위 위치 계산, 1시간=10rem
+    return ((h - 8) + (m >= 30 ? 0.5 : 0)) * 10;
   }
 
-  // 카드 위치 및 크기 (duration에 따라 동적 크기, 최소 반칸)
+  const H_MARGIN_REM = 1;
+  const V_GAP_REM = 2;
+
+  const GRID_TOTAL_REM = timeSlotsLength * 10; // 전체 그리드 높이
+
+  const startTop = getTimeTop(item.time) + V_GAP_REM / 2;
+  let height = (item.duration || 1) * 10 - V_GAP_REM;
+
+  if (startTop + height > GRID_TOTAL_REM) {
+    height = GRID_TOTAL_REM - startTop;
+    if (height < 0) height = 0; 
+  }
+
   const style = {
-    top: `${getTimeTop(item.time)}rem`,
-    height: `${(item.duration || 1) * 10}rem`, // duration에 따른 높이, 0.5시간=5rem(반칸)
-    left: 0,
-    right: 0,
-    margin: 0,
+    top: `${startTop}rem`,
+    height: `${height}rem`,   
+    left: `${H_MARGIN_REM}rem`,
+    right: `${H_MARGIN_REM}rem`,
     position: 'absolute',
     zIndex: transform ? 999 : 'auto',
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition: isDragging ? 'none' : 'box-shadow 0.1s'
   };
-
   const dragAreaStyle = {
     width: '100%', height: '100%', position: 'absolute', top: 0, left: 0,
     zIndex: 2, cursor: isEditMode ? 'grab' : 'default', background: 'none'
@@ -135,7 +145,7 @@ const Schedule = ({
     }));
   };
 
-  // 일정 수정 콜백 (더 이상 duration 수정 불가)
+ 
   const handleItemUpdated = (updatedItem, day) => {
     setSchedules(prev => ({
       ...prev,
@@ -147,10 +157,9 @@ const Schedule = ({
 
   return (
     <>
-      {/* 플랜 info 카드(제목, 예산, 기간 등) */}
       <div className='plan-info-card'>
         <div className='plan-details-left'>
-          <img src="https://i.ibb.co/yWZTJ4j/lego-profile.png" alt="user avatar" className='user-avatar' />
+          <img src={planDetails.author.profileImageUrl} alt="user avatar" className='user-avatar' />
           <div className='plan-text-info'>
             {isEditingTitle ? (
               <input
@@ -257,6 +266,7 @@ const Schedule = ({
                     onItemDeleted={handleItemDeleted}
                     onItemUpdated={handleItemUpdated}
                     onContextMenu={onContextMenu}
+                    timeSlotsLength={timeSlots.length}
                   />
                 ))}
               </div>

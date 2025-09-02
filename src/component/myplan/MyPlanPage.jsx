@@ -49,7 +49,7 @@ const MyPlanPage = () => {
   // 시간 선택 모달 상태
   const [timeModal, setTimeModal] = useState({
     isOpen: false,
-    step: 'start', // 'start' 또는 'end'
+    step: 'start', 
     draggedItem: null,
     targetDay: null,
     selectedStartTime: null,
@@ -78,16 +78,14 @@ const MyPlanPage = () => {
 
   useEffect(() => { fetchCartItems(); }, []);
 
-  // 사용 일수 계산
-  const lastUsedDayNum = Math.max(
-    0,
-    ...Object.keys(dailySchedules)
-      .filter(day => (dailySchedules[day] && dailySchedules[day].length > 0))
-      .map(day => parseInt(day.replace('Day ', '')))
-  );
-  // 기본 0박 0일로 표시
+  // [수정됨] 일정이 있는 날의 '수'를 직접 계산
+  const activeDayCount = Object.values(dailySchedules)
+    .filter(daySchedule => daySchedule.length > 0)
+    .length;
+
+  // [수정됨] 계산된 날의 '수'를 기준으로 기간 문자열 생성
   const planDurationStr =
-    lastUsedDayNum > 0 ? `${lastUsedDayNum - 1}박 ${lastUsedDayNum}일` : '0박 0일';
+    activeDayCount > 0 ? `${activeDayCount - 1}박 ${activeDayCount}일` : '0박 0일';
 
   const SLOT_HEIGHT_PX = 90; // 1시간 단위로 다시 변경
 
@@ -218,13 +216,11 @@ const MyPlanPage = () => {
   // 카드의 ref를 받아와서 위치를 계산
   const handleContextMenu = (event, item, day) => {
     event.preventDefault();
-    // 타겟 기준 상대적 위치(카드 바로 아래)로 띄움
-    const rect = event.currentTarget.getBoundingClientRect();
     setMenuState({
       visible: true,
       position: {
-        x: rect.left,
-        y: rect.top + rect.height + window.scrollY + 4, // 아래로 살짝 띄우기
+        x: event.clientX + window.scrollX,
+        y: event.clientY + window.scrollY,
       },
       selectedItem: item,
       day: day,
@@ -290,7 +286,7 @@ const MyPlanPage = () => {
     }
   };
 
-  // 플랜 목록 및 네비게이션
+
   const [planList, setPlanList] = useState([]);
   const fetchPlanList = async () => {
     try {
@@ -301,7 +297,6 @@ const MyPlanPage = () => {
     }
   };
 
-  // 플랜 상세 조회
   const fetchPlanDetail = async (planId) => {
     try {
       const res = await api.get(`/plans/${planId}`);
@@ -312,7 +307,7 @@ const MyPlanPage = () => {
         totalBudget: data.totalPrice,
         usedBudget: data.places.reduce((sum, p) => sum + (p.cost || 0), 0)
       });
-      // day별 스케줄 변환
+      
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
       data.places.forEach(place => {
         const day = `Day ${place.dayNumber}`;
@@ -356,12 +351,11 @@ const MyPlanPage = () => {
     Object.entries(dailySchedules).forEach(([day, items]) => {
       const dayNumber = parseInt(day.replace('Day ', ''));
       items.forEach(item => {
-        // cartId가 있는 아이템만 저장
         if (!item.cartId) return;
         const [h, m] = item.time.split(':').map(Number);
         const startTime = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
         
-        // duration을 사용하여 종료 시간 계산
+        
         const totalMinutes = h * 60 + m + (item.duration * 60);
         const endH = Math.floor(totalMinutes / 60);
         const endM = totalMinutes % 60;
@@ -391,10 +385,7 @@ const MyPlanPage = () => {
       await api.post('/plans', payload);
       alert('일정이 성공적으로 저장되었습니다.');
       setIsEditMode(false);
-      
-      // 저장 후에도 현재 스케줄 상태 유지 (fetchPlanList 제거)
-      // fetchPlanList(); // 이 줄을 제거하여 스케줄이 사라지지 않게 함
-      
+  
     } catch (e) {
       alert('저장 실패! ' + (e.response?.data?.message || ''));
     }
@@ -417,7 +408,7 @@ const MyPlanPage = () => {
     }
   };
 
-  // 메뉴 항목
+
   const menuItems = [
     { label: '일정 상세보기', action: handleViewDetails },
     { label: '삭제하기', action: handleDeleteItem },
@@ -433,7 +424,7 @@ const MyPlanPage = () => {
 
   const handleEdit = () => setIsEditMode(true);
 
-  // 타임 슬롯 (08:00 ~ 22:00, 1시간 단위)
+  
   const timeSlots = [];
   for (let h = 8; h < 23; h++) {
     timeSlots.push(`${String(h).padStart(2, '0')}:00`);
@@ -482,7 +473,6 @@ const MyPlanPage = () => {
               planDurationStr={planDurationStr}
             />
         
-        {/* 시간 선택 모달 */}
         <TimeSelectionModal
           isOpen={timeModal.isOpen}
           onClose={handleTimeModalClose}
