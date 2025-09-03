@@ -26,6 +26,8 @@
   gap: 1.8rem;
   margin-bottom: 2rem;     
   box-shadow: 0 0.225rem 1.125rem rgba(16, 24, 40, 0.06);
+  position: relative;
+  overflow: hidden;  
 }
 
 .plan-card-left {
@@ -174,5 +176,56 @@
     gap: 1.35rem;              
   }
   .card-right { justify-content: space-between; }
+  .budget-area { width: 100%; }
+}
+
+.card-track {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 1.6rem;
+  transition: transform 0.25s ease;
+}
+
+/* 오른쪽에서 나타나는 액션 패널 */
+.card-actions {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: 10.5rem;           
+  display: flex;
+  flex-direction: row; 
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0 0.75rem;
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, #fff 32%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* 열림 상태 */
+.plan-card.is-reveal .card-track { transform: translateX(-12rem); }
+.plan-card.is-reveal .card-actions { opacity: 1; pointer-events: auto; }
+
+/* 액션 버튼 */
+.action-btn {
+  flex: 1;
+  border-radius: 0.75rem;
+  padding: 0.8rem 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: 0.1rem solid transparent;
+  cursor: pointer;
+}
+.action-btn.primary { background:#eef2ff; color:#3843a7; border-color:#c7d2fe; }
+.action-btn.primary:hover { background:#e0e7ff; }
+.action-btn.danger  { background:#fff1f2; color:#e11d48; border-color:#fecdd3; }
+.action-btn.danger:hover { background:#ffe4e6; }
+
+/* 폭 튐 방지(모달 등 좁은 컨텍스트) */
+.budget-area { width: min(100%, 41.4rem); }
+@media (max-width: 48rem) {
+  .card-actions { width: 8.5rem; }
+  .plan-card.is-reveal .card-track { transform: translateX(-8.5rem); }
   .budget-area { width: 100%; }
 }
