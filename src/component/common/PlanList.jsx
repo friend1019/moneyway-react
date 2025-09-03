@@ -8,8 +8,10 @@ const PlanList = ({ plans, onPlanClick }) => {
   return (
     <>
       <Header />
-      <div className="plan-list-container">
-        <MyPlan />
+      <div className="plan-list-background" style={{backgroundColor:'#f6f7fb'}}>
+        <div className="plan-list-container">
+          <MyPlan />
+        </div>
       </div>
       <Footer />
     </>

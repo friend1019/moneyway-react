@@ -192,7 +192,7 @@
     color: #495057;
 }
 
-.clickbudget-input {
+.budget-input {
     border: none;
     background-color: transparent;
     width: 8rem;
@@ -203,12 +203,11 @@
     text-align: right;
 }
 
-.clickbudget-input::-webkit-outer-spin-button,
-.clickbudget-input::-webkit-inner-spin-button {
+.budget-input::-webkit-outer-spin-button,
+.budget-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-
 .used-budget-row {
   display: flex;
   justify-content: flex-end;
