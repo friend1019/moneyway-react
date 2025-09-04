@@ -49,7 +49,14 @@ function AppRouter() {
         }
       />
 
-       
+      <Route
+        path="/myplan/:planId"
+        element={
+          <ProtectedRoute>
+            <MyPlanPage />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/myplan"
         element={
