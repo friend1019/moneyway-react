@@ -210,7 +210,7 @@ const MyPlan = ({ onClose }) => {
                 {/* 상세(시간표)로 이동 */}
                 <button
                   className="action-btn primary"
-                  onClick={() => navigate(`/myplan/${id}`, { state: { isNewPlan: false } })}
+                  onClick={() => navigate(`/myplan/${id}`, { state: { isNewPlan: false, viewOnly: true} })}
                 >
                   계획보기
                 </button>
