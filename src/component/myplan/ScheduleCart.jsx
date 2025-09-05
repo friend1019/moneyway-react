@@ -103,8 +103,20 @@ const ScheduleCart = ({ cartItems: initialCartItems = [], dailySchedules = {} })
     setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
   };
 
-  // 숙소가 아닌 항목만 필터링
-  const nonLodgingItems = cartItems.filter(item => !item.category?.includes("숙소"));
+  // 현재 스케줄에 있는 cartId들을 수집
+  const scheduledCartIds = new Set();
+  Object.values(dailySchedules || {}).forEach(dayItems => {
+    (dayItems || []).forEach(item => {
+      if (item.cartId) {
+        scheduledCartIds.add(item.cartId);
+      }
+    });
+  });
+
+  // 숙소가 아닌 항목만 필터링하고, 이미 스케줄에 추가된 것은 제외
+  const nonLodgingItems = cartItems.filter(item => 
+    !item.category?.includes("숙소") && !scheduledCartIds.has(item.cartId)
+  );
 
   return (
     <div className="side-card-container">

@@ -3,12 +3,16 @@ import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import "../../css/mypage/MyPlan.css";
 
-import ArrowRightIcon from "../../images/myplan/right-arrow.svg"; // ← 역슬래시 제거
+import ArrowRightIcon from "../../images/myplan/right-arrow.svg";
 
+/* ---------- 유틸 ---------- */
 const toNumber = (v) => {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 };
+
+const sumBy = (arr, pick) =>
+  Array.isArray(arr) ? arr.reduce((s, x) => s + toNumber(pick(x)), 0) : 0;
 
 const isValidDate = (v) => {
   if (!v) return false;
@@ -17,7 +21,7 @@ const isValidDate = (v) => {
 };
 
 const formatDateRange = (start, end) => {
-  if (!isValidDate(start) || !isValidDate(end)) return "일정 미정"; // ← undefined 대신 안전한 기본값
+  if (!isValidDate(start) || !isValidDate(end)) return;
   const s = new Date(start);
   const e = new Date(end);
   const sKR = s.toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" });
@@ -26,7 +30,7 @@ const formatDateRange = (start, end) => {
 };
 
 const nightsDays = (start, end) => {
-  if (!isValidDate(start) || !isValidDate(end)) return "일정 미정"; // ← 빈 문자열 대신 기본값
+  if (!isValidDate(start) || !isValidDate(end)) return "일정 미정";
   const ms = new Date(end) - new Date(start);
   const days = Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) + 1); // 포함 계산
   const nights = Math.max(0, days - 1);
@@ -34,6 +38,57 @@ const nightsDays = (start, end) => {
 };
 
 const orderLabel = (i) => `${i + 1}번째 플랜`;
+
+/* ---------- 스케줄 지출 합계 계산기 ---------- */
+/** 
+ * 진행률(프로그레스 바)은 "스케줄 지출 합계" 기준.
+ * 1) 백엔드에서 spentBudget/totalSpent/usedBudget 같은 직접 합계 키가 오면 우선 사용
+ * 2) 없으면 schedules/days/dailySchedules/itineraries/places 내 cost/price/budget 합산
+ */
+const getSpentFromPlan = (p) => {
+  // 1) 서버가 직접 내려주는 합계 필드들
+  const direct =
+    toNumber(p.spentBudget) ||
+    toNumber(p.totalSpent) ||
+    toNumber(p.usedBudget) ||
+    toNumber(p.scheduleBudget) ||
+    0;
+  if (direct > 0) return direct;
+
+  // 2) 구조 별 합산
+  // 2-1) 평면 배열
+  if (Array.isArray(p.schedules)) {
+    const s = sumBy(p.schedules, (x) => x.cost ?? x.price ?? x.budget);
+    if (s > 0) return s;
+  }
+
+  // 2-2) 일자 기반 구조
+  const fromDaysLike = (days) =>
+    Array.isArray(days)
+      ? days.reduce((tot, d) => {
+          const items = d.items || d.places || d.schedules || [];
+          return tot + sumBy(items, (x) => x.cost ?? x.price ?? x.budget);
+        }, 0)
+      : 0;
+
+  const s1 = fromDaysLike(p.days);
+  if (s1 > 0) return s1;
+
+  const s2 = fromDaysLike(p.dailySchedules);
+  if (s2 > 0) return s2;
+
+  // 2-3) 그 외 자주 쓰이는 키들
+  if (Array.isArray(p.itineraries)) {
+    const s = fromDaysLike(p.itineraries);
+    if (s > 0) return s;
+  }
+  if (Array.isArray(p.places)) {
+    const s = sumBy(p.places, (x) => x.cost ?? x.price ?? x.budget);
+    if (s > 0) return s;
+  }
+
+  return 0;
+};
 
 /* ---------- 컴포넌트 ---------- */
 const MyPlan = ({ onClose }) => {
@@ -60,8 +115,8 @@ const MyPlan = ({ onClose }) => {
           ...p,
           id,
           title: p.title ?? "제목 없음",
-          totalBudget,
-          maxBudget,
+          totalBudget, // (표시에는 사용 안 하지만 호환성 유지)
+          maxBudget,   // 진행률의 분모(총예산)
           startDate: p.startDate ?? p.periodStart ?? null,
           endDate: p.endDate ?? p.periodEnd ?? null,
           thumbnailUrl:
@@ -115,19 +170,23 @@ const MyPlan = ({ onClose }) => {
 
   const handleReveal = (id) => setRevealId(id);
   const handleHide = () => setRevealId(null);
-  const handleToggleReveal = (id) => setRevealId((prev) => (prev === id ? null : id)); // 모바일/키보드 대응
+  const handleToggleReveal = (id) => setRevealId((prev) => (prev === id ? null : id));
 
   return (
     <div className="myplan-container">
-      {/* 상단: 로딩/새로고침 버튼(선택) */}
+      {/* 상단: 로딩/새로고침 안내 */}
       {loading && <div className="plan-loading">불러오는 중…</div>}
       {!loading && plans.length === 0 && (
         <p className="plan-empty-text">아직 저장된 여행 계획이 없어요.</p>
       )}
 
       {plans.map((plan, idx) => {
-        const current = toNumber(plan.totalBudget);
+        // ✅ 진행률은 "스케줄 지출 합계"
+        const current = getSpentFromPlan(plan);
+
+        // ✅ 총예산(분모)
         const max = toNumber(plan.maxBudget);
+
         const ratio = max > 0 ? current / max : 0;
         const pct = Math.min(100, Math.max(0, Math.round(ratio * 100)));
         const id = plan.id ?? idx;
@@ -198,7 +257,7 @@ const MyPlan = ({ onClose }) => {
                 </div>
               </div>
 
-              {/* 오른쪽 액션 패널 */}
+              {/* 우측 액션 패널 */}
               <div
                 className="card-actions"
                 onMouseEnter={() => handleReveal(id)}
@@ -207,10 +266,13 @@ const MyPlan = ({ onClose }) => {
                   삭제하기
                 </button>
 
-                {/* 상세(시간표)로 이동 */}
                 <button
                   className="action-btn primary"
-                  onClick={() => navigate(`/myplan/${id}`, { state: { isNewPlan: false, viewOnly: true} })}
+                  onClick={() =>
+                    navigate(`/myplan/${id}`, {
+                      state: { isNewPlan: false, viewOnly: true },
+                    })
+                  }
                 >
                   계획보기
                 </button>
@@ -220,6 +282,7 @@ const MyPlan = ({ onClose }) => {
         );
       })}
 
+      {/* 추가 카드 */}
       <div
         className="add-card"
         onClick={handleAddPlanClick}

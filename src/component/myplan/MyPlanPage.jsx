@@ -386,10 +386,25 @@ const MyPlanPage = () => {
 
   // 사용 예산 계산
   useEffect(() => {
-    const allItems = Object.values(dailySchedules).flat();
-    const totalCost = allItems.reduce((sum, item) => sum + (item.cost || 0), 0);
+    // 스케줄에 추가된 일정들의 비용
+    const allScheduleItems = Object.values(dailySchedules).flat();
+    const scheduleCost = allScheduleItems.reduce((sum, item) => sum + (item.cost || 0), 0);
+    
+    // 숙소 카드들의 비용 (활성화된 날짜 수만큼 곱하기)
+    const lodgingItems = cartItems.filter(item => 
+      item.category === '숙소' || item.category?.includes('숙소')
+    );
+    const activeDayCount = Object.values(dailySchedules).filter(daySchedule => 
+      (daySchedule || []).length > 0
+    ).length;
+    
+    const lodgingCost = lodgingItems.reduce((sum, item) => {
+      return sum + ((item.price || 0) * Math.max(1, activeDayCount - 1)); // n박은 n-1일
+    }, 0);
+    
+    const totalCost = scheduleCost + lodgingCost;
     setPlanDetails(prev => ({ ...prev, usedBudget: totalCost }));
-  }, [dailySchedules]);
+  }, [dailySchedules, cartItems]);
 
   // 예산
   const handleBudgetClick = useCallback(() => {
@@ -415,69 +430,108 @@ const MyPlanPage = () => {
   }, [titleInput]);
   const handleTitleKeyDown = useCallback((e) => { if (e.key === 'Enter') handleTitleBlur(); }, [handleTitleBlur]);
 
-  /** ---------- 저장 ---------- */
-  const handleSave = async () => {
-    const places = [];
+/** ---------- 저장 ---------- */
+/** ---------- 저장 ---------- */
+const handleSave = async () => {
+  const places = [];
 
-    Object.entries(dailySchedules).forEach(([day, items]) => {
-      const dayNumber = Number(String(day).replace('Day ', '')) || Number(day);
+  // 기존 스케줄에 추가된 일정들 처리
+  Object.entries(dailySchedules).forEach(([day, items]) => {
+    const dayNumber = Number(String(day).replace('Day ', '')) || Number(day);
 
-      (items || []).forEach((item) => {
-        if (!item?.time || !item?.cartId) return; // 시간/카트 없는 건 스킵
+    (items || []).forEach((item) => {
+      if (!item?.time || !item?.cartId) return; // 시간/카트 없는 건 스킵
 
-        const [h, m] = item.time.split(':').map(Number);
-        const startMinutes = h * 60 + m;
-        const rawEnd = startMinutes + Math.round((item.duration || 1) * 60);
+      const [h, m] = item.time.split(':').map(Number);
+      const startMinutes = h * 60 + m;
+      const rawEnd = startMinutes + Math.round((item.duration || 1) * 60);
 
-        // 08:00~23:00 클램프
-        const MIN = SLOT_START_HOUR * 60; // 480
-        const MAX = SLOT_END_HOUR * 60;   // 1380
-        const clamp = (v) => Math.min(Math.max(v, MIN), MAX);
-        const s = clamp(startMinutes);
-        let e = clamp(rawEnd);
+      // 08:00~23:00 클램프
+      const MIN = SLOT_START_HOUR * 60; // 480
+      const MAX = SLOT_END_HOUR * 60;   // 1380
+      const clamp = (v) => Math.min(Math.max(v, MIN), MAX);
+      const s = clamp(startMinutes);
+      let e = clamp(rawEnd);
 
-        // 0분 구간 방지
-        if (e <= s) {
-          if (s + 10 > MAX) return; // 23:00 넘으면 스킵
-          e = s + 10;
-        }
+      // 0분 구간 방지
+      if (e <= s) {
+        if (s + 10 > MAX) return; // 23:00 넘으면 스킵
+        e = s + 10;
+      }
 
-        const toHHMMSS = (mins) => {
-          const H = String(Math.floor(mins / 60)).padStart(2, '0');
-          const M = String(mins % 60).padStart(2, '0');
-          return `${H}:${M}:00`;
-        };
+      const toHHMMSS = (mins) => {
+        const H = String(Math.floor(mins / 60)).padStart(2, '0');
+        const M = String(mins % 60).padStart(2, '0');
+        return `${H}:${M}:00`;
+      };
 
+      places.push({
+        cartId: item.cartId,
+        dayNumber,
+        startTime: toHHMMSS(s),
+        endTime: toHHMMSS(e),
+      });
+    });
+  });
+  
+
+  // 숙소 카드들을 자동으로 각 날짜에 추가
+  const lodgingItems = cartItems.filter(item => 
+    item.category === '숙소' || item.category?.includes('숙소')
+  );
+
+  console.log('저장 시 숙소 아이템들:', lodgingItems);
+
+  // 활성화된 날짜들 가져오기 (스케줄이 있는 날들)
+  const activeDays = Object.entries(dailySchedules)
+    .filter(([day, items]) => (items || []).length > 0)
+    .map(([day]) => Number(String(day).replace('Day ', '')) || Number(day))
+    .sort((a, b) => a - b);
+
+  console.log('활성화된 날짜들:', activeDays);
+
+  // 숙소가 있고 활성화된 날짜가 있으면 각 날짜에 숙소 추가
+  if (lodgingItems.length > 0 && activeDays.length > 0) {
+    lodgingItems.forEach(lodgingItem => {
+      activeDays.forEach(dayNumber => {
         places.push({
-          cartId: item.cartId,
+          cartId: lodgingItem.cartId,
           dayNumber,
-          startTime: toHHMMSS(s),
-          endTime: toHHMMSS(e),
+          startTime: "23:00:00", // 숙소는 23:00부터
+          endTime: "23:59:00",   // 23:59까지로 설정
         });
       });
     });
+  }
 
-    if (!places.length) return alert('스케줄에 추가된 일정이 없습니다!');
-    if (!planId) return alert('유효하지 않은 접근입니다. 계획 ID가 없습니다.');
+  console.log('저장할 places:', places);
 
-    const payload = {
-      title: planDetails?.title || '새 여행 계획',
-      totalPrice: Number(planDetails?.totalBudget || 0),
-      places, // cartId 기반
-    };
+  if (!places.length) return alert('스케줄에 추가된 일정이 없습니다!');
+  if (!planId) return alert('유효하지 않은 접근입니다. 계획 ID가 없습니다.');
 
-    try {
-      await api.patch(`/plans/${planId}`, payload);
-      alert('여행 계획이 성공적으로 저장되었습니다.');
-      setIsEditMode(false);
-      setIsDirty(false);
-    } catch (e) {
-      const msg = e?.response?.data?.message || e.message;
-      console.error('ERROR:', e?.response || e);
-      alert(`저장 실패! ${msg}`);
-    }
+  const payload = {
+    title: planDetails?.title || '새 여행 계획',
+    totalPrice: Number(planDetails?.totalBudget || 0),
+    places, // cartId 기반 (스케줄 일정 + 숙소)
   };
 
+  try {
+    await api.patch(`/plans/${planId}`, payload);
+    alert('여행 계획이 성공적으로 저장되었습니다.');
+    setIsEditMode(false);
+    setIsDirty(false);
+    
+    
+    
+  } catch (e) {
+    const msg = e?.response?.data?.message || e.message;
+    console.error('ERROR:', e?.response || e);
+    alert(`저장 실패! ${msg}`);
+  }
+};
+const handleLodgingDelete = useCallback((cartId) => {
+  setCartItems(prev => prev.filter(item => item.cartId !== cartId));
+}, []);
   const handleEdit = useCallback(() => setIsEditMode(true), []);
 
   const menuItems = useMemo(() => [
@@ -495,11 +549,17 @@ const MyPlanPage = () => {
     );
   }
 
+
   return (
     <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>
       <Header />
       <div className='myplan-page-container'>
-        <LodgingCart cartItems={cartItems} isEditMode={isEditMode} />
+        <LodgingCart 
+          cartItems={cartItems} 
+          isEditMode={isEditMode}
+          dailySchedules={dailySchedules}
+          onDelete={handleLodgingDelete}
+        />
         <div className="center-column">
           <div className='schedule-header'>
             <div className="plan-sequence">
