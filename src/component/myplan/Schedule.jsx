@@ -1,512 +1,285 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { DndContext } from '@dnd-kit/core';
-import { useParams, useLocation } from 'react-router-dom';
-import '../../css/myplan/MyPlanPage.css';
-import Header from "../common/Header";
-import Schedule from './Schedule';
-import ScheduleCart from './ScheduleCart';
-import LodgingCart from './LodgingCart';
-import ContextMenu from './ContextMenu';
-import TimeSelectionModal from './TimeSelectionModal';
-import api from "../../api/axios";
+import React, { useState, useEffect } from 'react';
+import { useDroppable, useDraggable } from '@dnd-kit/core';
+import '../../css/myplan/Schedule.css';
 
-/** ---------- 시간/겹침 유틸 (1시간 단위) ---------- */
-const SLOT_START_HOUR = 8;
-const SLOT_END_HOUR = 23; // 마지막 표시시간 (종료 상한)
-const toSlotIndex = (time) => {
-  const [h] = time.split(':').map(Number);
-  return h - SLOT_START_HOUR; // 08:00 -> 0, 09:00 -> 1 ...
-};
-const isOverlapping = (newSchedule, existingSchedules) => {
-  const newStart = toSlotIndex(newSchedule.time);
-  const newEnd = newStart + Math.round(newSchedule.duration); // duration은 시간 단위
-  return existingSchedules.some(existing => {
-    if (existing.id === newSchedule.id) return false;
-    const existStart = toSlotIndex(existing.time);
-    const existEnd = existStart + Math.round(existing.duration);
-    return !(newEnd <= existStart || newStart >= existEnd);
-  });
-};
-const clampToRangeHHMMSS = (minutes) => {
-  const min = SLOT_START_HOUR * 60;
-  const max = SLOT_END_HOUR * 60;
-  const mm = Math.min(Math.max(minutes, min), max);
-  const h = Math.floor(mm / 60);
-  const m = mm % 60;
-  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
-};
+import hotelIcon from "../../images/shopping/hotel.svg";
+import cafeIcon from "../../images/shopping/cafe.svg";
+import activityIcon from "../../images/shopping/activity.svg";
+import foodIcon from "../../images/shopping/food.svg";
+import shoppingIcon from "../../images/shopping/shopping.svg";
+import tourIcon from "../../images/shopping/tour.svg";
 
-// 공통: 분->HH:MM:SS
-const toHHMMSS = (mins) => {
-  const H = String(Math.floor(mins / 60)).padStart(2, '0');
-  const M = String(mins % 60).padStart(2, '0');
-  return `${H}:${M}:00`;
-};
-// 공통: 다양한 입력(Date | string | null)을 YYYY-MM-DD 문자열로 정규화
-const toYMD = (d) => {
-  if (!d) return null;
-  const dt = (d instanceof Date) ? d : new Date(d);
-  if (Number.isNaN(dt.getTime())) return null;
-  return dt.toISOString().slice(0, 10);
-};
+const CATEGORY_ORDER = [
+  { name: "숙소", icon: hotelIcon },
+  { name: "식당", icon: foodIcon },
+  { name: "관광지", icon: tourIcon },
+  { name: "액티비티/체험", icon: activityIcon },
+  { name: "카페", icon: cafeIcon },
+  { name: "쇼핑", icon: shoppingIcon },
+];
 
-/** ---------- 페이지 ---------- */
-const MyPlanPage = () => {
-  const { planId } = useParams(); // /myplan/:planId 에서 사용
-
-  const [planDetails, setPlanDetails] = useState({
-    id: null,
-    title: '',
-    author: '',
-    totalBudget: 0,
-    usedBudget: 0,
-  });
-
-  // ⬇⬇⬇ 여행 기간 상태 추가
-  const [dates, setDates] = useState({ start: null, end: null });
-
-  const emptyDays = useMemo(
-    () => ({ 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] }),
-    []
+function DroppablePlannerCell({ day, time }) {
+  const { setNodeRef, isOver } = useDroppable({ id: `${day}-${time}` });
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ backgroundColor: isOver ? '#e0f7ff' : undefined }}
+      className='grid-cell planner-cell'
+    />
   );
-  const [dailySchedules, setDailySchedules] = useState(emptyDays);
+}
 
-  const [cartItems, setCartItems] = useState([]);
-  const [loadingCart, setLoadingCart] = useState(false);
-  const [loadingPlan, setLoadingPlan] = useState(false);
+const getCategoryIcon = (categoryName) => {
+  const category = CATEGORY_ORDER.find(c => c.name === categoryName);
+  return category ? <img src={category.icon} alt={categoryName} className="item-icon" /> : null;
+};
 
-  const [isEditingBudget, setIsEditingBudget] = useState(false);
-  const [budgetInput, setBudgetInput] = useState('');
-  const [isEditMode, setIsEditMode] = useState(true);
+const toCssCategory = (category) => category ? category.replace(/[ /]/g, '-') : '';
 
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [titleInput, setTitleInput] = useState('');
+const ScheduleItem = ({
+  item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated, onContextMenu, timeSlotsLength,
+}) => {
+  const uniqueId = item.id || item.cartId || item.placeId;
 
-  const location = useLocation();
-  const isNewPlan = location.state?.isNewPlan;
-  // 시간 선택 모달
-  const [timeModal, setTimeModal] = useState({
-    isOpen: false,
-    step: 'start',
-    draggedItem: null,
-    targetDay: null,
-    selectedStartTime: null,
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: uniqueId,
+    data: { ...item, origin: 'schedule', originalDay: day },
+    disabled: !isEditMode,
   });
 
-  // 컨텍스트 메뉴
-  const [menuState, setMenuState] = useState({
-    visible: false,
-    position: { x: 0, y: 0 },
-    selectedItem: null,
-    day: null,
-  });
-
-  /** ---------- 외부 데이터 ---------- */
-  const fetchCartItems = async () => {
-    setLoadingCart(true);
-    try {
-      const res = await api.get('/cart');
-      setCartItems(res.data.cartItems || []);
-    } catch {
-      alert('카트를 불러오지 못했습니다.');
-    } finally {
-      setLoadingCart(false);
-    }
-  };
-
-  const fetchPlanDetail = async (id) => {
-    setLoadingPlan(true);
-    try {
-      const res = await api.get(`/plans/${id}`);
-      const data = res.data;
-
-      setPlanDetails({
-        id: data.id ?? data.planId ?? id,
-        title: data.title ?? '',
-        author: data.username ?? '',
-        totalBudget: data.totalPrice ?? 0,
-        usedBudget: (data.places || []).reduce((sum, p) => sum + (p.cost || 0), 0),
-      });
-
-      // ⬇⬇⬇ 서버에서 기간을 내려주면 상태에 반영
-      const startFromServer = data.startDate ?? data.periodStart ?? null;
-      const endFromServer   = data.endDate   ?? data.periodEnd   ?? null;
-      setDates({
-        start: toYMD(startFromServer),
-        end: toYMD(endFromServer),
-      });
-
-      const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
-      (data.places || []).forEach(place => {
-        const day = `Day ${place.dayNumber}`;
-        if (!newSchedules[day]) newSchedules[day] = [];
-        const start = (place.startTime || '09:00:00').slice(0,5);
-        const end = (place.endTime || '10:00:00').slice(0,5);
-        const [sh, sm] = start.split(':').map(Number);
-        const [eh, em] = end.split(':').map(Number);
-        const duration = Math.max(1, ((eh*60 + em) - (sh*60 + sm)) / 60);
-
-        newSchedules[day].push({
-          id: place.placeId || Date.now() + Math.random(),
-          name: place.placeName,
-          time: start,
-          duration,
-          cost: place.cost || 0,
-          cartId: place.cartId,
-          placeId: place.placeId,
-          category: place.category
-        });
-      });
-      setDailySchedules(newSchedules);
-    } catch (e) {
-      console.error('GET /plans/{id} 실패:', e);
-      setPlanDetails({ id: id ?? null, title: '', author: '', totalBudget: 0, usedBudget: 0 });
-      setDailySchedules(emptyDays);
-      setDates({ start: null, end: null });
-    } finally {
-      setLoadingPlan(false);
-    }
+  function getTimeTop(time) {
+    const [h, m] = time.split(':').map(Number);
+    return ((h - 8) + (m >= 30 ? 0.5 : 0)) * 10;
   }
 
-  useEffect(() => { fetchCartItems(); }, []);
-  useEffect(() => {
-    if (planId) {
-      fetchPlanDetail(planId);
-      setIsEditMode(!!isNewPlan);
-    }
-  }, [planId, isNewPlan]);
+  const H_MARGIN_REM = 1;
+  const V_GAP_REM = 2;
 
-  /** ---------- 파생 정보 ---------- */
-  const activeDayCount = useMemo(
-    () => Object.values(dailySchedules).filter(daySchedule => daySchedule.length > 0).length,
-    [dailySchedules]
-  );
-  const planDurationStr = activeDayCount > 0 ? `${activeDayCount - 1}박 ${activeDayCount}일` : '0박 0일';
+  const GRID_TOTAL_REM = timeSlotsLength * 10; // 전체 그리드 높이
 
-  const SLOT_HEIGHT_PX = 90;
+  const startTop = getTimeTop(item.time) + V_GAP_REM / 2;
+  let height = (item.duration || 1) * 10 - V_GAP_REM;
 
-  const timeSlots = useMemo(() => {
-    const arr = [];
-    for (let h = SLOT_START_HOUR; h < SLOT_END_HOUR; h++) {
-      arr.push(`${String(h).padStart(2, '0')}:00`);
-    }
-    return arr;
-  }, []);
+  if (startTop + height > GRID_TOTAL_REM) {
+    height = GRID_TOTAL_REM - startTop;
+    if (height < 0) height = 0; 
+  }
 
-  /** ---------- DnD ---------- */
-  const handleDragEnd = async (event) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const origin = active.data.current?.origin;
-
-    // 숙소 카드는 드래그 불가 정책
-    if (origin === 'lodging') return;
-
-    if (origin === 'cart') {
-      const draggedItem = cartItems.find(item => item.cartId === active.id);
-      if (!draggedItem) return;
-
-      const [day] = over.id.split('-'); // 'Day 1-09:00' 형태라면 첫 파트만
-      setTimeModal({
-        isOpen: true,
-        step: 'start',
-        draggedItem,
-        targetDay: day,
-        selectedStartTime: null,
-      });
-    } else if (origin === 'schedule') {
-      const movedItem = active.data.current;
-      const originalDay = movedItem.originalDay;
-      const [newDay, newTime] = over.id.split('-');
-
-      const updatedItem = { ...movedItem, time: newTime, day: newDay };
-      if (isOverlapping(updatedItem, dailySchedules[newDay] || [])) {
-        alert('해당 시간에는 이미 다른 일정이 있습니다.');
-        return;
-      }
-      setDailySchedules(prev => {
-        const ns = { ...prev };
-        ns[originalDay] = ns[originalDay].filter(item => item.id !== movedItem.id);
-        ns[newDay] = [...(ns[newDay] || []), updatedItem];
-        return ns;
-      });
-    }
+  const style = {
+    top: `${startTop}rem`,
+    height: `${height}rem`,   
+    left: `${H_MARGIN_REM}rem`,
+    right: `${H_MARGIN_REM}rem`,
+    position: 'absolute',
+    zIndex: transform ? 999 : 'auto',
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+    transition: isDragging ? 'none' : 'box-shadow 0.1s'
+  };
+  const dragAreaStyle = {
+    width: '100%', height: '100%', position: 'absolute', top: 0, left: 0,
+    zIndex: 2, cursor: isEditMode ? 'grab' : 'default', background: 'none'
   };
 
-  /** ---------- 시간 모달 ---------- */
-  const handleTimeConfirm = (selectedTime) => {
-    const { step, draggedItem, targetDay, selectedStartTime } = timeModal;
-
-    if (step === 'start') {
-      setTimeModal(prev => ({ ...prev, step: 'end', selectedStartTime: selectedTime }));
-      return;
-    }
-
-    // 종료 선택 완료
-    const startTime = selectedStartTime;
-    const endTime = selectedTime;
-
-    const [sh, sm] = startTime.split(':').map(Number);
-    const [eh, em] = endTime.split(':').map(Number);
-    const startMinutes = sh * 60 + sm;
-    const endMinutes = eh * 60 + em;
-    const durationHours = (endMinutes - startMinutes) / 60;
-
-    if (durationHours <= 0) {
-      alert('종료 시간은 시작 시간보다 늦어야 합니다.');
-      return;
-    }
-
-    const newScheduleItem = {
-      id: Date.now(),
-      name: draggedItem.placeName,
-      cost: draggedItem.price,
-      category: draggedItem.category,
-      time: startTime,
-      duration: durationHours,
-      cartId: draggedItem.cartId
-    };
-
-    if (isOverlapping(newScheduleItem, dailySchedules[targetDay] || [])) {
-      alert('해당 시간에는 이미 다른 일정이 있습니다.');
-      setTimeModal({ isOpen: false, step: 'start', draggedItem: null, targetDay: null, selectedStartTime: null });
-      return;
-    }
-
-    setDailySchedules(prev => ({
-      ...prev,
-      [targetDay]: [...(prev[targetDay] || []), newScheduleItem]
-    }));
-    setCartItems(prev => prev.filter(item => item.cartId !== draggedItem.cartId));
-
-    setTimeModal({ isOpen: false, step: 'start', draggedItem: null, targetDay: null, selectedStartTime: null });
+  const handleContextMenu = (e) => {
+    if (!isEditMode) return;
+    if (onContextMenu) onContextMenu(e, item, day);
   };
-
-  const handleTimeModalClose = () => {
-    setTimeModal({ isOpen: false, step: 'start', draggedItem: null, targetDay: null, selectedStartTime: null });
-  };
-
-  /** ---------- 컨텍스트 메뉴 ---------- */
-  const closeMenu = useCallback(() => {
-    setMenuState(prev => ({ ...prev, visible: false }));
-  }, []);
-  const handleContextMenu = (event, item, day) => {
-    event.preventDefault();
-    setMenuState({
-      visible: true,
-      position: { x: event.clientX + window.scrollX, y: event.clientY + window.scrollY },
-      selectedItem: item,
-      day,
-    });
-  };
-  const handleDeleteItem = () => {
-    const { selectedItem, day } = menuState;
-    if (!selectedItem || !day) return;
-
-    setDailySchedules(prev => ({
-      ...prev,
-      [day]: prev[day].filter(item => item.id !== selectedItem.id)
-    }));
-
-    if (selectedItem.cartId) {
-      const cartItem = {
-        cartId: selectedItem.cartId,
-        placeName: selectedItem.name,
-        category: selectedItem.category,
-        price: selectedItem.cost,
-      };
-      setCartItems(prev => [...prev, cartItem]);
-    }
-    closeMenu();
-  };
-  const handleViewDetails = () => {
-    const { selectedItem } = menuState;
-    if (!selectedItem) return;
-    alert(`'${selectedItem.name}'의 상세 보기 페이지로 이동합니다.`);
-    closeMenu();
-  };
-  useEffect(() => {
-    if (menuState.visible) window.addEventListener('click', closeMenu);
-    return () => window.removeEventListener('click', closeMenu);
-  }, [menuState.visible, closeMenu]);
-
-  useEffect(() => {
-    const allItems = Object.values(dailySchedules).flat();
-    const totalCost = allItems.reduce((sum, item) => sum + (item.cost || 0), 0);
-    setPlanDetails(prev => ({ ...prev, usedBudget: totalCost }));
-  }, [dailySchedules]);
-
-  const handleBudgetClick = () => { setBudgetInput(planDetails.totalBudget); setIsEditingBudget(true); };
-  const handleBudgetChange = (e) => setBudgetInput(e.target.value);
-  const handleBudgetBlur = () => {
-    const newTotalBudget = parseInt(budgetInput, 10) || 0;
-    setPlanDetails(prev => ({ ...prev, totalBudget: newTotalBudget }));
-    setIsEditingBudget(false);
-  };
-  const handleBudgetKeyDown = (e) => { if (e.key === 'Enter') handleBudgetBlur(); };
-
-  const handleTitleClick = () => { setTitleInput(planDetails.title); setIsEditingTitle(true); };
-  const handleTitleChange = (e) => setTitleInput(e.target.value);
-  const handleTitleBlur = () => { setPlanDetails(prev => ({ ...prev, title: titleInput })); setIsEditingTitle(false); };
-  const handleTitleKeyDown = (e) => { if (e.key === 'Enter') handleTitleBlur(); };
-
-  /** ---------- 저장/수정 ---------- */
-  const handleSave = async () => {
-    const places = [];
-
-    Object.entries(dailySchedules).forEach(([day, items]) => {
-      const dayNumber = Number(String(day).replace('Day ', '')) || Number(day);
-
-      items.forEach((item) => {
-        if (!item?.time) return; // 시간 없는 건 제외
-
-        const [h, m] = item.time.split(':').map(Number);
-        const startMinutes = h * 60 + m;
-        const rawEnd = startMinutes + Math.round((item.duration || 1) * 60);
-
-        // 08:00~23:00 클램프
-        const MIN = SLOT_START_HOUR * 60; // 480
-        const MAX = SLOT_END_HOUR * 60;   // 1380
-        const clamp = (v) => Math.min(Math.max(v, MIN), MAX);
-        const s = clamp(startMinutes);
-        let e = clamp(rawEnd);
-
-        if (e <= s) {
-          if (s + 10 > MAX) return; // 23:00 넘으면 스킵
-          e = s + 10;
-        }
-
-        const base = {
-          dayNumber,
-          startTime: toHHMMSS(s),
-          endTime: toHHMMSS(e),
-          cost: Number(item.cost || 0),
-        };
-
-        // placeId 우선, 없으면 cartId
-        if (item.placeId) {
-          places.push({ ...base, placeId: item.placeId });
-        } else if (item.cartId) {
-          places.push({ ...base, cartId: item.cartId });
-        }
-      });
-    });
-
-    if (!places.length) return alert('스케줄에 추가된 일정이 없습니다!');
-    if (!planId) return alert('유효하지 않은 접근입니다. 계획 ID가 없습니다.');
-
-    // ⬇⬇⬇ 기간을 YYYY-MM-DD로 정규화하여 함께 저장
-    const startYMD = toYMD(dates.start);
-    const endYMD   = toYMD(dates.end);
-
-    const payload = {
-      title: planDetails?.title || '새 여행 계획',
-      totalPrice: Number(planDetails?.totalBudget || 0),
-      places,
-
-      // 서버 호환을 위해 양쪽 키 모두 전송
-      startDate: startYMD,
-      endDate: endYMD,
-      periodStart: startYMD,
-      periodEnd: endYMD,
-    };
-
-    try {
-      console.log(`[UPDATE] PATCH /plans/${planId}`, payload);
-      await api.patch(`/plans/${planId}`, payload);
-      alert('여행 계획이 성공적으로 저장되었습니다.');
-      setIsEditMode(false);
-    } catch (e) {
-      const msg = e?.response?.data?.message || e.message;
-      console.error('ERROR:', e?.response || e);
-      alert(`저장 실패! ${msg}`);
-    }
-  };
-
-  const handleEdit = () => setIsEditMode(true);
-
-  const menuItems = [
-    { label: '일정 상세보기', action: handleViewDetails },
-    { label: '삭제하기', action: handleDeleteItem },
-  ];
 
   return (
-    <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>
-      <Header />
-      <div className='myplan-page-container'>
-        <LodgingCart cartItems={cartItems} isEditMode={isEditMode} />
-        <div className="center-column">
-          <div className='schedule-header'>
-            <div className="plan-sequence">
-              <span className='plan-breadcrumb'>
-                {planDetails.title || '새 여행 계획'}
-              </span>
-            </div>
-            {isEditMode ? (
-              <button className='save-button' onClick={handleSave}>저장하기</button>
-            ) : (
-              <button className='edit-button' onClick={handleEdit}>수정하기</button>
-            )}
-          </div>
-
-          {(loadingPlan || loadingCart) && (
-            <div className="loading-box">불러오는 중…</div>
-          )}
-
-          <div className='schedule-main-container'>
-            <Schedule
-              // ⬇⬇⬇ 날짜 변경 받기 (Schedule에서 start/end를 Date 또는 문자열로 넘겨줘도 됨)
-              onDateChange={(start, end) => setDates({ start: toYMD(start), end: toYMD(end) })}
-
-              isEditingTitle={isEditingTitle}
-              titleInput={titleInput}
-              onTitleClick={handleTitleClick}
-              onTitleChange={handleTitleChange}
-              onTitleBlur={handleTitleBlur}
-              onTitleKeyDown={handleTitleKeyDown}
-              planDetails={planDetails}
-              dailySchedules={dailySchedules}
-              timeSlots={timeSlots}
-              onContextMenu={handleContextMenu}
-              slotHeight={SLOT_HEIGHT_PX}
-              isEditMode={isEditMode}
-              isEditingBudget={isEditingBudget}
-              onBudgetClick={handleBudgetClick}
-              onBudgetChange={handleBudgetChange}
-              onBudgetBlur={handleBudgetBlur}
-              onBudgetKeyDown={handleBudgetKeyDown}
-              budgetInput={budgetInput}
-              planDurationStr={planDurationStr}
-              // (선택) 초기 날짜 표시가 필요하면 Schedule에 dates 전달도 가능
-              // dates={dates}
-            />
-
-            <TimeSelectionModal
-              isOpen={timeModal.isOpen}
-              onClose={handleTimeModalClose}
-              onConfirm={handleTimeConfirm}
-              itemName={timeModal.draggedItem?.placeName}
-              category={timeModal.draggedItem?.category}
-              step={timeModal.step}
-            />
-          </div>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`schedule-item schedule-item-card ${toCssCategory(item.category)}`}
+      onContextMenu={handleContextMenu}
+    >
+      <div
+        className="item-content"
+        {...(isEditMode ? listeners : {})}
+        style={dragAreaStyle}
+      >
+        <div className="item-category-info">
+          {getCategoryIcon(item.category)}
+          <span className="item-category-name">{item.category}</span>
         </div>
-
-        {isEditMode
-          ? <ScheduleCart cartItems={cartItems} dailySchedules={dailySchedules} />
-          : <div className="side-card-container-placeholder"></div>}
+        <div className="item-name">{item.placeName || item.name}</div>
+        <div className="item-cost">₩ {(item.cost || item.price || 0).toLocaleString()}</div>
       </div>
-
-      {isEditMode && menuState.visible && (
-        <ContextMenu
-          position={menuState.position}
-          items={menuItems}
-          onClose={closeMenu}
-        />
-      )}
-    </DndContext>
+    </div>
   );
 };
 
-export default MyPlanPage;
+const Schedule = ({
+  planDetails,
+  dailySchedules,
+  timeSlots,
+  onContextMenu,
+  slotHeight,
+  isEditingBudget,
+  onBudgetClick,
+  onBudgetChange,
+  onBudgetBlur,
+  onBudgetKeyDown,
+  budgetInput,
+  isEditMode,
+  isEditingTitle,
+  titleInput,
+  onTitleClick,
+  onTitleChange,
+  onTitleBlur,
+  onTitleKeyDown,
+  planDurationStr,
+  onDurationDrag,
+  ...props
+}) => {
+  const [schedules, setSchedules] = useState(dailySchedules);
+
+  // 상위에서 dailySchedules이 바뀌면 동기화
+  useEffect(() => { setSchedules(dailySchedules); }, [dailySchedules]);
+
+  // 일정 삭제 콜백
+  const handleItemDeleted = (item, day) => {
+    setSchedules(prev => ({
+      ...prev,
+      [day]: prev[day].filter(d => d.id !== item.id)
+    }));
+  };
+
+ 
+  const handleItemUpdated = (updatedItem, day) => {
+    setSchedules(prev => ({
+      ...prev,
+      [day]: prev[day].map(d => d.id === updatedItem.id ? updatedItem : d)
+    }));
+  };
+
+  const days = Object.keys(schedules || {});
+
+  return (
+    <>
+      <div className='plan-info-card'>
+        <div className='plan-details-left'>
+          <img src={planDetails.author.profileImageUrl} alt="user avatar" className='user-avatar' />
+          <div className='plan-text-info'>
+            {isEditingTitle ? (
+              <input
+                type="text"
+                value={titleInput}
+                onChange={onTitleChange}
+                onBlur={onTitleBlur}
+                onKeyDown={onTitleKeyDown}
+                className="title-edit-input"
+                placeholder="제목을 입력하세요"
+                autoFocus
+              />
+            ) : (
+              <h2
+                className={`plan-title ${isEditMode ? 'editable' : ''}`}
+                onClick={isEditMode ? onTitleClick : undefined}
+              >
+                {planDetails.title ? planDetails.title : (
+                <span className="placeholder-text">제목을 입력하세요</span>
+                )}
+                {isEditMode && ' ✎'}
+                </h2>
+            )}
+            <p className='plan-duration'>{planDurationStr}</p>
+          </div>
+        </div>
+        <div className='plan-budget-right'>
+          {(planDetails.usedBudget > planDetails.totalBudget && planDetails.totalBudget > 0) ? (
+            <div className="budget-alert">
+              <span className="alert-icon">⚠️</span>
+              <span>
+                <span className="budget-over-amount">
+                  ₩{((planDetails.usedBudget || 0) - (planDetails.totalBudget || 0)).toLocaleString()}
+                </span>
+                &nbsp;초과되었습니다.
+              </span>
+              <span className="used-budget-bubble">
+                ₩ {(planDetails.usedBudget || 0).toLocaleString()}
+              </span>
+            </div>
+          ) : (
+              <div className='used-budget'>
+                ₩ {(planDetails.usedBudget || 0).toLocaleString()}
+              </div>
+          )}
+
+          <div className={
+            'budget-progress-bar' +
+            (planDetails.usedBudget > planDetails.totalBudget && planDetails.totalBudget > 0 ? ' over' : '')
+          }>
+            <div
+              className={
+                'budget-progress-fill' +
+                (planDetails.usedBudget > planDetails.totalBudget && planDetails.totalBudget > 0 ? ' over' : '')
+              }
+              style={{
+                width: planDetails.totalBudget > 0
+                  ? `${Math.min(100, planDetails.usedBudget / planDetails.totalBudget * 100)}%`
+                  : '0%'
+              }}
+            ></div>
+          </div>
+          <div className='total-budget'>
+            <span>예산</span>
+            {isEditingBudget ? (
+              <input
+                type="number"
+                value={budgetInput}
+                onChange={onBudgetChange}
+                onBlur={onBudgetBlur}
+                onKeyDown={onBudgetKeyDown}
+                className="budget-input"
+              />
+            ) : (
+              <span onClick={onBudgetClick} className="budget-amount-clickable">
+                ₩ {(planDetails.totalBudget || 0).toLocaleString()}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+      {/* --- 시간표 스케줄 그리드 --- */}
+      <div className='schedule-grid'>
+        <div className='time-column'>
+          <div className='header-cell' style={{ borderBottomColor: '#dee2e6' }}></div>
+          {timeSlots.map(time => (
+            <div key={time} className='time-cell'>{time}</div>
+          ))}
+        </div>
+        <div className='days-column-container'>
+          {days.map(day => (
+            <div key={day} className='day-column'>
+              <div className='header-cell'>{day}</div>
+              <div className="planner-content-wrapper" style={{ 
+                position: 'relative', 
+                minHeight: `${timeSlots.length * 10}rem` // 1시간 단위이므로 10rem씩
+              }}>
+                {timeSlots.map(time => (
+                  <DroppablePlannerCell key={time} day={day} time={time} />
+                ))}
+                {(schedules[day] || []).map(item => (
+                  <ScheduleItem
+                    key={item.id || item.cartId || item.placeId}
+                    item={item}
+                    day={day}
+                    slotHeight={slotHeight}
+                    isEditMode={isEditMode}
+                    onItemDeleted={handleItemDeleted}
+                    onItemUpdated={handleItemUpdated}
+                    onContextMenu={onContextMenu}
+                    timeSlotsLength={timeSlots.length}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Schedule;

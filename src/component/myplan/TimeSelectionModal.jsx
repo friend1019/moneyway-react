@@ -31,7 +31,6 @@ const TimeSelectionModal = ({
 
   if (!isOpen) return null;
 
-  // 시간 옵션들 (30분 단위)
   const timeOptions = [];
   for (let h = 8; h < 23; h++) {
     timeOptions.push(`${String(h).padStart(2, '0')}:00`);
@@ -60,7 +59,7 @@ const TimeSelectionModal = ({
       <div className="time-modal-container">
         <div className="time-modal-header">
           <div className="activity-badge">
-            <img src={icon} alt={category} className="activity-icon-img" style={{ width: '1rem', height: '1rem' }} />
+            <img src={icon} alt={category} className="activity-icon-img" style={{ width: '2rem', height: '2rem' }} />
             <span className="activity-text" style={{ color }}>{category || '액티비티'}</span>
             <span className="activity-category">[{itemName}]</span>
           </div>

@@ -44,8 +44,7 @@ api.interceptors.response.use(
 
     if (status === 401 && isTokenRefresh) {
       useAuthStore.getState().clearAccessToken();
-      useAuthStore.getState().setInitialized(true); // ✅ 초기화는 여기서
-      return Promise.reject(error);
+      useAuthStore.getState().setInitialized(true); 
     }
 
     if (status === 401 && !originalRequest._retry && !isLoginRequest) {
