@@ -5,7 +5,7 @@ import SideMenu from "./SideMenu";
 import useUserStore from "../../api/userStore";
 import "../../css/common/Header.css";
 
-import logo from "../../images/header/logo.svg";
+import logo from "../../images/header/logo2.svg";
 import menu from "../../images/header/menu.svg";
 import account from "../../images/header/account.svg";
 import cartlogo from "../../images/header/cart.svg";

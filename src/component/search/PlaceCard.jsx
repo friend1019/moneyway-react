@@ -1,6 +1,6 @@
 import React from 'react';
 import '../../css/search/PlaceCard.css';
-import { FaHeart, FaStar, FaRegStar } from 'react-icons/fa';
+import { FaStar, FaRegStar } from 'react-icons/fa';
 
 const PlaceCard = ({ place, onClick }) => {
   const { title, categoryName, address, status, rating, imageUrls = [] } = place;
@@ -24,9 +24,6 @@ const PlaceCard = ({ place, onClick }) => {
           <span className="place-rating">{stars}</span>
           <p className="place-status">{status}</p>
         </div>
-        <button className="favorite-btn" onClick={e => e.stopPropagation()}>
-          <FaHeart />
-        </button>
       </div>
 
       <div className="card-subinfo">

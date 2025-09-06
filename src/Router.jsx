@@ -106,6 +106,7 @@ function AppRouter() {
             </ProtectedRoute>
           }
         />
+
       </Route>
     </Routes>
   );
