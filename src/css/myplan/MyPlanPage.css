@@ -97,3 +97,8 @@
     color: #555;
     padding: 0 0.5rem;
   }
+.left-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 10rem; 
+  }

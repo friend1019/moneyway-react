@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
 import '../../css/myplan/Schedule.css';
 
+import BudgetDisplay from './BudgetDisplay';
+
 import hotelIcon from "../../images/shopping/hotel.svg";
 import cafeIcon from "../../images/shopping/cafe.svg";
 import activityIcon from "../../images/shopping/activity.svg";
@@ -134,10 +136,8 @@ const Schedule = ({
 }) => {
   const [schedules, setSchedules] = useState(dailySchedules);
 
-  // 상위에서 dailySchedules이 바뀌면 동기화
   useEffect(() => { setSchedules(dailySchedules); }, [dailySchedules]);
 
-  // 일정 삭제 콜백
   const handleItemDeleted = (item, day) => {
     setSchedules(prev => ({
       ...prev,
@@ -159,7 +159,11 @@ const Schedule = ({
     <>
       <div className='plan-info-card'>
         <div className='plan-details-left'>
-          <img src={planDetails.author.profileImageUrl} alt="user avatar" className='user-avatar' />
+          <img 
+            src={planDetails.author?.profileImageUrl || '기본_이미지_경로.svg'} 
+            alt="user avatar" 
+            className='user-avatar' 
+          />
           <div className='plan-text-info'>
             {isEditingTitle ? (
               <input
@@ -186,60 +190,17 @@ const Schedule = ({
             <p className='plan-duration'>{planDurationStr}</p>
           </div>
         </div>
-        <div className='plan-budget-right'>
-          {(planDetails.usedBudget > planDetails.totalBudget && planDetails.totalBudget > 0) ? (
-            <div className="budget-alert">
-              <span className="alert-icon">⚠️</span>
-              <span>
-                <span className="budget-over-amount">
-                  ₩{((planDetails.usedBudget || 0) - (planDetails.totalBudget || 0)).toLocaleString()}
-                </span>
-                &nbsp;초과되었습니다.
-              </span>
-              <span className="used-budget-bubble">
-                ₩ {(planDetails.usedBudget || 0).toLocaleString()}
-              </span>
-            </div>
-          ) : (
-              <div className='used-budget'>
-                ₩ {(planDetails.usedBudget || 0).toLocaleString()}
-              </div>
-          )}
-
-          <div className={
-            'budget-progress-bar' +
-            (planDetails.usedBudget > planDetails.totalBudget && planDetails.totalBudget > 0 ? ' over' : '')
-          }>
-            <div
-              className={
-                'budget-progress-fill' +
-                (planDetails.usedBudget > planDetails.totalBudget && planDetails.totalBudget > 0 ? ' over' : '')
-              }
-              style={{
-                width: planDetails.totalBudget > 0
-                  ? `${Math.min(100, planDetails.usedBudget / planDetails.totalBudget * 100)}%`
-                  : '0%'
-              }}
-            ></div>
-          </div>
-          <div className='total-budget'>
-            <span>예산</span>
-            {isEditingBudget ? (
-              <input
-                type="number"
-                value={budgetInput}
-                onChange={onBudgetChange}
-                onBlur={onBudgetBlur}
-                onKeyDown={onBudgetKeyDown}
-                className="budget-input"
-              />
-            ) : (
-              <span onClick={onBudgetClick} className="budget-amount-clickable">
-                ₩ {(planDetails.totalBudget || 0).toLocaleString()}
-              </span>
-            )}
-          </div>
-        </div>
+        <BudgetDisplay
+          usedBudget={planDetails.usedBudget || 0}
+          totalBudget={planDetails.totalBudget || 0}
+          isEditMode={isEditMode}
+          isEditingBudget={isEditingBudget}
+          budgetInput={budgetInput}
+          onBudgetClick={onBudgetClick}
+          onBudgetChange={onBudgetChange}
+          onBudgetBlur={onBudgetBlur}
+          onBudgetKeyDown={onBudgetKeyDown}
+        />
       </div>
       {/* --- 시간표 스케줄 그리드 --- */}
       <div className='schedule-grid'>

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import BudgetDisplay from "../myplan/BudgetDisplay.jsx"; 
 import "../../css/mypage/MyPlan.css";
-
 import ArrowRightIcon from "../../images/myplan/right-arrow.svg";
 
 /* ---------- 유틸 ---------- */
@@ -11,84 +11,7 @@ const toNumber = (v) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-const sumBy = (arr, pick) =>
-  Array.isArray(arr) ? arr.reduce((s, x) => s + toNumber(pick(x)), 0) : 0;
-
-const isValidDate = (v) => {
-  if (!v) return false;
-  const d = new Date(v);
-  return !Number.isNaN(d.getTime());
-};
-
-const formatDateRange = (start, end) => {
-  if (!isValidDate(start) || !isValidDate(end)) return;
-  const s = new Date(start);
-  const e = new Date(end);
-  const sKR = s.toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" });
-  const eKR = e.toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" });
-  return `${sKR} ~ ${eKR}`;
-};
-
-const nightsDays = (start, end) => {
-  if (!isValidDate(start) || !isValidDate(end)) return "일정 미정";
-  const ms = new Date(end) - new Date(start);
-  const days = Math.max(1, Math.round(ms / (1000 * 60 * 60 * 24)) + 1); // 포함 계산
-  const nights = Math.max(0, days - 1);
-  return `${nights}박 ${days}일`;
-};
-
 const orderLabel = (i) => `${i + 1}번째 플랜`;
-
-/* ---------- 스케줄 지출 합계 계산기 ---------- */
-/** 
- * 진행률(프로그레스 바)은 "스케줄 지출 합계" 기준.
- * 1) 백엔드에서 spentBudget/totalSpent/usedBudget 같은 직접 합계 키가 오면 우선 사용
- * 2) 없으면 schedules/days/dailySchedules/itineraries/places 내 cost/price/budget 합산
- */
-const getSpentFromPlan = (p) => {
-  // 1) 서버가 직접 내려주는 합계 필드들
-  const direct =
-    toNumber(p.spentBudget) ||
-    toNumber(p.totalSpent) ||
-    toNumber(p.usedBudget) ||
-    toNumber(p.scheduleBudget) ||
-    0;
-  if (direct > 0) return direct;
-
-  // 2) 구조 별 합산
-  // 2-1) 평면 배열
-  if (Array.isArray(p.schedules)) {
-    const s = sumBy(p.schedules, (x) => x.cost ?? x.price ?? x.budget);
-    if (s > 0) return s;
-  }
-
-  // 2-2) 일자 기반 구조
-  const fromDaysLike = (days) =>
-    Array.isArray(days)
-      ? days.reduce((tot, d) => {
-          const items = d.items || d.places || d.schedules || [];
-          return tot + sumBy(items, (x) => x.cost ?? x.price ?? x.budget);
-        }, 0)
-      : 0;
-
-  const s1 = fromDaysLike(p.days);
-  if (s1 > 0) return s1;
-
-  const s2 = fromDaysLike(p.dailySchedules);
-  if (s2 > 0) return s2;
-
-  // 2-3) 그 외 자주 쓰이는 키들
-  if (Array.isArray(p.itineraries)) {
-    const s = fromDaysLike(p.itineraries);
-    if (s > 0) return s;
-  }
-  if (Array.isArray(p.places)) {
-    const s = sumBy(p.places, (x) => x.cost ?? x.price ?? x.budget);
-    if (s > 0) return s;
-  }
-
-  return 0;
-};
 
 /* ---------- 컴포넌트 ---------- */
 const MyPlan = ({ onClose }) => {
@@ -98,30 +21,30 @@ const MyPlan = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const [revealId, setRevealId] = useState(null); // 화살표 hover 시 열릴 카드 id
 
-  /* 목록 조회: GET /api/plans */
   const fetchPlans = async () => {
     setLoading(true);
     try {
       const res = await api.get("/plans");
       const list = Array.isArray(res.data) ? res.data : [];
 
-      // 서버 응답을 화면용으로 정규화
+
       const normalized = list.map((p, idx) => {
-        const id = p.id ?? p.planId ?? idx;
-        const totalBudget = toNumber(p.totalBudget ?? p.totalPrice);
-        const maxBudget = toNumber(p.maxBudget ?? 800000); // 기본값 보장
+        const id = String(p.id ?? idx);                 // 문자열로 정규화(라우팅 안전)
+        const maxBudget = toNumber(p.totalPrice);       // 총예산(분모)
+        const current = toNumber(p.currentPrice);       // 현재 사용액(분자)
+        const thumb =
+          p.thumbnailUrl ||
+          p.profileImageUrl ||
+          "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='80'><rect width='100%' height='100%' fill='%23eef2ff'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='12'>No Image</text></svg>";
 
         return {
-          ...p,
           id,
           title: p.title ?? "제목 없음",
-          totalBudget, // (표시에는 사용 안 하지만 호환성 유지)
-          maxBudget,   // 진행률의 분모(총예산)
-          startDate: p.startDate ?? p.periodStart ?? null,
-          endDate: p.endDate ?? p.periodEnd ?? null,
-          thumbnailUrl:
-            p.thumbnailUrl ||
-            "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='80'><rect width='100%' height='100%' fill='%23eef2ff'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='12'>No Image</text></svg>",
+          username: p.username ?? "",
+          thumbnailUrl: thumb,
+          period: p.period ?? "일정 미정",
+          maxBudget,
+          currentSpent: current,
         };
       });
 
@@ -138,7 +61,7 @@ const MyPlan = ({ onClose }) => {
     fetchPlans();
   }, []);
 
-  /* 플랜 생성: POST /api/plans/empty  → /myplan/:id로 이동 */
+  /* 플랜 생성: POST /plans/empty → /myplan/:id */
   const handleAddPlanClick = async () => {
     try {
       onClose?.();
@@ -148,7 +71,7 @@ const MyPlan = ({ onClose }) => {
         alert("생성된 여행 계획 ID를 확인할 수 없습니다.");
         return;
       }
-      navigate(`/myplan/${newPlanId}`, { state: { isNewPlan: true } });
+      navigate(`/myplan/${String(newPlanId)}`, { state: { isNewPlan: true } });
     } catch (e) {
       console.error("POST /plans/empty 실패:", e);
       alert("새 여행 계획을 만들 수 없어요. 잠시 후 다시 시도해주세요.");
@@ -160,7 +83,7 @@ const MyPlan = ({ onClose }) => {
     if (!window.confirm("이 여행 계획을 삭제할까요?")) return;
     try {
       await api.delete(`/plans/${id}`);
-      setPlans((prev) => prev.filter((p) => (p.id ?? p.planId) !== id));
+      setPlans((prev) => prev.filter((p) => p.id !== id));
       setRevealId(null);
     } catch (e) {
       console.error("DELETE /plans/{id} 실패:", e);
@@ -174,31 +97,19 @@ const MyPlan = ({ onClose }) => {
 
   return (
     <div className="myplan-container">
-      {/* 상단: 로딩/새로고침 안내 */}
       {loading && <div className="plan-loading">불러오는 중…</div>}
       {!loading && plans.length === 0 && (
         <p className="plan-empty-text">아직 저장된 여행 계획이 없어요.</p>
       )}
 
       {plans.map((plan, idx) => {
-        // ✅ 진행률은 "스케줄 지출 합계"
-        const current = getSpentFromPlan(plan);
-
-        // ✅ 총예산(분모)
-        const max = toNumber(plan.maxBudget);
-
-        const ratio = max > 0 ? current / max : 0;
-        const pct = Math.min(100, Math.max(0, Math.round(ratio * 100)));
-        const id = plan.id ?? idx;
-        const badgeLeft = Math.min(96, Math.max(4, pct)); // 끝단 클램프
-
         return (
-          <section key={id} className="plan-section">
+          <section key={plan.id} className="plan-section">
             <p className="section-label">{orderLabel(idx)}</p>
 
             {/* 카드: 트랙(내용) + 액션 패널 */}
             <div
-              className={`plan-card ${revealId === id ? "is-reveal" : ""}`}
+              className={`plan-card ${revealId === plan.id ? "is-reveal" : ""}`}
               onMouseLeave={handleHide}
             >
               {/* 좌/우 내용이 들어있는 트랙 - 왼쪽 슬라이드 */}
@@ -208,45 +119,33 @@ const MyPlan = ({ onClose }) => {
                   <div className="plan-title-box">
                     <div className="plan-title">{plan.title}</div>
 
-                    {/* 날짜/숙박 정보 */}
-                    <div className="plan-subtitle">
-                      {nightsDays(plan.startDate, plan.endDate)}
-                    </div>
-                    <div className="plan-dates">
-                      {formatDateRange(plan.startDate, plan.endDate)}
-                    </div>
+                    {/* 기간(문자열 그대로) */}
+                    <div className="plan-subtitle">{plan.period}</div>
                   </div>
                 </div>
 
                 <div className="plan-card-right">
-                  {/* 예산 바 */}
-                  <div className="budget-area">
-                    <div
-                      className="budget-badge"
-                      style={{ left: `calc(${badgeLeft}% - 4.2rem)` }}
-                    >
-                      ₩ {current.toLocaleString("ko-KR")}
-                    </div>
-
-                    <div className="bar-track">
-                      <div className="bar-fill" style={{ width: `${pct}%` }} />
-                      <div className="bar-base" />
-                    </div>
-
-                    <div className="budget-meta">
-                      <span className="meta-left">예산</span>
-                      <span className="meta-right">₩ {max.toLocaleString("ko-KR")}</span>
-                    </div>
-                  </div>
+                  {/* ✅ 기존 예산 바를 BudgetDisplay 컴포넌트로 교체 */}
+                  <BudgetDisplay
+                    usedBudget={plan.currentSpent}
+                    totalBudget={plan.maxBudget}
+                    isEditMode={false} // ✅ 수정 불가능하도록 설정
+                    isEditingBudget={false}
+                    onBudgetClick={() => {}} // 빈 함수 (클릭 불가)
+                    onBudgetChange={() => {}} // 빈 함수
+                    onBudgetBlur={() => {}} // 빈 함수
+                    onBudgetKeyDown={() => {}} // 빈 함수
+                    budgetInput="" // 사용되지 않음
+                  />
 
                   {/* 화살표 버튼: hover/클릭 시 우측 액션패널 open */}
                   <button
                     className="chevron-btn"
                     aria-label="액션 열기"
-                    aria-expanded={revealId === id}
-                    onMouseEnter={() => handleReveal(id)}
-                    onFocus={() => handleReveal(id)}
-                    onClick={() => handleToggleReveal(id)}
+                    aria-expanded={revealId === plan.id}
+                    onMouseEnter={() => handleReveal(plan.id)}
+                    onFocus={() => handleReveal(plan.id)}
+                    onClick={() => handleToggleReveal(plan.id)}
                   >
                     <img
                       src={ArrowRightIcon}
@@ -258,18 +157,15 @@ const MyPlan = ({ onClose }) => {
               </div>
 
               {/* 우측 액션 패널 */}
-              <div
-                className="card-actions"
-                onMouseEnter={() => handleReveal(id)}
-              >
-                <button className="action-btn danger" onClick={() => handleDelete(id)}>
+              <div className="card-actions" onMouseEnter={() => handleReveal(plan.id)}>
+                <button className="action-btn danger" onClick={() => handleDelete(plan.id)}>
                   삭제하기
                 </button>
 
                 <button
                   className="action-btn primary"
                   onClick={() =>
-                    navigate(`/myplan/${id}`, {
+                    navigate(`/myplan/${plan.id}`, {
                       state: { isNewPlan: false, viewOnly: true },
                     })
                   }
