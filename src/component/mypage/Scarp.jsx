@@ -4,7 +4,6 @@ import api from "../../api/axios";
 import useUserStore from "../../api/userStore";
 import { toast } from "react-toastify";
 import {
-  FaTrophy,
   FaHeart,
   FaRegHeart,
   FaRegCommentAlt,
@@ -47,7 +46,6 @@ const Scrap = () => {
           isLiked: p.liked,
           isScrapped: p.scrapped,
           isMine: p.mine,
-          isChallenge: p.challenge,
         }));
         setScraps(parsed);
       } catch (err) {
@@ -89,13 +87,6 @@ const Scrap = () => {
                     </span>
                     <span className="created-at">
                       {formatDateTime(post.createdAt)}
-                    </span>
-                    <span
-                      className={`challenge-label ${
-                        post.isChallenge ? "challenge-true" : "challenge-false"
-                      }`}
-                    >
-                      <FaTrophy className="challenge-icon" /> Challenge
                     </span>
                   </div>
                 </div>

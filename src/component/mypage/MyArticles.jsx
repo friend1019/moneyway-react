@@ -4,7 +4,6 @@ import api from "../../api/axios";
 import useUserStore from "../../api/userStore";
 import { toast } from "react-toastify";
 import {
-  FaTrophy,
   FaHeart,
   FaRegHeart,
   FaRegCommentAlt,
@@ -52,7 +51,6 @@ const MyArticles = () => {
           isLiked: p.liked,
           isScrapped: p.scrapped,
           isMine: p.mine,
-          isChallenge: p.challenge,
         }));
         setPosts(parsedPosts);
       } catch (err) {
@@ -90,13 +88,6 @@ const MyArticles = () => {
                     <span className="nickname">{post.writerInfo.nickname}</span>
                     <span className="created-at">
                       {formatDateTime(post.createdAt)}
-                    </span>
-                    <span
-                      className={`challenge-label ${
-                        post.isChallenge ? "challenge-true" : "challenge-false"
-                      }`}
-                    >
-                      <FaTrophy className="challenge-icon" /> Challenge
                     </span>
                   </div>
                 </div>

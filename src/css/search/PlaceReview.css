@@ -6,8 +6,8 @@
 
 /* 팔레트 (섹션 로컬 변수) */
 .reviews {
-  --brand: #0066f9;
-  --brand-2: #307ef1;
+  --brand: #0066F9;
+  --brand-2: #0066F9;
   --ink: #333;
   --muted: #7f7f7f;
   --card-bg: #fff;
@@ -88,35 +88,6 @@
   overflow: hidden;
   transition: box-shadow .2s ease, transform .15s ease, background .2s ease;
   animation: rv-fade-up .4s ease both;
-}
-
-/* 좌측 포인트 바 (호버 시 길이 증가) */
-.rv-item::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0; bottom: 0;
-  width: .4rem;
-  background: var(--accent-grad);
-  transform-origin: top;
-  transform: scaleY(.25);
-  transition: transform .25s ease;
-  border-top-left-radius: 1.3rem;
-  border-bottom-left-radius: 1.3rem;
-}
-
-/* hover / focus 효과 */
-.rv-item:hover,
-.rv-item:focus-within {
-  transform: translateY(-.2rem);
-  box-shadow: 0px 8px 20px rgba(0,0,0,.15);
-  background:
-    radial-gradient(120% 100% at 0% 0%, rgba(48,126,241,.06), transparent 60%),
-    var(--card-bg);
-}
-.rv-item:hover::before,
-.rv-item:focus-within::before {
-  transform: scaleY(1);
 }
 
 /* 작성자명 */
