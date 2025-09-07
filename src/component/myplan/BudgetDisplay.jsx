@@ -1,4 +1,6 @@
 import React from 'react';
+import { FiEdit } from "react-icons/fi"; 
+import { FiAlertTriangle } from "react-icons/fi";
 import '../../css/myplan/BudgetDisplay.css';
 
 const BudgetDisplay = ({
@@ -12,64 +14,76 @@ const BudgetDisplay = ({
   onBudgetKeyDown,
   budgetInput,
 }) => {
-  const isOverBudget = totalBudget > 0 && usedBudget > totalBudget;
+  // ✅ 예산 초과 판정 (예산이 0일 때도 사용금액이 있으면 초과)
+  const isOverBudget = usedBudget > totalBudget;
   const overAmount = usedBudget - totalBudget;
-  const progressPercent = totalBudget > 0 ? Math.min(100, (usedBudget / totalBudget) * 100) : 0;
-  
-  // 말풍선 위치 계산 (프로그레스 바 끝점에 위치)
-  const bubblePosition = Math.min(96, Math.max(4, progressPercent)); // 4%~96% 사이로 제한
+
+  const progressPercent =
+    totalBudget > 0 ? Math.min(100, (usedBudget / totalBudget) * 100) : (usedBudget > 0 ? 100 : 0);
+
+  const bubblePosition = Math.min(96, Math.max(4, progressPercent));
 
   return (
     <div className='plan-budget-right'>
-      {/* 사용 예산 말풍선 */}
-      <div className="budget-bubble-container">
-        <div 
-          className={`budget-bubble ${isOverBudget ? 'over-budget' : ''}`}
-          style={{ left: `${bubblePosition}%` }}
+    {isOverBudget && (
+      <div className="budget-over-inline">
+        <FiAlertTriangle className="alert-icon" />
+        <span>₩{overAmount.toLocaleString()} 초과되었습니다.</span>
+      </div>
+    )}
+
+    {/* 사용 예산 말풍선 */}
+    <div className="budget-bubble-container">
+      <div
+        className={`budget-bubble ${isOverBudget ? 'over-budget' : ''}`}
+        style={{ left: `${bubblePosition}%` }}
+      >
+        ₩{usedBudget.toLocaleString()}
+        <div className="bubble-arrow"></div>
+      </div>
+    </div>
+
+    {/* 프로그레스 바 */}
+    <div className={`budget-progress-bar ${isOverBudget ? 'over' : ''}`}>
+      
+      <div
+        className={`budget-progress-fill ${isOverBudget ? 'over' : ''}`}
+        style={{ width: `${progressPercent}%` }}
+      ></div>
+    </div>
+
+    {/* 예산 정보 */}
+    <div className='total-budget'>
+      <span>예산</span>
+      {isEditMode && isEditingBudget ? (
+        <input
+          type="text"
+          inputMode="numeric"
+          value={budgetInput}
+          onChange={(e) => {
+            const newValue = e.target.value.replace(/^0+/, "");
+            e.target.value = newValue;
+            onBudgetChange(e);
+          }}
+          onBlur={onBudgetBlur}
+          onKeyDown={onBudgetKeyDown}
+          className="myplan-budget-input"
+          autoFocus
+        />
+      ) : (
+        <span
+          onClick={isEditMode ? onBudgetClick : undefined}
+          className={isEditMode ? 'budget-amount-clickable' : ''}
+          style={{ display: "flex", alignItems: "center", gap: "0.4rem", cursor: isEditMode ? "pointer" : "default" }}
         >
-          ₩{usedBudget.toLocaleString()}
-          <div className="bubble-arrow"></div>
-        </div>
-      </div>
-
-      {/* 프로그레스 바 */}
-      <div className={`budget-progress-bar ${isOverBudget ? 'over' : ''}`}>
-        <div
-          className={`budget-progress-fill ${isOverBudget ? 'over' : ''}`}
-          style={{ width: `${progressPercent}%` }}
-        ></div>
-      </div>
-
-      {/* 예산 정보 */}
-      <div className='total-budget'>
-        <span>예산</span>
-        {isEditMode && isEditingBudget ? (
-          <input
-            type="number"
-            value={budgetInput}
-            onChange={onBudgetChange}
-            onBlur={onBudgetBlur}
-            onKeyDown={onBudgetKeyDown}
-            className="budget-input"
-            autoFocus
-          />
-        ) : (
-          <span
-            onClick={isEditMode ? onBudgetClick : undefined}
-            className={isEditMode ? 'budget-amount-clickable' : ''}
-          >
-            ₩{totalBudget.toLocaleString()}
-          </span>
-        )}
-      </div>
-
-      {/* 초과 시 경고 메시지 */}
-      {isOverBudget && (
-        <div className="budget-over-alert">
-          ⚠️ ₩{overAmount.toLocaleString()} 초과되었습니다.
-        </div>
+          <FiEdit />
+          {totalBudget > 0 
+            ? `₩${totalBudget.toLocaleString()}`
+            : <span className="budget-placeholder">예산을 설정해주세요</span>}
+        </span>
       )}
     </div>
+  </div>
   );
 };
 
