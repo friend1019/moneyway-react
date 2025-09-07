@@ -111,22 +111,19 @@ const MyPlanPage = () => {
       const res = await api.get(`/plans/${id}`);
       const data = res.data;
 
+      const finalThumbnail =
+        data.thumbnailUrl ||
+        data.profileImageUrl ||
+        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='80'><rect width='100%' height='100%' fill='%23eef2ff'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='12'>No Image</text></svg>";
+
       setPlanDetails({
         id: String(data.id ?? data.planId ?? id),
         title: data.title ?? '',
+        thumbnailUrl: finalThumbnail,       
         totalBudget: Number(data.totalPrice ?? 0),
         usedBudget: Number(data.currentPrice ?? 0),
         period: data.period ?? null,
-        thumbnailUrl:
-          data.thumbnailUrl ||
-          data.profileImageUrl ||
-          "data:image/svg+xml;...",
-        author: {
-          username: data.username ?? '작성자',
-          profileImageUrl: data.profileImageUrl
-        }
       });
-
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
       (data.places || []).forEach(place => {
         const day = `Day ${place.dayNumber}`;
@@ -326,7 +323,6 @@ const MyPlanPage = () => {
       [targetDay]: [...(prev[targetDay] || []), newScheduleItem]
     }));
 
-    // ✅ 숙소는 카트에서 제거하지 않음
     setCartItems(prev => {
       const isLodging = (draggedItem.category || '').includes('숙소') || draggedItem.category === '숙소';
       return isLodging ? prev : prev.filter(item => item.cartId !== draggedItem.cartId);
@@ -340,43 +336,42 @@ const MyPlanPage = () => {
     setTimeModal({ isOpen: false, step: 'start', draggedItem: null, targetDay: null, selectedStartTime: null });
   }, []);
 
-  /** ---------- 컨텍스트 메뉴 ---------- */
   const closeMenu = useCallback(() => {
     setMenuState(prev => ({ ...prev, visible: false }));
   }, []);
 
   const handleContextMenu = useCallback((event, item, day) => {
     event.preventDefault();
-    if (!item || !day) return;
-    alert('삭제합니다.');
-  
-    setDailySchedules(prev => ({
-      ...prev,
-      [day]: (prev[day] || []).filter(i => i.id !== item.id)
-    }));
-  
-    // 숙소는 복귀 X, 비-숙소만 카트 복귀
-    const isLodging = item.category === '숙소' || item.category?.includes('숙소');
-    if (!isLodging && item.cartId) {
-      setCartItems(prev => [...prev, {
-        cartId: item.cartId,
-        placeName: item.name,
-        category: item.category,
-        price: item.cost,
-      }]);
-    }
-    setIsDirty(true);
-  }, []);
-  
-  // 숙소 아이템 우클릭 → 바로 삭제
+    if (!isEditMode || !item || !day) return;
+
+    setMenuState({
+      visible: true,
+      position: { x: event.clientX, y: event.clientY },
+      selectedItem: item,
+      day: day,
+      contextType: 'schedule',
+    });
+  }, [isEditMode]);
+
   const handleLodgingContextMenu = useCallback((event, item) => {
     event.preventDefault();
     if (!item?.cartId) return;
-    alert('삭제합니다.');
-  
-    setCartItems(prev => prev.filter(i => i.cartId !== item.cartId));
-    setIsDirty(true);
+    
+    if (window.confirm(`'${item.placeName}' 항목을 카트에서 삭제하시겠습니까?`)) {
+      setCartItems(prev => prev.filter(i => i.cartId !== item.cartId));
+      setIsDirty(true);
+    }
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = () => closeMenu();
+    if (menuState.visible) {
+      window.addEventListener('click', handleClickOutside);
+    }
+    return () => {
+      window.removeEventListener('click', handleClickOutside);
+    };
+  }, [menuState.visible, closeMenu]);
 
   const handleDeleteItem = useCallback(() => {
     const { selectedItem, day } = menuState;
@@ -452,14 +447,15 @@ const MyPlanPage = () => {
   /** ---------- 저장 ---------- */
   const handleSave = async () => {
     const places = [];
-
+  
     Object.entries(dailySchedules).forEach(([day, items]) => {
       const dayNumber = Number(String(day).replace('Day ', '')) || Number(day);
       (items || []).forEach((item) => {
-        if (!item?.time || !item?.cartId) {
-          console.warn("저장 제외:", item);
+        if (!item?.time || (!item.cartId && !item.placeId)) {
+          console.warn("저장 제외 (ID 정보 부족):", item);
           return;
         }
+        
         const [h, m] = item.time.split(':').map(Number);
         const startMinutes = h * 60 + m;
         const endMinutes = startMinutes + Math.round((item.duration || 1) * 60);
@@ -471,31 +467,41 @@ const MyPlanPage = () => {
         };
         const startTime = toHHMM(startMinutes);
         const endTime = toHHMM(endMinutes);
-
-        places.push({
-          cartId: item.cartId,
+  
+        const placeData = {
           cost: item.cost || 0,
           dayNumber,
           startTime,
           endTime,
-        });
+        };
+  
+        if (item.placeId) {
+          placeData.placeId = item.placeId;
+        } else {
+          placeData.cartId = item.cartId;
+        }
+        
+        places.push(placeData);
       });
     });
-
+  
     if (!places.length) return alert('스케줄에 추가된 일정이 없습니다!');
     if (!planId) return alert('계획 ID가 없습니다.');
-
+  
     const payload = {
       title: planDetails?.title || '새 여행 계획',
-      totalPrice: Number(planDetails?.totalBudget || 0),
+      // ✨ 핵심 수정: '총예산' 대신 계산된 '사용 예산'을 전송
+      totalPrice: Number(planDetails?.usedBudget || 0),
       places,
     };
-
+  
     try {
       await api.patch(`/plans/${planId}`, payload);
-
-      // 비-숙소 카트만 삭제
-      const scheduledCartIds = new Set(places.map(p => p.cartId));
+  
+      const scheduledCartIds = new Set(
+          Object.values(dailySchedules).flat().map(p => p.cartId).filter(Boolean)
+      );
+        
       const itemsToDelete = cartItems.filter(item =>
         scheduledCartIds.has(item.cartId) &&
         !(item.category === '숙소' || item.category?.includes('숙소'))
@@ -505,7 +511,7 @@ const MyPlanPage = () => {
           api.delete(`/cart/${item.cartId}`)
         ));
       }
-
+  
       alert('여행 계획이 저장되었습니다.');
       setIsEditMode(false);
       setIsDirty(false);
@@ -516,7 +522,7 @@ const MyPlanPage = () => {
         )
       );
       fetchPlanDetail(planId);
-
+  
     } catch (e) {
       const msg = e?.response?.data?.message || e.message;
       console.error('ERROR:', e?.response || e);
@@ -608,6 +614,7 @@ const MyPlanPage = () => {
 
           <div className='schedule-main-container'>
             <Schedule
+            
               isEditingTitle={isEditingTitle}
               titleInput={titleInput}
               onTitleClick={handleTitleClick}

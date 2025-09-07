@@ -134,6 +134,7 @@ const Schedule = ({
   onDurationDrag,
   ...props
 }) => {
+  
   const [schedules, setSchedules] = useState(dailySchedules);
 
   useEffect(() => { setSchedules(dailySchedules); }, [dailySchedules]);
@@ -160,7 +161,7 @@ const Schedule = ({
       <div className='plan-info-card'>
         <div className='plan-details-left'>
           <img 
-            src={planDetails.author?.profileImageUrl || '기본_이미지_경로.svg'} 
+            src={planDetails.profileImageUrl} 
             alt="user avatar" 
             className='user-avatar' 
           />

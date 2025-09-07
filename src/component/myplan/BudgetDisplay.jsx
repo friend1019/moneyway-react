@@ -14,7 +14,6 @@ const BudgetDisplay = ({
   onBudgetKeyDown,
   budgetInput,
 }) => {
-  // ✅ 예산 초과 판정 (예산이 0일 때도 사용금액이 있으면 초과)
   const isOverBudget = usedBudget > totalBudget;
   const overAmount = usedBudget - totalBudget;
 

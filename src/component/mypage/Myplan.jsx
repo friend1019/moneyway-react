@@ -29,9 +29,9 @@ const MyPlan = ({ onClose }) => {
 
 
       const normalized = list.map((p, idx) => {
-        const id = String(p.id ?? idx);                 // 문자열로 정규화(라우팅 안전)
-        const maxBudget = toNumber(p.totalPrice);       // 총예산(분모)
-        const current = toNumber(p.currentPrice);       // 현재 사용액(분자)
+        const id = String(p.id ?? idx);                
+        const maxBudget = toNumber(p.totalPrice);      
+        const current = toNumber(p.currentPrice);       
         const thumb =
           p.thumbnailUrl ||
           p.profileImageUrl ||
@@ -125,17 +125,17 @@ const MyPlan = ({ onClose }) => {
                 </div>
 
                 <div className="plan-card-right">
-                  {/* ✅ 기존 예산 바를 BudgetDisplay 컴포넌트로 교체 */}
+                  {/* 기존 예산 바를 BudgetDisplay 컴포넌트로 교체 */}
                   <BudgetDisplay
                     usedBudget={plan.currentSpent}
                     totalBudget={plan.maxBudget}
-                    isEditMode={false} // ✅ 수정 불가능하도록 설정
+                    isEditMode={false} 
                     isEditingBudget={false}
-                    onBudgetClick={() => {}} // 빈 함수 (클릭 불가)
-                    onBudgetChange={() => {}} // 빈 함수
-                    onBudgetBlur={() => {}} // 빈 함수
-                    onBudgetKeyDown={() => {}} // 빈 함수
-                    budgetInput="" // 사용되지 않음
+                    onBudgetClick={() => {}} 
+                    onBudgetChange={() => {}} 
+                    onBudgetBlur={() => {}} 
+                    onBudgetKeyDown={() => {}} 
+                    budgetInput="" 
                   />
 
                   {/* 화살표 버튼: hover/클릭 시 우측 액션패널 open */}
