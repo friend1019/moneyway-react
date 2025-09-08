@@ -64,12 +64,12 @@ const ScheduleItem = ({
 
   if (startTop + height > GRID_TOTAL_REM) {
     height = GRID_TOTAL_REM - startTop;
-    if (height < 0) height = 0; 
+    if (height < 0) height = 0;
   }
 
   const style = {
     top: `${startTop}rem`,
-    height: `${height}rem`,   
+    height: `${height}rem`,
     left: `${H_MARGIN_REM}rem`,
     right: `${H_MARGIN_REM}rem`,
     position: 'absolute',
@@ -130,14 +130,18 @@ const Schedule = ({
   onTitleChange,
   onTitleBlur,
   onTitleKeyDown,
-  planDurationStr,
   onDurationDrag,
   ...props
 }) => {
-  
-  const [schedules, setSchedules] = useState(dailySchedules);
+  const [schedules, setSchedules] = useState({
+    "Day 1": [],
+    "Day 2": [],
+    "Day 3": [],
+    "Day 4": [],
+    ...dailySchedules
+  });
 
-  useEffect(() => { setSchedules(dailySchedules); }, [dailySchedules]);
+  useEffect(() => { setSchedules(prev => ({ ...prev, ...dailySchedules })); }, [dailySchedules]);
 
   const handleItemDeleted = (item, day) => {
     setSchedules(prev => ({
@@ -146,7 +150,6 @@ const Schedule = ({
     }));
   };
 
- 
   const handleItemUpdated = (updatedItem, day) => {
     setSchedules(prev => ({
       ...prev,
@@ -154,16 +157,23 @@ const Schedule = ({
     }));
   };
 
-  const days = Object.keys(schedules || {});
+  // ✅ Day 열림 상태 관리
+  const [openDays, setOpenDays] = useState(1);
+  const [planDurationStr, setPlanDurationStr] = useState("0박 1일");
+
+  useEffect(() => {
+    const nights = openDays - 1;
+    setPlanDurationStr(`${nights}박 ${openDays}일`);
+  }, [openDays]);
 
   return (
     <>
       <div className='plan-info-card'>
         <div className='plan-details-left'>
-          <img 
-            src={planDetails.profileImageUrl} 
-            alt="user avatar" 
-            className='user-avatar' 
+          <img
+            src={planDetails.profileImageUrl}
+            alt="user avatar"
+            className='user-avatar'
           />
           <div className='plan-text-info'>
             {isEditingTitle ? (
@@ -183,10 +193,10 @@ const Schedule = ({
                 onClick={isEditMode ? onTitleClick : undefined}
               >
                 {planDetails.title ? planDetails.title : (
-                <span className="placeholder-text">제목을 입력하세요</span>
+                  <span className="placeholder-text">제목을 입력하세요</span>
                 )}
                 {isEditMode && ' ✎'}
-                </h2>
+              </h2>
             )}
             <p className='plan-duration'>{planDurationStr}</p>
           </div>
@@ -203,6 +213,7 @@ const Schedule = ({
           onBudgetKeyDown={onBudgetKeyDown}
         />
       </div>
+
       {/* --- 시간표 스케줄 그리드 --- */}
       <div className='schedule-grid'>
         <div className='time-column'>
@@ -211,33 +222,52 @@ const Schedule = ({
             <div key={time} className='time-cell'>{time}</div>
           ))}
         </div>
+
         <div className='days-column-container'>
-          {days.map(day => (
-            <div key={day} className='day-column'>
-              <div className='header-cell'>{day}</div>
-              <div className="planner-content-wrapper" style={{ 
-                position: 'relative', 
-                minHeight: `${timeSlots.length * 10}rem` // 1시간 단위이므로 10rem씩
-              }}>
-                {timeSlots.map(time => (
-                  <DroppablePlannerCell key={time} day={day} time={time} />
-                ))}
-                {(schedules[day] || []).map(item => (
-                  <ScheduleItem
-                    key={item.id || item.cartId || item.placeId}
-                    item={item}
-                    day={day}
-                    slotHeight={slotHeight}
-                    isEditMode={isEditMode}
-                    onItemDeleted={handleItemDeleted}
-                    onItemUpdated={handleItemUpdated}
-                    onContextMenu={onContextMenu}
-                    timeSlotsLength={timeSlots.length}
-                  />
-                ))}
+          {["Day 1", "Day 2", "Day 3", "Day 4"].map((day, idx) => {
+            const isOpen = idx < openDays;
+            return (
+              <div key={day} className={`day-column ${!isOpen ? "disabled" : ""}`}>
+                <div className='header-cell'>{day}</div>
+
+                {isOpen ? (
+                  <div
+                    className="planner-content-wrapper"
+                    style={{ minHeight: `${timeSlots.length * 10}rem` }}
+                  >
+                    {timeSlots.map(time => (
+                      <DroppablePlannerCell key={time} day={day} time={time} />
+                    ))}
+                    {(schedules[day] || []).map(item => (
+                      <ScheduleItem
+                        key={item.id || item.cartId || item.placeId}
+                        item={item}
+                        day={day}
+                        slotHeight={slotHeight}
+                        isEditMode={isEditMode}
+                        onItemDeleted={handleItemDeleted}
+                        onItemUpdated={handleItemUpdated}
+                        onContextMenu={onContextMenu}
+                        timeSlotsLength={timeSlots.length}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="day-locked-mask">
+                    <div
+                      className="day-locked-overlay"
+                      onClick={(e) => {
+                        e.stopPropagation(); // 이벤트 버블링 방지
+                        setOpenDays(prev => Math.min(prev + 1, 4));
+                      }}
+                    >
+                      <span className="plus">+</span>
+                    </div>
+                  </div>
+                   )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </>

@@ -77,7 +77,6 @@ const MyPlan = ({ onClose }) => {
       alert("새 여행 계획을 만들 수 없어요. 잠시 후 다시 시도해주세요.");
     }
   };
-
   /* 플랜 삭제: DELETE /api/plans/{id} */
   const handleDelete = async (id) => {
     if (!window.confirm("이 여행 계획을 삭제할까요?")) return;

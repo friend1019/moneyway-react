@@ -105,6 +105,7 @@ const MyPlanPage = () => {
     }
   };
 
+
   const fetchPlanDetail = async (id) => {
     setLoadingPlan(true);
     try {
@@ -123,6 +124,7 @@ const MyPlanPage = () => {
         totalBudget: Number(data.totalPrice ?? 0),
         usedBudget: Number(data.currentPrice ?? 0),
         period: data.period ?? null,
+        places: data.places || [],
       });
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
       (data.places || []).forEach(place => {
@@ -143,7 +145,7 @@ const MyPlanPage = () => {
           cost: place.cost || 0,
           cartId: place.cartId,
           placeId: place.placeId,
-          category: place.category
+          category: place.category,
         });
       });
       setDailySchedules(newSchedules);
@@ -243,7 +245,6 @@ const MyPlanPage = () => {
 
     const origin = active.data.current?.origin;
 
-    // ✅ 숙소도 드래그 허용
     if (origin === 'cart' || origin === 'lodging') {
       const draggedItem = cartItems.find(item => item.cartId === active.id);
       if (!draggedItem) return;
@@ -309,7 +310,8 @@ const MyPlanPage = () => {
       category: draggedItem.category,
       time: startTime,
       duration: durationHours,
-      cartId: draggedItem.cartId
+      cartId: draggedItem.cartId,
+      placeId: draggedItem.placeId 
     };
 
     if (isOverlapping(newScheduleItem, dailySchedules[targetDay] || [])) {
@@ -382,7 +384,6 @@ const MyPlanPage = () => {
       [day]: (prev[day] || []).filter(item => item.id !== selectedItem.id)
     }));
 
-    // ✅ 숙소는 복귀하지 않음
     const isLodging = selectedItem.category === '숙소' || selectedItem.category?.includes('숙소');
     if (!isLodging && selectedItem.cartId) {
       const cartItem = {
@@ -444,91 +445,105 @@ const MyPlanPage = () => {
   }, [titleInput]);
   const handleTitleKeyDown = useCallback((e) => { if (e.key === 'Enter') handleTitleBlur(); }, [handleTitleBlur]);
 
+  const initialPlaceIds = useMemo(() => 
+    new Set(Object.values(planDetails.places || {}).flat().map(p => p.placeId)), 
+    [planDetails.places]
+);
   /** ---------- 저장 ---------- */
   const handleSave = async () => {
     const places = [];
   
+    // 1. UI 상태(dailySchedules)를 API가 요구하는 형식(places 배열)으로 변환
     Object.entries(dailySchedules).forEach(([day, items]) => {
       const dayNumber = Number(String(day).replace('Day ', '')) || Number(day);
+  
       (items || []).forEach((item) => {
-        if (!item?.time || (!item.cartId && !item.placeId)) {
+        // ID나 시간이 없는 항목은 저장에서 제외
+        if (!item?.time) {
           console.warn("저장 제외 (ID 정보 부족):", item);
           return;
         }
-        
-        const [h, m] = item.time.split(':').map(Number);
-        const startMinutes = h * 60 + m;
-        const endMinutes = startMinutes + Math.round((item.duration || 1) * 60);
+
+        if (!item?.time || (item.cartId == null && item.placeId == null)) {
+          // item.cartId가 null 또는 undefined가 아니고,
+          // item.placeId가 null 또는 undefined가 아닌 경우만 통과
+          console.warn("저장 제외 (ID가 null이거나 없음):", item);
+          return;
+      }
+  
+        // 시간 계산
+        const [h, m] = String(item.time).split(':').map(Number);
+        const startMinutes = (h || 0) * 60 + (m || 0);
+        const endMinutes = startMinutes + Math.max(60, Math.round((item.duration || 1) * 60));
+  
         const toHHMM = (mins) => {
-          const clampedMins = Math.max(0, Math.min(1439, mins));
-          const H = String(Math.floor(clampedMins / 60)).padStart(2, '0');
-          const M = String(clampedMins % 60).padStart(2, '0');
+          const clamped = Math.max(0, Math.min(1439, mins));
+          const H = String(Math.floor(clamped / 60)).padStart(2, '0');
+          const M = String(clamped % 60).padStart(2, '0');
           return `${H}:${M}`;
         };
-        const startTime = toHHMM(startMinutes);
-        const endTime = toHHMM(endMinutes);
   
-        const placeData = {
-          cost: item.cost || 0,
+        const base = {
+          cost: Number(item.cost || 0),
           dayNumber,
-          startTime,
-          endTime,
+          startTime: toHHMM(startMinutes),
+          endTime: toHHMM(endMinutes),
         };
   
-        if (item.placeId) {
-          placeData.placeId = item.placeId;
-        } else {
-          placeData.cartId = item.cartId;
+        if (item.placeId && item.cartId) {
+          places.push({ ...base, placeId: item.placeId, cartId: item.cartId });
+        } else if (item.placeId) {
+          places.push({ ...base, placeId: item.placeId });
+        } else if (item.cartId) {
+          places.push({ ...base, cartId: item.cartId });
         }
-        
-        places.push(placeData);
       });
     });
   
-    if (!places.length) return alert('스케줄에 추가된 일정이 없습니다!');
-    if (!planId) return alert('계획 ID가 없습니다.');
-  
-    const payload = {
-      title: planDetails?.title || '새 여행 계획',
-      // ✨ 핵심 수정: '총예산' 대신 계산된 '사용 예산'을 전송
-      totalPrice: Number(planDetails?.usedBudget || 0),
-      places,
-    };
+    // 저장할 일정이 없으면 함수 종료
+    if (!places.length && isDirty) { // isDirty 조건 추가: 변경사항이 있을때만 알림
+      alert('스케줄에 추가된 일정이 없습니다!');
+      return;
+    }
   
     try {
-      await api.patch(`/plans/${planId}`, payload);
+      // 2. 현재 planId를 지역 변수로 복사하여 상태 동기화 문제 해결
+      let currentPlanId = planId;
   
-      const scheduledCartIds = new Set(
-          Object.values(dailySchedules).flat().map(p => p.cartId).filter(Boolean)
-      );
-        
-      const itemsToDelete = cartItems.filter(item =>
-        scheduledCartIds.has(item.cartId) &&
-        !(item.category === '숙소' || item.category?.includes('숙소'))
-      );
-      if (itemsToDelete.length > 0) {
-        await Promise.all(itemsToDelete.map(item =>
-          api.delete(`/cart/${item.cartId}`)
-        ));
+      // 3. 첫 저장일 경우 (planId가 'new' 또는 비어있음), 서버에서 새 planId를 먼저 발급받음
+      if (!currentPlanId || currentPlanId === "new") {
+        const res = await api.post("/plans/empty", {
+          title: planDetails?.title || "새 여행 계획",
+        });
+        currentPlanId = String(res?.data?.id ?? res?.data?.planId);
+        if (!currentPlanId) {
+          throw new Error("새로운 계획 ID를 발급받지 못했습니다.");
+        }
       }
   
-      alert('여행 계획이 저장되었습니다.');
-      setIsEditMode(false);
-      setIsDirty(false);
-      setCartItems(prev =>
-        prev.filter(item =>
-          !(scheduledCartIds.has(item.cartId) &&
-            !(item.category === '숙소' || item.category?.includes('숙소')))
-        )
-      );
-      fetchPlanDetail(planId);
+      // 4. 최종 페이로드(payload) 생성
+      const payload = {
+        title: planDetails?.title || "새 여행 계획",
+        totalPrice: Number(planDetails?.usedBudget || 0),
+        places,
+      };
+  
+      // 5. 확정된 ID(currentPlanId)를 사용하여 PATCH 요청
+      await api.patch(`/plans/${currentPlanId}`, payload);
+  
+      alert("여행 계획이 저장되었습니다.");
+  
+      // 6. 모든 작업 성공 후, 확정된 ID의 URL로 안전하게 이동
+      // (URL이 변경되면 페이지가 리렌더링되고, useParams의 planId가 갱신됩니다)
+      navigate(`/myplan/${currentPlanId}`, { replace: true, state: { isNewPlan: false } });
   
     } catch (e) {
       const msg = e?.response?.data?.message || e.message;
-      console.error('ERROR:', e?.response || e);
+      console.error("ERROR:", e?.response || e);
       alert(`저장 실패! ${msg}`);
     }
   };
+  
 
   const handleEdit = useCallback(() => setIsEditMode(true), []);
 
@@ -554,7 +569,6 @@ const MyPlanPage = () => {
     ];
   }, [menuState, handleViewDetails, handleDeleteItem, closeMenu]);
 
-  // 로딩 화면
   if (pageLoading) {
     return (
       <div className="myplan-page-container">
