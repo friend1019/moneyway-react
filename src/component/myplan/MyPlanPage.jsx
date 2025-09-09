@@ -91,7 +91,7 @@ const MyPlanPage = () => {
   });
 
   /** ---------- 외부 데이터 ---------- */
-  const fetchCartItems = async () => {
+  const fetchCartItems = useCallback(async () => {
     setLoadingCart(true);
     try {
       const res = await api.get('/cart');
@@ -102,10 +102,10 @@ const MyPlanPage = () => {
     } finally {
       setLoadingCart(false);
     }
-  };
+  }, []); // 이 함수는 외부 의존성이 없으므로 빈 배열을 사용합니다.
 
 
-  const fetchPlanDetail = async (id) => {
+  const fetchPlanDetail = useCallback(async (id) => {
     setLoadingPlan(true);
     try {
       const res = await api.get(`/plans/${id}`);
@@ -121,7 +121,7 @@ const MyPlanPage = () => {
         title: data.title ?? '',
         username: data.username ?? '', // username 추가
         profileImageUrl: finalThumbnail, 
-        thumbnailUrl: finalThumbnail,       
+        thumbnailUrl: finalThumbnail,      
         totalBudget: Number(data.totalPrice ?? 0),
         usedBudget: Number(data.currentPrice ?? 0),
         period: data.period ?? null,
@@ -167,9 +167,10 @@ const MyPlanPage = () => {
     } finally {
       setLoadingPlan(false);
     }
-  };
+  }, [emptyDays]); // 이 함수는 emptyDays에 의존합니다.
 
-  const fetchAllPlanIds = async () => {
+
+  const fetchAllPlanIds = useCallback(async () => {
     try {
       const res = await api.get('/plans');
       const ids = (res.data || [])
@@ -188,7 +189,7 @@ const MyPlanPage = () => {
         return prev;
       });
     }
-  };
+  }, [planId]);
 
   // prev/next 계산
   const { prevPlanId, nextPlanId } = useMemo(() => {
@@ -235,7 +236,7 @@ const MyPlanPage = () => {
     };
     loadData();
     return () => { mounted = false; };
-  }, [planId, location.state]);
+  }, [planId, location.state, fetchAllPlanIds, fetchCartItems, fetchPlanDetail]);
 
   // 새 플랜 플래그 반영
   useEffect(() => {
@@ -610,7 +611,7 @@ const MyPlanPage = () => {
         {
           action: () => {
             if (menuState.selectedItem?.cartId) {
-              alert('dl 카트를 삭제할까요.'); // 일정카트처럼 안내 문구
+              alert('dl 카트를 삭제할까요.'); 
               setCartItems(prev => prev.filter(i => i.cartId !== menuState.selectedItem.cartId));
               setIsDirty(true);
               closeMenu();
