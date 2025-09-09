@@ -9,7 +9,11 @@ const AIBudget = () => {
     const navigate = useNavigate();
 
     const handleNext = () => {
-        navigate('/ai-period'); 
+        navigate('/ai-period', { 
+            state: { 
+                budget: budget[0] 
+            } 
+        });
     };
 
     return (

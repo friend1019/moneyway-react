@@ -10,7 +10,6 @@ import ContextMenu from './ContextMenu';
 import TimeSelectionModal from './TimeSelectionModal';
 import api from "../../api/axios";
 
-/** ---------- 시간/겹침 유틸 (1시간 단위) ---------- */
 const SLOT_START_HOUR = 8;
 const SLOT_END_HOUR = 23;
 const toSlotIndex = (time) => {
@@ -212,23 +211,31 @@ const MyPlanPage = () => {
 
   // 데이터 로딩
   useEffect(() => {
+    // AI 플랜 데이터가 이미 처리된 경우 fetchPlanDetail을 건너뛰도록 조건 추가
+    if (location.state?.isAIPlan) {
+      // AI 플랜의 경우 카트 아이템만 불러오면 됨
+      fetchCartItems();
+      fetchAllPlanIds();
+      setPageLoading(false);
+      return; 
+    }
     let mounted = true;
     const loadData = async () => {
       try {
         await Promise.all([
-          fetchAllPlanIds(),
-          fetchCartItems(),
-          planId ? fetchPlanDetail(planId) : Promise.resolve(),
+        fetchAllPlanIds(),
+        fetchCartItems(),
+        (planId && !location.state?.isAIPlan) ? fetchPlanDetail(planId) : Promise.resolve(),
         ]);
-      } catch (error) {
+        } catch (error) {
         console.error('데이터 로딩 중 오류:', error);
-      } finally {
-        if (mounted) setPageLoading(false);
+        } finally {
+         if (mounted) setPageLoading(false);
       }
     };
     loadData();
     return () => { mounted = false; };
-  }, [planId]);
+  }, [planId, location.state]);
 
   // 새 플랜 플래그 반영
   useEffect(() => {
@@ -237,6 +244,53 @@ const MyPlanPage = () => {
     else setIsEditMode(false);
   }, [planId, isNewPlan]);
 
+  useEffect(() => {
+    if (location.state?.isAIPlan && location.state?.planData) {
+      console.log("AI가 생성한 플랜 데이터를 받아 처리합니다:", location.state);
+      
+      const aiPlanData = location.state.planData;
+      const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
+
+      aiPlanData.days.forEach(dayData => {
+        const dayKey = `Day ${dayData.day.replace('일차', '')}`; // "1일차" -> "Day 1"
+        if (!newSchedules[dayKey]) newSchedules[dayKey] = [];
+
+        dayData.places.forEach(place => {
+          const start = place.startTime || '09:00';
+          const end = place.endTime || '10:00';
+          const [sh, sm] = start.split(':').map(Number);
+          const [eh, em] = end.split(':').map(Number);
+          const duration = Math.max(1, ((eh * 60 + em) - (sh * 60 + sm)) / 60);
+
+          newSchedules[dayKey].push({
+            id: place.placeId || Date.now() + Math.random(),
+            name: place.title, 
+            time: start,
+            duration,
+            cost: place.cost || 0,
+            placeId: place.placeId,
+            category: place.categoryName, 
+            thumbnailUrl: place.thumbnailUrl || "기본 이미지 URL",
+          });
+        });
+      });
+      setDailySchedules(newSchedules);
+
+      setPlanDetails({
+        id: location.state.planId,
+        title: location.state.planTitle,
+        totalBudget: location.state.budget,
+
+      });
+      
+  
+      setEnabledDays(aiPlanData.days.length);
+  
+      setIsEditMode(false);
+      
+      setIsDirty(true);
+    }
+  }, [location.state])
   /** ---------- 파생 정보 ---------- */
   const planDurationStr = `${Math.max(0, enabledDays - 1)}박 ${enabledDays}일`;
   const SLOT_HEIGHT_PX = 90;
@@ -455,7 +509,8 @@ const MyPlanPage = () => {
   }, [titleInput]);
   const handleTitleKeyDown = useCallback((e) => { if (e.key === 'Enter') handleTitleBlur(); }, [handleTitleBlur]);
 
-  
+
+
   /** ---------- 저장 ---------- */
   const handleSave = async () => {
     const places = [];
@@ -578,6 +633,7 @@ const MyPlanPage = () => {
     );
   }
 
+  
   const handleMapView = () => {
     navigate('/map');
   };

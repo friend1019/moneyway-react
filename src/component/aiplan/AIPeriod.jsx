@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import ProgressSteps from '../aiplan/ProgressStep';
 import '../../css/aiplan/AIPeriod.css'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const AIPeriod = () => {
     const [selectedPeriod, setSelectedPeriod] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const budget = location.state?.budget;
 
     const travelPeriods = [
         "당일치기",
@@ -13,9 +16,20 @@ const AIPeriod = () => {
         "2박 3일",
         "3박 4일"
     ];
+    
+    const convertDurationToNumber = (duration) => {
+        const durationMap = { "당일치기": 1, "1박 2일": 2, "2박 3일": 3, "3박 4일": 4 };
+        return durationMap[duration] || 1;
+    };
 
     const handleNext = () => {
-        navigate('/ai-name'); 
+        if (!selectedPeriod) return;
+        navigate('/ai-name', {
+            state: {
+                budget: budget,
+                duration: convertDurationToNumber(selectedPeriod)
+            }
+        });
     };
 
     return (
