@@ -1,50 +1,158 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { FaImage } from "react-icons/fa6";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
-import useUserStore from "../../api/userStore"; // ✅ Zustand 유저 상태
+import useUserStore from "../../api/userStore";
 import "../../css/community/PostCreateForm.css";
 
+const MAX_IMAGES = 10;
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_FILE_MB = 10;
+
 const PostCreateForm = () => {
-  const { user } = useUserStore(); // ✅ 전역 상태에서 유저 정보 접근
+  const { user } = useUserStore();
   const profileImg = user?.profileImageUrl;
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [budgetEnabled, setBudgetEnabled] = useState(false);
+
+  // 예산 입력: 숫자 문자열 + 포커스 상태
   const [totalCost, setTotalCost] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
-  const [imageUrls, setImageUrls] = useState([]);
+  const [isBudgetFocused, setIsBudgetFocused] = useState(false);
+
+  // 썸네일
+  const [thumbFile, setThumbFile] = useState(null);
+  const [thumbPreview, setThumbPreview] = useState(null);
+
+  // 본문 이미지
+  const [photoFiles, setPhotoFiles] = useState([]);
+  const [photoPreviews, setPhotoPreviews] = useState([]);
+
   const navigate = useNavigate();
+  const isFormValid = title.trim() !== "" && content.trim() !== "";
 
-  const handleSubmit = async () => {
-    try {
-      const body = {
-        title,
-        content,
-        totalCost: budgetEnabled ? parseInt(totalCost) : null,
-        thumbnailUrl,
-        imageUrls,
-      };
+  useEffect(() => {
+    return () => {
+      if (thumbPreview) URL.revokeObjectURL(thumbPreview);
+      photoPreviews.forEach(URL.revokeObjectURL);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      await api.post("/posts", body);
-      toast.success("글이 등록되었습니다!");
-      setBudgetEnabled(false);
-      setTotalCost("");
-      setThumbnailUrl("");
-      setImageUrls([]);
-      setTitle("");
-      setContent("");
-      navigate("/community");
-    } catch (err) {
-      console.error("글 등록 실패", err);
-      const message = err.response?.data?.message || "글 등록에 실패했습니다.";
-      toast.error(message);
+  // ===== 통화 포맷 유틸 =====
+  const nfKR = useMemo(() => new Intl.NumberFormat("ko-KR"), []);
+  const onlyDigits = useCallback((s) => (s || "").replace(/\D/g, ""), []);
+  const toCurrency = useCallback(
+    (n) => (typeof n === "number" && !Number.isNaN(n) ? `₩ ${nfKR.format(n)}원` : ""),
+    [nfKR]
+  );
+
+  // API에 보낼 숫자 값
+  const totalCostValue = useMemo(() => {
+    const digits = onlyDigits(totalCost);
+    return digits ? parseInt(digits, 10) : null;
+  }, [totalCost, onlyDigits]);
+
+  // 예산 입력 핸들러
+  const handleBudgetChange = (e) => {
+    const digits = onlyDigits(e.target.value);
+    setTotalCost(digits);
+  };
+  const handleBudgetFocus = () => setIsBudgetFocused(true);
+  const handleBudgetBlur = () => setIsBudgetFocused(false);
+
+  // 표시용 값 (포커스 중: 숫자, 블러: ₩ …원)
+  const budgetDisplayValue = useMemo(() => {
+    const digits = onlyDigits(totalCost);
+    if (!digits) return "";
+    if (isBudgetFocused) return digits;
+    return toCurrency(parseInt(digits, 10));
+  }, [isBudgetFocused, totalCost, onlyDigits, toCurrency]);
+
+  // 파일 선택(썸네일)
+  const handleSelectThumbnail = (e) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (!ACCEPTED_TYPES.includes(f.type)) {
+      toast.warn("이미지(jpg/png/webp/gif)만 업로드할 수 있어요.");
+      return;
+    }
+    if (f.size > MAX_FILE_MB * 1024 * 1024) {
+      toast.warn(`썸네일은 ${MAX_FILE_MB}MB 이하만 가능해요.`);
+      return;
+    }
+    if (thumbPreview) URL.revokeObjectURL(thumbPreview);
+    setThumbFile(f);
+    setThumbPreview(URL.createObjectURL(f));
+  };
+
+  // 파일 선택(본문 이미지)
+  const handleSelectPhotos = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const next = [];
+    for (const f of files) {
+      if (!ACCEPTED_TYPES.includes(f.type)) {
+        toast.warn("이미지(jpg/png/webp/gif)만 업로드할 수 있어요.");
+        continue;
+      }
+      if (f.size > MAX_FILE_MB * 1024 * 1024) {
+        toast.warn(`각 이미지는 ${MAX_FILE_MB}MB 이하만 가능해요.`);
+        continue;
+      }
+      next.push(f);
+    }
+
+    const merged = [...photoFiles, ...next].slice(0, MAX_IMAGES);
+    photoPreviews.forEach(URL.revokeObjectURL);
+    const previews = merged.map((f) => URL.createObjectURL(f));
+
+    setPhotoFiles(merged);
+    setPhotoPreviews(previews);
+
+    if (photoFiles.length + next.length > MAX_IMAGES) {
+      toast.info(`이미지는 최대 ${MAX_IMAGES}장까지 업로드할 수 있어요.`);
     }
   };
 
-  const isFormValid = title.trim() !== "" && content.trim() !== "";
+  // 제출
+  const handleSubmit = async () => {
+    try {
+      const fd = new FormData();
+      const postJson = {
+        title,
+        content,
+        totalCost: totalCostValue, // 숫자 or null
+      };
+      fd.append("post", new Blob([JSON.stringify(postJson)], { type: "application/json" }));
+      if (thumbFile) fd.append("thumbnail", thumbFile);
+      photoFiles.forEach((file) => fd.append("photos", file));
+
+      await api.post("/posts", fd);
+      toast.success("글이 등록되었습니다!");
+
+      if (thumbPreview) URL.revokeObjectURL(thumbPreview);
+      photoPreviews.forEach(URL.revokeObjectURL);
+
+      // reset
+      setTitle("");
+      setContent("");
+      setTotalCost("");
+      setIsBudgetFocused(false);
+      setThumbFile(null);
+      setThumbPreview(null);
+      setPhotoFiles([]);
+      setPhotoPreviews([]);
+
+      navigate("/community");
+    } catch (err) {
+      console.error("글 등록 실패", err);
+      const message = err?.response?.data?.message || "글 등록에 실패했습니다.";
+      toast.error(message);
+    }
+  };
 
   return (
     <div className="post-form-whole-wrapper">
@@ -70,7 +178,7 @@ const PostCreateForm = () => {
             alt="프로필"
             className="profile-img"
           />
-          <textarea
+        <textarea
             className="post-content-input"
             placeholder="나의 여행을 공유해보세요!"
             value={content}
@@ -83,41 +191,47 @@ const PostCreateForm = () => {
 
         {/* 푸터 */}
         <div className="post-footer">
-          {/* 왼쪽: 예산 */}
+          {/* 예산 */}
           <div className="budget-group">
-            <label className="budget-checkbox">
-              <input
-                type="checkbox"
-                checked={budgetEnabled}
-                onChange={() => setBudgetEnabled(!budgetEnabled)}
-              />
-              나의 예산
-            </label>
+            <span className="budget-label">나의 예산</span>
             <input
-              className={`budget-input ${budgetEnabled ? "active" : "inactive"}`}
-              placeholder="₩ 0"
-              disabled={!budgetEnabled}
-              value={totalCost}
-              onChange={(e) => setTotalCost(e.target.value.replace(/\D/g, ""))}
+              className="budget-input"
+              placeholder="₩ 0원"
+              inputMode="numeric"
+              pattern="\d*"
+              aria-label="여행 예산"
+              value={budgetDisplayValue}
+              onChange={handleBudgetChange}
+              onFocus={handleBudgetFocus}
+              onBlur={handleBudgetBlur}
             />
           </div>
 
-          {/* 오른쪽: 이미지 + 공유 */}
+          {/* 이미지 + 공유 */}
           <div className="action-group">
+            {/* 썸네일(단일) */}
+            <input
+              type="file"
+              accept="image/*"
+              style={{ display: "none" }}
+              id="thumb-upload"
+              onChange={handleSelectThumbnail}
+            />
+            <label htmlFor="thumb-upload" className="upload-btn" title="썸네일 업로드">
+              <FaImage size={22} /> 썸네일
+            </label>
+
+            {/* 본문 이미지(다중) */}
             <input
               type="file"
               accept="image/*"
               multiple
               style={{ display: "none" }}
-              id="image-upload"
-              onChange={(e) => {
-                const files = Array.from(e.target.files || []);
-                const newUrls = files.map((file) => URL.createObjectURL(file));
-                setImageUrls((prev) => [...prev, ...newUrls].slice(0, 10)); // 최대 10개
-              }}
+              id="photos-upload"
+              onChange={handleSelectPhotos}
             />
-            <label htmlFor="image-upload" className="upload-btn" title="이미지 업로드">
-              <FaImage size={25} />
+            <label htmlFor="photos-upload" className="upload-btn" title="이미지 업로드(최대 10)">
+              <FaImage size={22} /> 이미지
             </label>
 
             <button
@@ -130,22 +244,30 @@ const PostCreateForm = () => {
           </div>
         </div>
 
-        {/* 썸네일 선택 */}
-        {imageUrls.length > 0 && (
-          <div className="thumbnail-selector">
-            <p className="thumbnail-title">썸네일로 사용할 이미지를 선택하세요:</p>
-            <div className="thumbnail-image-list">
-              {imageUrls.map((url, idx) => (
-                <img
-                  key={idx}
-                  src={url}
-                  alt={`uploaded-${idx}`}
-                  className={`thumbnail-image ${thumbnailUrl === url ? "selected" : ""}`}
-                  onClick={() => setThumbnailUrl(url)}
-                />
-              ))}
+        {/* 썸네일 미리보기 */}
+        {thumbPreview && (
+          <>
+            <div className="divider" />
+            <div className="thumbnail-selector">
+              <p className="thumbnail-title">썸네일 미리보기</p>
+              <img src={thumbPreview} alt="thumbnail" className="thumbnail-image selected" />
             </div>
-          </div>
+          </>
+        )}
+
+        {/* 본문 이미지 미리보기 */}
+        {photoPreviews.length > 0 && (
+          <>
+            <div className="divider" />
+            <div className="thumbnail-selector">
+              <p className="thumbnail-title">업로드될 이미지 목록</p>
+              <div className="thumbnail-image-list">
+                {photoPreviews.map((url, idx) => (
+                  <img key={idx} src={url} alt={`uploaded-${idx}`} className="thumbnail-image" />
+                ))}
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>

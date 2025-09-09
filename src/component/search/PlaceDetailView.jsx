@@ -44,7 +44,7 @@ const PlaceDetailView = ({ place, onBack }) => {
       });
       toast.success("일정에 추가되었습니다!");
     } catch (err) {
-      toast.error("추가 중 오류가 발생했습니다.");
+      toast.error("로그인이 필요한 기능입니다.");
       console.error(err);
     }
   };
