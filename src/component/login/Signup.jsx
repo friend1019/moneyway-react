@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import Header from "../common/Header";
-import signupImage from "../../images/login/signup.svg";
+import signupImage from "../../images/login/signup.png";
 import api from "../../api/axios";
 import { toast } from "react-toastify";
 
@@ -151,7 +150,6 @@ function Signup() {
   return (
     <>
       <div className="header">
-        <Header />
       </div>
       <div className="signup-container">
         <div className="signup-image">

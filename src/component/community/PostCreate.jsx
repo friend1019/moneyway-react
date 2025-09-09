@@ -1,27 +1,16 @@
-import Header from "../common/Header";
-import Footer from "../common/Footer";
+
+import HomeButton from "./HomeButton";
 import PostCreateForm from "./PostCreateForm";
-
-const containerStyle = {
-  minHeight: "66rem",
-  padding: "2rem",
-  backgroundColor: "#F6F6F6",
-
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-};
+import "../../css/community/PostCreateForm.css";
 
 const PostCreate = () => {
   return (
     <>
-      <Header />
-      <div style={containerStyle}>
+      <HomeButton showBack={true} />
+      <div className="post-create-container">
         <PostCreateForm />
       </div>
-      <Footer />
     </>
   );
-};
-
+}
 export default PostCreate;

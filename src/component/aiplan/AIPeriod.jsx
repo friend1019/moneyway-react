@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Header from "../common/Header";
 import ProgressSteps from '../aiplan/ProgressStep';
 import '../../css/aiplan/AIPeriod.css'
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +20,6 @@ const AIPeriod = () => {
 
     return (
         <>
-            <Header />
             <div className="page-container">
                 <ProgressSteps currentStep={2} />
                 <div className="content-container">

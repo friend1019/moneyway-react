@@ -1,104 +1,135 @@
-// 햄버거
+// src/components/common/SideMenu.jsx
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
+import useUserStore from "../../api/userStore";
 import api from "../../api/axios";
 import "../../css/common/SideMenu.css";
-import LoadingSpinner from "./LoadingSpinner";
+
+const SLIDE_MS = 350; // CSS transition 시간과 반드시 동일
 
 const SideMenu = ({ onClose }) => {
-  const [nickname, setNickname] = useState("");
   const navigate = useNavigate();
-  const [profileImageUrl, setProfileImageUrl] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, logout } = useUserStore();
+  const isLoggedIn = !!user;
 
+  // 슬라이드 인/아웃 제어
+  const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
+
+  // mount 후 한 프레임 뒤 open → 트랜지션 동작
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get("/mypage/me");
-        setNickname(res.data.nickname);
-        setProfileImageUrl(res.data.profileImageUrl);
-        setIsLoggedIn(true); // 로그인 성공
-      } catch (err) {
-        console.error("유저 정보 불러오기 실패:", err);
-        setIsLoggedIn(false); //로그인 안 되어 있는 상태
-      } finally {
-        setLoading(false);
-      }
+    const id = requestAnimationFrame(() => setOpen(true));
+    // 스크롤 잠금
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      cancelAnimationFrame(id);
+      document.body.style.overflow = prev;
     };
-    fetchUser();
   }, []);
+
+  const startClose = useCallback(() => {
+    if (closing) return;
+    setOpen(false);
+    setClosing(true);
+    setTimeout(() => {
+      onClose?.(); // 애니메이션 끝나고 부모에게 언마운트 요청
+    }, SLIDE_MS);
+  }, [closing, onClose]);
+
+  // ESC로 닫기
+  useEffect(() => {
+    const onKey = (e) => e.key === "Escape" && startClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [startClose]);
 
   const handleLogout = async () => {
     try {
       await api.post("/auth/logout");
+      logout();
+      navigate("/");
       toast.success("로그아웃 되었습니다.");
-      navigate("/login");
-      window.location.reload(); // 페이지 새로고침
+      startClose();
     } catch (err) {
+      console.error("로그아웃 에러:", err);
       toast.error("로그아웃 중 오류가 발생했습니다.");
     }
   };
 
   return (
-    <div className="side-menu-overlay show" onClick={onClose}>
-      <div className="side-menu" onClick={(e) => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}>
+    <>
+      {/* 오버레이 */}
+      <div
+        className={`side-menu-overlay ${open && !closing ? "open" : ""}`}
+        onClick={startClose}
+        aria-hidden="true"
+      />
+
+      {/* 패널 */}
+      <aside
+        className={`side-menu ${open && !closing ? "open" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="사이드 메뉴"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button className="close-btn" onClick={startClose} aria-label="닫기">
           ×
         </button>
 
-        {loading ? (
-          <LoadingSpinner />
-        ) : (
-          <>
-            <div className="user-info-ham">
-              {isLoggedIn ? (
-                <>
-                  {profileImageUrl ? (
-                    <img
-                      className="profile-image-sidemenu"
-                      src={profileImageUrl}
-                      alt="프로필"
-                    />
-                  ) : (
-                    <div className="profile-circle" />
-                  )}
-                  <div className="nickname">{nickname}</div>
-                  <div className="logout" onClick={handleLogout}>
-                    로그아웃
-                  </div>
-                </>
+        <div className="user-info-ham">
+          {isLoggedIn ? (
+            <>
+              {user.profileImageUrl ? (
+                <img
+                  className="profile-image-sidemenu"
+                  src={user.profileImageUrl}
+                  alt="프로필"
+                />
               ) : (
-                <div className="logged-out">
-                  {" "}
-                  <div
-                    className="login-btn-ham"
-                    onClick={() => {
-                      navigate("/login");
-                      onClose(); // 사이드메뉴도 닫아줌
-                    }}
-                  >
-                    로그인하세요
-                  </div>
-                </div>
+                <div className="profile-circle" />
               )}
+              <div className="nickname">{user.nickname}</div>
+              <button className="logout" onClick={handleLogout}>
+                로그아웃
+              </button>
+            </>
+          ) : (
+            <div className="logged-out">
+              <button
+                className="login-btn-ham"
+                onClick={() => {
+                  navigate("/login");
+                  startClose();
+                }}
+              >
+                로그인하세요
+              </button>
             </div>
-            <ul className="menu-list">
-              <li>
-                <Link to="/ai-plan">AI 플랜 생성</Link>
-              </li>
-              <li>
-                <Link to="/myplan">나만의 플랜 생성</Link>
-              </li>
-              <li>
-                <Link to="/community">커뮤니티</Link>
-              </li>
-            </ul>
-          </>
-        )}
-      </div>
-    </div>
+          )}
+        </div>
+
+        <ul className="menu-list">
+          <li>
+            <Link to="/aiplan" onClick={startClose}>
+              AI 플랜 생성
+            </Link>
+          </li>
+          <li>
+            <Link to="/create-plan" onClick={startClose}>
+              나만의 플랜 생성
+            </Link>
+          </li>
+          <li>
+            <Link to="/community" onClick={startClose}>
+              커뮤니티
+            </Link>
+          </li>
+        </ul>
+      </aside>
+    </>
   );
 };
 

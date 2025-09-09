@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Header from "../common/Header";
 import CartList from "./CartList";
 import TotalCart from "./TotalCart";
 import api from "../../api/axios";
-import Footer from "../common/Footer";
 import noImage from "../../images/planning/noImage.svg";
 
 const CartMain = () => {
@@ -54,7 +52,6 @@ const CartMain = () => {
 
   return (
     <>
-      <Header />
       <div style={containerStyle}>
         <div style={cartLeft}>
           <CartList cartItems={cartItems} setCartItems={setCartItems} />
@@ -63,7 +60,6 @@ const CartMain = () => {
           <TotalCart cartItems={cartItems} />
         </div>
       </div>
-      <Footer />
     </>
   );
 };

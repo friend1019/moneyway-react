@@ -1,288 +1,171 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "react-datepicker/dist/react-datepicker.css";
+import { useEffect, useRef } from "react";
+import Lenis from "@studio-freight/lenis";
+
 import "../../css/main/Main.css";
-import { getPlacesByCategory } from "../../api/tourApi.js";
+import mainIcons from "../../images/main/mainIcons.svg";
+import TogetherSection from "./TogetherSection";
+import MainSlider from "./MainSlider";
+import mainIcons2 from "../../images/main/mainIcons2.png";
+import cartIcon from "../../images/main/cartIcon.svg";
+import RotatingTextWave from "./RotatingTextWave";
 
-import Header from "../common/Header";
-import Footer from "../common/Footer.jsx";
-import HorizontalSlider from "../main/Slider";
-import PlanFormSection from "../aiplan/PlanFormSection";
-import PlaceDetailView from "../search/PlaceDetailView";
-
-import { ReactComponent as BriefcaseIcon } from "../../images/main/briefcase.svg";
-import PlaneIslandImg from "../../images/main/fifth/airplane.svg";
-import Mandarin from "../../images/main/fifth/mandarin.svg";
-
-import { ReactComponent as BedIcon } from "../../images/main//fifth/accommodation.svg";
-import { ReactComponent as FoodIcon } from "../../images/main/fifth/restaurant.svg";
-import { ReactComponent as CafeIcon } from "../../images/main/fifth/cafe.svg";
-import { ReactComponent as ActivityIcon } from "../../images/main/fifth/activity.svg";
-import { ReactComponent as HoverBedIcon } from "../../images/main//fifth/hover_accommodation.svg";
-import { ReactComponent as HoverFoodIcon } from "../../images/main/fifth/hover_restaurant.svg";
-import { ReactComponent as HoverCafeIcon } from "../../images/main/fifth/hover_cafe.svg";
-import { ReactComponent as HoverActivityIcon } from "../../images/main/fifth/hover_activity.svg";
-
-function Main() {
-
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [editorPicksData, setEditorPicksData] = useState([]);
-  const [recommendationsData, setRecommendationsData] = useState([]);
-  const [selectedPlace, setSelectedPlace] = useState(null);
-
-  const navigate = useNavigate();
-
-  const categories = [
-    {
-      icon: BedIcon,
-      hoverIcon: HoverBedIcon,
-      title: "숙소",
-      desc: "취향 따라 고르는<br />제주 숙소",
-    },
-    {
-      icon: FoodIcon,
-      hoverIcon: HoverFoodIcon,
-      title: "식당",
-      desc: "숨겨있는 제주<br />맛집 발견",
-    },
-    {
-      icon: CafeIcon,
-      hoverIcon: HoverCafeIcon,
-      title: "카페",
-      desc: "테마별 제주<br />핫플 카페",
-    },
-    {
-      icon: ActivityIcon,
-      hoverIcon: HoverActivityIcon,
-      title: "액티비티",
-      desc: "제주에서만<br />다채로운 체험",
-    },
-  ];
-
+export default function StickyTest() {
   useEffect(() => {
-    const fetchRecommendations = async () => {
-      const data = await getPlacesByCategory("TOURIST_ATTRACTION");
-      const sliced = data.slice(13, 20).map((item, idx) => ({
-        id: idx,
-        image: item.imageUrls?.[0],
-        title: item.title,
-        tags: [item.categoryName],
-        ...item,
-      }));
-      setRecommendationsData(sliced);
-    };
-    fetchRecommendations();
-  }, []);
+    // ✅ Lenis 초기화
+    const lenis = new Lenis({
+      duration: 1.5, // 묵직한 느낌
+      easing: (t) => 1 - Math.pow(2, -10 * t), // easeOutExpo 느낌
+      smoothWheel: true,
+      smoothTouch: true,
+    });
 
-  useEffect(() => {
-    const fetchEditorPicks = async () => {
-      const data = await getPlacesByCategory("ACTIVITY");
-      const sliced = data.slice(1, 7).map((item, idx) => ({
-        id: idx,
-        image: item.imageUrls?.[0],
-        title: item.title,
-        type: item.categoryName,
-      }));
-      setEditorPicksData(sliced);
+    // ✅ RAF 루프 실행
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    return () => {
+      lenis.destroy();
     };
-    fetchEditorPicks();
   }, []);
 
   return (
-    <>
-      <Header />
-
-      {/* 1번째 페이지 */}
-      <div className="FirstMain">
-        <div className="visual-section">
-          <div className="jeju-banner">
-            <div className="banner-horizontal-line"></div>
-            <div className="banner-text">
-              <h1>
-                머니웨이에서 만나보세요,
-                <br />
-                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;당신을 위한{" "}
-                <span className="highlight">제주여행</span>
-              </h1>
-            </div>
-          </div>
-        </div>
-
-        <div className="main-content-bg">
-          <div className="banner-card-fix">
-            <div className="icon-wrapper">
-              <BriefcaseIcon className="card-icon-img-fix" />
-            </div>
-            <div className="content-wrapper">
-              <div className="card-title-fix">
-                머니웨이에서 가장 특별한 제주도 여정을 경험할 수 있어요.
-              </div>
-              <div className="card-footer-fix">
-                <span className="card-footer-main-text">
-                  숙소, 액티비티부터 숨은 명소까지, 완벽하게 설계하는 나만의
-                  일정!
-                </span>
-                <div className="card-footer-action-group">
-                  <span className="card-footer-sub-text">
-                    한정된 예산 안에서 빛나는 여행을 경험해 보세요.
-                  </span>
-                  <div className="arrow-line"></div>
-                  <button className="card-btn-fix">플랜 구경하기</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 2번째 페이지 - 분리된 컴포넌트 */}
-      <PlanFormSection />
-
-      {/* 3번째 페이지 */}
-      <div className="editor-pick">
-        <section className="editor-section-container">
-          <div className="editor-section-header">
-            <p className="editor-section-subtitle">Editor's Pick</p>
-            <h2 className="editor-section-title">이달의 여행 구경하기</h2>
-          </div>
-          <HorizontalSlider>
-            <div className="editor-cards-list">
-              {editorPicksData.map((item) => (
-                <div key={item.id} className="editor-pick-card">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="card-image"
-                  />
-                  <div className="card-title">{item.title}</div>
-                </div>
-              ))}
-            </div>
-          </HorizontalSlider>
-        </section>
-      </div>
-
-      {/* 4번째 페이지 */}
-      <div className="recommendation">
-        <section className="recommendation-section-container">
-          <div className="recommendation-section-header">
-            <p className="recommendation-section-subtitle">MONEYWAY's Pick</p>
-            <h2 className="recommendation-section-title">추천 명소</h2>
-          </div>
-          <HorizontalSlider>
-            <div className="moneyway-cards-list">
-              {recommendationsData.map((item) => (
-                <div
-                  key={item.id}
-                  className="recommendation-card"
-                  onClick={() => setSelectedPlace(item)}
-                >
-                  <div className="image-wrapper">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="card-image"
-                    />
-                  </div>
-                  <div className="info-wrapper">
-                    <h4 className="title">{item.title}</h4>
-                    <div className="tags-wrapper">
-                      {item.tags.map((tag, index) => (
-                        <span key={index} className="tag">
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </HorizontalSlider>
-        </section>
-      </div>
-
-      {/* 5번째 페이지 */}
-      <div className="landing-main-wrapper">
-        <div className="landing-content">
-          <h1 className="landing-title">저예산 제주 여행을 찾고 계신가요?</h1>
-          <p className="landing-desc">
-            돌담길, 귤밭, 바다 내음 가득한 골목까지.
-            <br />
-            제주다운 여행을 돈 걱정 없이 즐기고 싶다면?
-            <br />
-            머니웨이가 숨은 스팟과 감성 숙소까지 챙겨드립니다.
-          </p>
-          <div className="landing-bar-img-row">
-            <div className="landing-bar" />
-            <img src={Mandarin} alt="" className="landing-thumb" />
-            <div className="landing-sub">
-              당신만을 위한 제주, 지금 여기서 시작해요.
-            </div>
-          </div>
-
-          <div className="landing-category-cards">
-            {categories.map((cat, idx) => {
-              const Icon = hoveredIndex === idx ? cat.hoverIcon : cat.icon;
-              return (
-                <div
-                  className="landing-category-card"
-                  key={cat.title}
-                  onMouseEnter={() => setHoveredIndex(idx)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  onClick={() =>
-                    navigate(
-                      `/search?category=${encodeURIComponent(cat.title)}`
-                    )
-                  }
-                >
-                  <Icon className="category-icon" />
-                  <div>
-                    <div className="category-title">{cat.title}</div>
-                    <div
-                      className="category-desc"
-                      dangerouslySetInnerHTML={{ __html: cat.desc }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="landing-visual-bg">
-          <div className="landing-bg-circle circle1">
-            <div className="landing-bg-circle circle2">
-              <div className="landing-bg-circle circle3"></div>
-            </div>
-          </div>
-          <img
-            src={PlaneIslandImg}
-            alt="비행기 일러스트"
-            className="landing-plane-img"
-          />
-        </div>
-      </div>
-
-      <Footer />
-
-      {selectedPlace && (
-        <div
-          className="place-detail-overlay"
-          onClick={() => setSelectedPlace(null)}
-        >
-          <div
-            className="place-detail-popup"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <PlaceDetailView
-              place={selectedPlace}
-              onBack={() => setSelectedPlace(null)}
-            />
-          </div>
-        </div>
-      )}
-    </>
+    <main>
+      <HeroSection />
+      <PanelSection />
+      <TogetherSection />
+      <ThirdPanel />
+      <MainSlider />
+    </main>
   );
 }
 
-export default Main;
+function HeroSection() {
+  const pinRef = useRef(null);
+
+  useEffect(() => {
+    const pin = pinRef.current;
+    const panel = document.querySelector(".test-panel"); // 첫 패널
+
+    if (!pin || !panel) return;
+
+    const update = () => {
+      // 패널의 top(Y)과 핀의 '화면 중앙 기준 bottom' 계산
+      const panelTop = panel.getBoundingClientRect().top;
+      const pinRect = pin.getBoundingClientRect();
+      // pin 은 fixed + top:50vh + translateY(-50%) 이라서 화면 중앙이 pin의 수직 중심
+      const pinBottomY = window.innerHeight * 0.5 + pinRect.height * 0.5;
+
+      // 패널 top이 pin bottom을 지나면(= 완전히 덮음) 숨김
+      const fullyCovered = panelTop <= pinBottomY - 400; // 여유 4px
+      pin.classList.toggle("is-hidden", fullyCovered);
+    };
+
+    const onScroll = () => requestAnimationFrame(update);
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  return (
+    <section className="test-hero">
+      <div ref={pinRef} className="test-hero__pin">
+        <h1>제주도 여행, 아직도 어렵게 하세요?</h1>
+        <p>돈 걱정 없이, 돈 쓰러가는 제주여행!</p>
+        <ScrollDown />
+      </div>
+      <div className="test-hero__spacer" />
+    </section>
+  );
+}
+
+/* ScrollDown 컴포넌트 */
+function ScrollDown() {
+  return (
+    <div className="scroll-down">
+      <span className="scroll-text">Scroll</span>
+      <span className="scroll-icon">↓</span>
+    </div>
+  );
+}
+
+function PanelSection() {
+  return (
+    <section className="test-panel">
+      <div className="title-strip">
+        {/* ✅ 여기 교체: 회전 + 웨이브 */}
+        <p className="title-eyebrow">
+          <RotatingTextWave
+            phrases={[
+              "내 계획이 시작되는 곳,",
+              "내 여행이 실현되는 곳,",
+              "내 추억이 기록되는 곳,",
+            ]}
+            interval={2000} // 문구당 2초 유지
+            height={64} // 한 줄 높이(px) — title-eyebrow에 맞추어 조절
+            align="center" // 'left' | 'center' | 'right'
+            amplitude={10} // 웨이브 높이(px)
+            charDelay={0.035} // 파도 속도(글자당 지연)
+          />
+        </p>
+
+        <h2 className="title-main">MONEYWAY</h2>
+        <ul className="emoji-row">
+          <li>🌴</li>
+          <li>💰</li>
+          <li>🚌</li>
+          <li>💰</li>
+          <li>🌴</li>
+        </ul>
+      </div>
+
+      <div className="panel-grid">
+        <div className="panel-left">
+          <p className="panel-eyebrow">당신을 위한 JEJU</p>
+          <h2 className="panel-title">
+            머니웨이에서 찾으세요, <br />
+            당신에게 딱 맞는 맞춤 여행 플랜
+          </h2>
+          <p className="panel-sub">
+            가고 싶은 맛집, 명소, 숙소를 둘러보세요. <br />
+            마음에 들면 나의 여행카트에 <b>쏙!</b>
+          </p>
+          <div className="panel-cta">
+            <img
+              className="panel-cart-icon"
+              src={cartIcon}
+              alt=""
+              aria-hidden="true"
+            />
+            <a href="/cart" className="panel-btn">
+              <span className="panel-btn__text">카트 채우러 가기</span>
+              <span className="panel-btn__arrow" aria-hidden="true">
+                ›
+              </span>
+            </a>
+          </div>
+        </div>
+
+        <div className="panel-right">
+          <div className="icon-stage">
+            <img src={mainIcons} alt="여행 아이콘 모음" />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ThirdPanel() {
+  return (
+    <section className="third-panel-container">
+      <img src={mainIcons2} alt="여행 아이콘 모음" />
+    </section>
+  );
+}

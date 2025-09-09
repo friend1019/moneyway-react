@@ -3,9 +3,8 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoginHeader from "./LoginHeader";
-import Header from "../common/Header";
 import api from "../../api/axios";
-import useAuthStore from "../../api/authStore.js";
+import useUserStore from "../../api/userStore";
 import "../../css/login/Signin.css";
 import "../../css/login/Signup.css";
 import "../../css/login/LoginPage.css";
@@ -17,11 +16,9 @@ const Signin = () => {
   const [passwordError, setPasswordError] = useState("");
   const [loginError, setLoginError] = useState("");
 
-  const { setAccessToken } = useAuthStore();
+  const { setUser } = useUserStore.getState();
   const navigate = useNavigate();
   const location = useLocation();
-
-  //로그인 전 사용자가 보려던 경로 저장 (기본값은 '/')
   const from = location.state?.from?.pathname || "/";
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -58,13 +55,16 @@ const Signin = () => {
     try {
       const response = await api.post("/auth/login", { email, password });
 
-      const token = response.data?.tokenInfo?.accessToken;
-      if (token) {
-        setAccessToken(token); //Zustand에 저장
+      const { tokenInfo, userInfo } = response.data;
+      const accessToken = tokenInfo?.accessToken;
+      if (accessToken && userInfo) {
+        const user = { ...userInfo, accessToken };
+        setUser(user);
         toast.success("로그인 성공!");
-        navigate(from, { replace: true }); //이전 페이지로 이동
+        navigate(from, { replace: true });
       } else {
-        console.error("❌ 토큰이 응답에 없음!", response.data);
+        console.error("❌ accessToken 또는 userInfo가 응답에 없음!", response.data);
+        setLoginError("로그인 응답이 올바르지 않습니다.");
       }
     } catch (err) {
       const code = err.response?.data?.code;
@@ -80,7 +80,6 @@ const Signin = () => {
 
   return (
     <>
-      <Header />
       <div className="login-container">
         <div className="login-header">
           <LoginHeader text="로그인" />

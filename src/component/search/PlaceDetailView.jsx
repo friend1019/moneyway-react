@@ -11,6 +11,9 @@ import {
   FaCopy,
 } from "react-icons/fa";
 
+/* ✅ 리뷰 컴포넌트 임포트 (같은 폴더라고 가정) */
+import PlaceReview from "./PlaceReview";
+
 const PlaceDetailView = ({ place, onBack }) => {
   const handleCopyAddress = () => {
     navigator.clipboard.writeText(place.address || "");
@@ -160,6 +163,9 @@ const PlaceDetailView = ({ place, onBack }) => {
             </div>
           )}
         </div>
+
+        {/* ✅ 더미 리뷰 표시 */}
+        <PlaceReview placeId={place.placeId} />
       </div>
     </>
   );
