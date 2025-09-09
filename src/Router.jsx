@@ -31,6 +31,7 @@ import AppLayout from "./component/common/AppLayout"; // ✅ 레이아웃
 function AppRouter() {
   return (
     <Routes>
+
       {/* ✅ 이 레이아웃 안의 Outlet만 애니메이션, Header/Footers는 고정 */}
       <Route element={<AppLayout />}>
         <Route path="/" element={<Main />} />
@@ -92,6 +93,14 @@ function AppRouter() {
             </ProtectedRoute>
           }
         />
+        <Route
+        path="/myplan/:planId"
+        element={
+          <ProtectedRoute>
+            <MyPlanPage />
+          </ProtectedRoute>
+        }
+      />
 
         <Route path="/community" element={<CommunityMain />} />
         <Route path="/posts/create" element={<PostCreate />} />
@@ -108,6 +117,7 @@ function AppRouter() {
         />
 
       </Route>
+
     </Routes>
   );
 }

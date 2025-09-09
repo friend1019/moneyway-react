@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
 import '../../css/myplan/Schedule.css';
 
+import BudgetDisplay from './BudgetDisplay';
+
 import hotelIcon from "../../images/shopping/hotel.svg";
 import cafeIcon from "../../images/shopping/cafe.svg";
 import activityIcon from "../../images/shopping/activity.svg";
 import foodIcon from "../../images/shopping/food.svg";
 import shoppingIcon from "../../images/shopping/shopping.svg";
 import tourIcon from "../../images/shopping/tour.svg";
-import plusArrow from '../../images/myplan/plus-arrow.svg';
 
 const CATEGORY_ORDER = [
   { name: "숙소", icon: hotelIcon },
   { name: "식당", icon: foodIcon },
-  { name: "관광명소", icon: tourIcon },
+  { name: "관광지", icon: tourIcon },
   { name: "액티비티/체험", icon: activityIcon },
   { name: "카페", icon: cafeIcon },
   { name: "쇼핑", icon: shoppingIcon },
@@ -38,13 +39,8 @@ const getCategoryIcon = (categoryName) => {
 const toCssCategory = (category) => category ? category.replace(/[ /]/g, '-') : '';
 
 const ScheduleItem = ({
-  item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated, onContextMenu
+  item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated, onContextMenu, timeSlotsLength,
 }) => {
-  const [isHover, setIsHover] = useState(false);
-  const [dragType, setDragType] = useState(null); // 'top' | 'bottom' | null
-  const [startY, setStartY] = useState(null);
-  const [startDuration, setStartDuration] = useState(null);
-
   const uniqueId = item.id || item.cartId || item.placeId;
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -55,69 +51,41 @@ const ScheduleItem = ({
 
   function getTimeTop(time) {
     const [h, m] = time.split(':').map(Number);
-    return ((h - 8) + (m >= 30 ? 0.5 : 0)) * 10; // 1칸=10rem, 0.5칸=5rem
+    return ((h - 8) + (m >= 30 ? 0.5 : 0)) * 10;
   }
 
-  // 카드 위치 및 크기
+  const H_MARGIN_REM = 1;
+  const V_GAP_REM = 2;
+
+  const GRID_TOTAL_REM = timeSlotsLength * 10; // 전체 그리드 높이
+
+  const startTop = getTimeTop(item.time) + V_GAP_REM / 2;
+  let height = (item.duration || 1) * 10 - V_GAP_REM;
+
+  if (startTop + height > GRID_TOTAL_REM) {
+    height = GRID_TOTAL_REM - startTop;
+    if (height < 0) height = 0;
+  }
+
   const style = {
-    top: `${getTimeTop(item.time)}rem`,
-    height: `${item.duration * slotHeight}px`,
-    left: 0,
-    right: 0,
-    margin: 0,
+    top: `${startTop}rem`,
+    height: `${height}rem`,
+    left: `${H_MARGIN_REM}rem`,
+    right: `${H_MARGIN_REM}rem`,
     position: 'absolute',
     zIndex: transform ? 999 : 'auto',
     transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
     transition: isDragging ? 'none' : 'box-shadow 0.1s'
   };
-
   const dragAreaStyle = {
     width: '100%', height: '100%', position: 'absolute', top: 0, left: 0,
     zIndex: 2, cursor: isEditMode ? 'grab' : 'default', background: 'none'
   };
 
-  // 여기서 confirm/alert 제거, onContextMenu만 호출
   const handleContextMenu = (e) => {
     if (!isEditMode) return;
     if (onContextMenu) onContextMenu(e, item, day);
   };
-
-  const handleDragStart = (e, type) => {
-    e.preventDefault(); e.stopPropagation();
-    setDragType(type);
-    setStartY(e.clientY);
-    setStartDuration(item.duration);
-    document.body.style.cursor = "ns-resize";
-  };
-
-  useEffect(() => {
-    if (!dragType) return;
-    const handleMove = (e) => {
-      if (startY === null) return;
-      const deltaY = e.clientY - startY;
-      const slotHalf = slotHeight / 2;
-      let offsetHalf = Math.round(deltaY / slotHalf) * 0.5;
-      let newDuration = dragType === "top"
-        ? startDuration - offsetHalf
-        : startDuration + offsetHalf;
-      newDuration = Math.max(0.5, Math.round(newDuration * 2) / 2);
-      if (newDuration !== item.duration) {
-        if (onItemUpdated) onItemUpdated({ ...item, duration: newDuration }, day);
-      }
-    };
-    const handleUp = () => {
-      setDragType(null);
-      setStartY(null);
-      setStartDuration(null);
-      document.body.style.cursor = "";
-    };
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("mouseup", handleUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("mouseup", handleUp);
-    };
-  }, [dragType, startY, startDuration, item, day, onItemUpdated, slotHeight]);
 
   return (
     <div
@@ -126,35 +94,7 @@ const ScheduleItem = ({
       {...attributes}
       className={`schedule-item schedule-item-card ${toCssCategory(item.category)}`}
       onContextMenu={handleContextMenu}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
     >
-      {isEditMode && isHover && (
-        <>
-          <button
-            className="resize-btn top"
-            style={{
-              position: 'absolute', top: '-14px', left: '50%',
-              transform: 'translate(-50%, 0) rotate(180deg)', zIndex: 20
-            }}
-            tabIndex={-1}
-            onMouseDown={e => handleDragStart(e, "top")}
-          >
-            <img src={plusArrow} alt="minus" style={{ width: 22 }} />
-          </button>
-          <button
-            className="resize-btn bottom"
-            style={{
-              position: 'absolute', bottom: '-14px', left: '50%',
-              transform: 'translate(-50%, 0)', zIndex: 20
-            }}
-            tabIndex={-1}
-            onMouseDown={e => handleDragStart(e, "bottom")}
-          >
-            <img src={plusArrow} alt="plus" style={{ width: 22 }} />
-          </button>
-        </>
-      )}
       <div
         className="item-content"
         {...(isEditMode ? listeners : {})}
@@ -165,12 +105,11 @@ const ScheduleItem = ({
           <span className="item-category-name">{item.category}</span>
         </div>
         <div className="item-name">{item.placeName || item.name}</div>
-        <div className="item-cost">₩ {item.cost ? item.cost.toLocaleString() : (item.price ? item.price.toLocaleString() : 0)}</div>
+        <div className="item-cost">₩ {(item.cost || item.price || 0).toLocaleString()}</div>
       </div>
     </div>
   );
 };
-
 
 const Schedule = ({
   planDetails,
@@ -191,16 +130,19 @@ const Schedule = ({
   onTitleChange,
   onTitleBlur,
   onTitleKeyDown,
-  planDurationStr,
   onDurationDrag,
   ...props
 }) => {
-  const [schedules, setSchedules] = useState(dailySchedules);
+  const [schedules, setSchedules] = useState({
+    "Day 1": [],
+    "Day 2": [],
+    "Day 3": [],
+    "Day 4": [],
+    ...dailySchedules
+  });
 
-  // 상위에서 dailySchedules이 바뀌면 동기화
-  useEffect(() => { setSchedules(dailySchedules); }, [dailySchedules]);
+  useEffect(() => { setSchedules(prev => ({ ...prev, ...dailySchedules })); }, [dailySchedules]);
 
-  // 일정 삭제 콜백
   const handleItemDeleted = (item, day) => {
     setSchedules(prev => ({
       ...prev,
@@ -208,7 +150,6 @@ const Schedule = ({
     }));
   };
 
-  // 일정 수정 콜백(duration)
   const handleItemUpdated = (updatedItem, day) => {
     setSchedules(prev => ({
       ...prev,
@@ -216,14 +157,53 @@ const Schedule = ({
     }));
   };
 
-  const days = Object.keys(schedules || {});
+  const [openDays, setOpenDays] = useState(1);
+  const [planDurationStr, setPlanDurationStr] = useState("0박 1일");
+
+  useEffect(() => {
+    const nights = openDays - 1;
+    setPlanDurationStr(`${nights}박 ${openDays}일`);
+  }, [openDays]);
+
+  // 기본 이미지 fallback 함수
+  const getProfileImage = () => {
+    // 1. profileImageUrl이 있으면 사용
+    if (planDetails.profileImageUrl) {
+      return planDetails.profileImageUrl;
+    }
+    
+    // 2. thumbnailUrl이 있으면 사용
+    if (planDetails.thumbnailUrl) {
+      return planDetails.thumbnailUrl;
+    }
+    
+    // 3. 둘 다 없으면 기본 이미지 생성
+    const username = planDetails.username || planDetails.author || '사용자';
+    const firstChar = username.charAt(0).toUpperCase();
+    
+    return `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%20%20%20%20%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23FFD3E0%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20font-family%3D%22%27Arial%27%2C%20sans-serif%22%20font-size%3D%2250%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3E${firstChar}%3C%2Ftext%3E%0A%3C%2Fsvg%3E%0A`;
+  };
+
+  const handleImageError = (e) => {
+    // 이미지 로드 실패 시 기본 이미지로 대체
+    console.warn('Profile image failed to load, using fallback');
+    const username = planDetails.username || planDetails.author || '사용자';
+    const firstChar = username.charAt(0).toUpperCase();
+    
+    e.target.src = `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%20%20%20%20%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23FFD3E0%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20font-family%3D%22%27Arial%27%2C%20sans-serif%22%20font-size%3D%2250%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3E${firstChar}%3C%2Ftext%3E%0A%3C%2Fsvg%3E%0A`;
+  };
 
   return (
     <>
-      {/* 플랜 info 카드(제목, 예산, 기간 등) */}
       <div className='plan-info-card'>
         <div className='plan-details-left'>
-          <img src="https://i.ibb.co/yWZTJ4j/lego-profile.png" alt="user avatar" className='user-avatar' />
+          <img
+            src={getProfileImage()}
+            alt="user avatar"
+            className='user-avatar'
+            onError={handleImageError}
+            onLoad={() => console.log('Profile image loaded successfully')}
+          />
           <div className='plan-text-info'>
             {isEditingTitle ? (
               <input
@@ -237,71 +217,32 @@ const Schedule = ({
                 autoFocus
               />
             ) : (
-              <h2 className='plan-title' onClick={onTitleClick}>
+              <h2
+                className={`plan-title ${isEditMode ? 'editable' : ''}`}
+                onClick={isEditMode ? onTitleClick : undefined}
+              >
                 {planDetails.title ? planDetails.title : (
                   <span className="placeholder-text">제목을 입력하세요</span>
-                )} ✎
+                )}
+                {isEditMode && ' ✎'}
               </h2>
             )}
             <p className='plan-duration'>{planDurationStr}</p>
           </div>
         </div>
-        <div className='plan-budget-right'>
-          {(planDetails.usedBudget > planDetails.totalBudget && planDetails.totalBudget > 0) ? (
-            <div className="budget-alert">
-              <span className="alert-icon">⚠️</span>
-              <span>
-                <span className="budget-over-amount">
-                  ₩{(planDetails.usedBudget - planDetails.totalBudget).toLocaleString()}
-                </span>
-                &nbsp;초과되었습니다.
-              </span>
-              <span className="used-budget-bubble">
-                ₩ {planDetails.usedBudget.toLocaleString()}
-              </span>
-            </div>
-          ) : (
-            <div className='used-budget'>
-              ₩ {planDetails.usedBudget.toLocaleString()}
-            </div>
-          )}
-
-          <div className={
-            'budget-progress-bar' +
-            (planDetails.usedBudget > planDetails.totalBudget && planDetails.totalBudget > 0 ? ' over' : '')
-          }>
-            <div
-              className={
-                'budget-progress-fill' +
-                (planDetails.usedBudget > planDetails.totalBudget && planDetails.totalBudget > 0 ? ' over' : '')
-              }
-              style={{
-                width: planDetails.totalBudget > 0
-                  ? `${Math.min(100, planDetails.usedBudget / planDetails.totalBudget * 100)}%`
-                  : '0%'
-              }}
-            ></div>
-          </div>
-          <div className='total-budget'>
-            <span>예산</span>
-            {isEditingBudget ? (
-              <input
-                type="number"
-                value={budgetInput}
-                onChange={onBudgetChange}
-                onBlur={onBudgetBlur}
-                onKeyDown={onBudgetKeyDown}
-                className="budget-input"
-                isEditMode={isEditMode}
-              />
-            ) : (
-              <span onClick={onBudgetClick} className="budget-amount-clickable">
-                ₩ {planDetails.totalBudget ? planDetails.totalBudget.toLocaleString() : '0'}
-              </span>
-            )}
-          </div>
-        </div>
+        <BudgetDisplay
+          usedBudget={planDetails.usedBudget || 0}
+          totalBudget={planDetails.totalBudget || 0}
+          isEditMode={isEditMode}
+          isEditingBudget={isEditingBudget}
+          budgetInput={budgetInput}
+          onBudgetClick={onBudgetClick}
+          onBudgetChange={onBudgetChange}
+          onBudgetBlur={onBudgetBlur}
+          onBudgetKeyDown={onBudgetKeyDown}
+        />
       </div>
+
       {/* --- 시간표 스케줄 그리드 --- */}
       <div className='schedule-grid'>
         <div className='time-column'>
@@ -310,29 +251,57 @@ const Schedule = ({
             <div key={time} className='time-cell'>{time}</div>
           ))}
         </div>
+
         <div className='days-column-container'>
-          {days.map(day => (
-            <div key={day} className='day-column'>
-              <div className='header-cell'>{day}</div>
-              <div className="planner-content-wrapper" style={{ position: 'relative', minHeight: slotHeight * timeSlots.length }}>
-                {timeSlots.map(time => (
-                  <DroppablePlannerCell key={time} day={day} time={time} />
-                ))}
-                {(schedules[day] || []).map(item => (
-                  <ScheduleItem
-                    key={item.id || item.cartId || item.placeId}
-                    item={item}
-                    day={day}
-                    slotHeight={slotHeight}
-                    isEditMode={isEditMode}
-                    onItemDeleted={handleItemDeleted}
-                    onItemUpdated={handleItemUpdated}
-                    onContextMenu={onContextMenu}
-                  />
-                ))}
+          {["Day 1", "Day 2", "Day 3", "Day 4"].map((day, idx) => {
+            const isOpen = idx < openDays;
+            return (
+              <div key={day} className={`day-column ${!isOpen ? "disabled" : ""}`}>
+                <div className='header-cell'>{day}</div>
+
+                {/* 1. 이 Wrapper는 항상 렌더링하여 그리드의 배경을 만듭니다. */}
+                <div
+                  className="planner-content-wrapper"
+                  style={{ minHeight: `${timeSlots.length * 10}rem` }}
+                >
+                  {/* 2. 그리드 선(PlannerCell)은 항상 렌더링되도록 바깥으로 뺍니다. */}
+                  {timeSlots.map(time => (
+                    <DroppablePlannerCell key={time} day={day} time={time} />
+                  ))}
+
+                  {/* 3. 날짜가 열려있으면 스케줄 아이템을 보여줍니다. */}
+                  {isOpen && (schedules[day] || []).map(item => (
+                    <ScheduleItem
+                      key={item.id || item.cartId || item.placeId}
+                      item={item}
+                      day={day}
+                      slotHeight={slotHeight}
+                      isEditMode={isEditMode}
+                      onItemDeleted={handleItemDeleted}
+                      onItemUpdated={handleItemUpdated}
+                      onContextMenu={onContextMenu}
+                      timeSlotsLength={timeSlots.length}
+                    />
+                  ))}
+                  
+                  {/* 4. 날짜가 닫혀있고 수정 모드일 때, 그리드 위에 오버레이를 겹칩니다. */}
+                  {!isOpen && isEditMode && (
+                    <div className="day-locked-mask">
+                      <div
+                        className="day-locked-overlay"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDays(prev => Math.min(prev + 1, 4));
+                        }}
+                      >
+                        <span className="plus">+</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </>

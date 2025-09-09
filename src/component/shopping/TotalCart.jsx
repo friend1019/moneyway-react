@@ -12,7 +12,7 @@ const CATEGORY_ORDER = [
   { name: "숙소", icon: hotelIcon },
   { name: "식당", icon: foodIcon },
   { name: "관광지", icon: tourIcon },
-  { name: "액티비티/체험", icon: activityIcon },
+  { name: "액티비티", icon: activityIcon },
   { name: "카페", icon: cafeIcon },
   { name: "쇼핑", icon: shoppingIcon },
 ];
