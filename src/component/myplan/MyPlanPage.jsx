@@ -102,8 +102,7 @@ const MyPlanPage = () => {
     } finally {
       setLoadingCart(false);
     }
-  }, []); // 이 함수는 외부 의존성이 없으므로 빈 배열을 사용합니다.
-
+  }, []); 
 
   const fetchPlanDetail = useCallback(async (id) => {
     setLoadingPlan(true);
@@ -148,7 +147,7 @@ const MyPlanPage = () => {
           cartId: place.cartId,
           placeId: place.placeId,
           category: place.category,
-          thumbnailUrl: finalThumbnail, // 통일된 이미지 사용
+          thumbnailUrl: finalThumbnail, 
         });
       });
       setDailySchedules(newSchedules);
@@ -167,7 +166,7 @@ const MyPlanPage = () => {
     } finally {
       setLoadingPlan(false);
     }
-  }, [emptyDays]); // 이 함수는 emptyDays에 의존합니다.
+  }, [emptyDays]); 
 
 
   const fetchAllPlanIds = useCallback(async () => {
@@ -253,7 +252,7 @@ const MyPlanPage = () => {
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
 
       aiPlanData.days.forEach(dayData => {
-        const dayKey = `Day ${dayData.day.replace('일차', '')}`; // "1일차" -> "Day 1"
+        const dayKey = `Day ${dayData.day.replace('일차', '')}`; 
         if (!newSchedules[dayKey]) newSchedules[dayKey] = [];
 
         dayData.places.forEach(place => {
@@ -272,6 +271,8 @@ const MyPlanPage = () => {
             placeId: place.placeId,
             category: place.categoryName, 
             thumbnailUrl: place.thumbnailUrl || "기본 이미지 URL",
+            mapX: place.mapX, 
+            mapY: place.mapY,
           });
         });
       });
@@ -280,19 +281,20 @@ const MyPlanPage = () => {
       setPlanDetails({
         id: location.state.planId,
         title: location.state.planTitle,
-        totalBudget: location.state.budget,
-
+        totalBudget: location.state.budget
       });
       
+      const daysLength = aiPlanData.days?.length || 1;
+
+      setEnabledDays(daysLength);
   
-      setEnabledDays(aiPlanData.days.length);
-  
-      setIsEditMode(false);
+
+      setIsEditMode(false); 
       
       setIsDirty(true);
     }
-  }, [location.state])
-  /** ---------- 파생 정보 ---------- */
+  }, [location.state]);
+
   const planDurationStr = `${Math.max(0, enabledDays - 1)}박 ${enabledDays}일`;
   const SLOT_HEIGHT_PX = 90;
 
@@ -377,7 +379,9 @@ const MyPlanPage = () => {
       time: startTime,
       duration: durationHours,
       cartId: draggedItem.cartId,
-      placeId: draggedItem.placeId 
+      placeId: draggedItem.placeId ,
+      mapX: draggedItem.mapX, 
+      mapY: draggedItem.mapY,
     };
 
     if (isOverlapping(newScheduleItem, dailySchedules[targetDay] || [])) {
@@ -521,15 +525,12 @@ const MyPlanPage = () => {
       const dayNumber = Number(String(day).replace('Day ', '')) || Number(day);
   
       (items || []).forEach((item) => {
-        // ID나 시간이 없는 항목은 저장에서 제외
         if (!item?.time) {
           console.warn("저장 제외 (ID 정보 부족):", item);
           return;
         }
 
         if (!item?.time || (item.cartId == null && item.placeId == null)) {
-          // item.cartId가 null 또는 undefined가 아니고,
-          // item.placeId가 null 또는 undefined가 아닌 경우만 통과
           console.warn("저장 제외 (ID가 null이거나 없음):", item);
           return;
       }
@@ -634,9 +635,19 @@ const MyPlanPage = () => {
     );
   }
 
-  
+  //지도 위치 프롭스
   const handleMapView = () => {
-    navigate('/map');
+    const allPlaces = Object.values(dailySchedules).flat();
+
+    const placesForMap = allPlaces.map(item => ({
+      id: item.placeId || item.cartId || item.id,
+      name: item.name,
+      category: item.category,
+      lat: item.mapY, 
+      lng: item.mapX, 
+    }));
+
+    navigate('/map', { state: { places: placesForMap } });
   };
   return (
     <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>

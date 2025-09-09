@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
 import '../../css/myplan/Schedule.css';
 
@@ -36,8 +35,13 @@ const CATEGORY_ORDER = [
     { name: "쇼핑", icon: shoppingIcon },
 ];
 
-function DroppablePlannerCell({ day, time }) {
-    const { setNodeRef, isOver } = useDroppable({ id: `${day}-${time}` });
+
+
+function DroppablePlannerCell({ day, time, disabled }) {
+    const { setNodeRef, isOver } = useDroppable({
+        id: `${day}-${time}`,
+        disabled: disabled,
+    });
     return (
         <div
             ref={setNodeRef}
@@ -52,14 +56,11 @@ const getCategoryIcon = (categoryName) => {
     return category ? <img src={category.icon} alt={categoryName} className="item-icon" /> : null;
 };
 
-// [수정] 이 함수를 CSS에 맞게 한글 클래스 이름을 반환하도록 변경합니다.
 const toCssCategory = (apiCategory) => {
-    if (!apiCategory) return '기본'; // 기본 클래스 이름
+    if (!apiCategory) return '기본';
     
-    // API_CATEGORY_TO_KOREAN 맵을 사용하여 한글 이름 찾기
     const koreanCategory = API_CATEGORY_TO_KOREAN[apiCategory] || apiCategory;
     
-    // CSS 클래스 이름에 슬래시(/)가 포함된 경우(액티비티/체험) 하이픈(-)으로 변경
     return koreanCategory.replace('/', '-');
 };
 
@@ -69,7 +70,6 @@ const ScheduleItem = ({
     const uniqueId = item.id || item.cartId || item.placeId;
     const displayCategory = translateCategory(item.category);
     
-    // toCssCategory 함수가 이제 한글 클래스 이름을 반환합니다.
     const cssCategoryClass = toCssCategory(item.category);
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -138,10 +138,10 @@ const ScheduleItem = ({
     );
 };
 
-// 이하 Schedule 컴포넌트는 수정할 내용이 없습니다.
+
 const Schedule = ({
+    dailySchedules, 
     planDetails,
-    dailySchedules,
     timeSlots,
     onContextMenu,
     slotHeight,
@@ -158,54 +158,19 @@ const Schedule = ({
     onTitleChange,
     onTitleBlur,
     onTitleKeyDown,
-    onDurationDrag,
-    ...props
+    enabledDays,
+    onAddDay,
+    planDurationStr,
 }) => {
-    const [schedules, setSchedules] = useState({
-        "Day 1": [],
-        "Day 2": [],
-        "Day 3": [],
-        "Day 4": [],
-        ...dailySchedules
-    });
-
-    useEffect(() => { setSchedules(prev => ({ ...prev, ...dailySchedules })); }, [dailySchedules]);
-
-    const handleItemDeleted = (item, day) => {
-        setSchedules(prev => ({
-            ...prev,
-            [day]: prev[day].filter(d => d.id !== item.id)
-        }));
-    };
-
-    const handleItemUpdated = (updatedItem, day) => {
-        setSchedules(prev => ({
-            ...prev,
-            [day]: prev[day].map(d => d.id === updatedItem.id ? updatedItem : d)
-        }));
-    };
-
-    const [openDays, setOpenDays] = useState(1);
-    const [planDurationStr, setPlanDurationStr] = useState("0박 1일");
-
-    useEffect(() => {
-        const nights = openDays - 1;
-        setPlanDurationStr(`${nights}박 ${openDays}일`);
-    }, [openDays]);
 
     const getProfileImage = () => {
-        if (planDetails.profileImageUrl) {
-            return planDetails.profileImageUrl;
-        }
-        
-        if (planDetails.thumbnailUrl) {
-            return planDetails.thumbnailUrl;
-        }
+        if (planDetails.profileImageUrl) return planDetails.profileImageUrl;
+        if (planDetails.thumbnailUrl) return planDetails.thumbnailUrl;
         
         const username = planDetails.username || planDetails.author || '사용자';
         const firstChar = username.charAt(0).toUpperCase();
         
-        return `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%2C%20100%22%3E%0A%20%20%20%20%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23FFD3E0%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20font-family%3D%22%27Arial%27%2C%20sans-serif%22%20font-size%3D%2250%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3E${firstChar}%3C%2Ftext%3E%0A%3C%2Fsvg%3E%0A`;
+        return `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%20%20%20%20%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23FFD3E0%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20font-family%3D%22%27Arial%27%2C%20sans-serif%22%20font-size%3D%2250%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3E${firstChar}%3C%2Ftext%3E%0A%3C%2Fsvg%3E%0A`;
     };
 
     const handleImageError = (e) => {
@@ -225,7 +190,6 @@ const Schedule = ({
                         alt="user avatar"
                         className='user-avatar'
                         onError={handleImageError}
-                        onLoad={() => console.log('Profile image loaded successfully')}
                     />
                     <div className='plan-text-info'>
                         {isEditingTitle ? (
@@ -244,9 +208,7 @@ const Schedule = ({
                                 className={`plan-title ${isEditMode ? 'editable' : ''}`}
                                 onClick={isEditMode ? onTitleClick : undefined}
                             >
-                                {planDetails.title ? planDetails.title : (
-                                    <span className="placeholder-text">제목을 입력하세요</span>
-                                )}
+                                {planDetails.title || <span className="placeholder-text">제목을 입력하세요</span>}
                                 {isEditMode && ' ✎'}
                             </h2>
                         )}
@@ -275,8 +237,10 @@ const Schedule = ({
                 </div>
 
                 <div className='days-column-container'>
-                    {["Day 1", "Day 2", "Day 3", "Day 4"].map((day, idx) => {
-                        const isOpen = idx < openDays;
+                    {Array.from({ length: 4 }, (_, i) => `Day ${i + 1}`).map((day, idx) => {
+                        const isOpen = idx < enabledDays;
+                        const isNextDay = idx === enabledDays;
+
                         return (
                             <div key={day} className={`day-column ${!isOpen ? "disabled" : ""}`}>
                                 <div className='header-cell'>{day}</div>
@@ -285,32 +249,33 @@ const Schedule = ({
                                     style={{ minHeight: `${timeSlots.length * 10}rem` }}
                                 >
                                     {timeSlots.map(time => (
-                                        <DroppablePlannerCell key={time} day={day} time={time} />
+                                        <DroppablePlannerCell
+                                            key={time}
+                                            day={day}
+                                            time={time}
+                                            disabled={!isOpen}
+                                        />
                                     ))}
-                                    {isOpen && (schedules[day] || []).map(item => (
+                                    {isOpen && (dailySchedules[day] || []).map(item => (
                                         <ScheduleItem
                                             key={item.id || item.cartId || item.placeId}
                                             item={item}
                                             day={day}
                                             slotHeight={slotHeight}
                                             isEditMode={isEditMode}
-                                            onItemDeleted={handleItemDeleted}
-                                            onItemUpdated={handleItemUpdated}
                                             onContextMenu={onContextMenu}
                                             timeSlotsLength={timeSlots.length}
                                         />
                                     ))}
                                     
                                     {!isOpen && isEditMode && (
-                                        <div className="day-locked-mask">
-                                            <div
-                                                className="day-locked-overlay"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setOpenDays(prev => Math.min(prev + 1, 4));
-                                                }}
-                                            >
-                                                <span className="plus">+</span>
+                                        <div 
+                                            className="day-locked-mask" 
+                                            onClick={isNextDay ? onAddDay : undefined}
+                                            style={{ cursor: isNextDay ? 'pointer' : 'default' }}
+                                        >
+                                            <div className="day-locked-overlay">
+                                                {isNextDay && <span className="plus">+</span>}
                                             </div>
                                         </div>
                                     )}
