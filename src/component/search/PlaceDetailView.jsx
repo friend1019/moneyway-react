@@ -11,7 +11,7 @@ import {
   FaCopy,
 } from "react-icons/fa";
 
-/* ✅ 리뷰 컴포넌트 임포트 (같은 폴더라고 가정) */
+
 import PlaceReview from "./PlaceReview";
 
 const PlaceDetailView = ({ place, onBack }) => {

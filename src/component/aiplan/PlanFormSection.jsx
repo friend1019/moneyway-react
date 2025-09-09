@@ -63,7 +63,6 @@ const PlanFormSection = () => {
           )}
         </div>
 
-        {/* ✅ 플랜 이름 입력란 */}
         <div className="plan-title-input-wrapper">
           <input
             type="text"
