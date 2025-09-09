@@ -526,20 +526,16 @@ const MyPlanPage = () => {
         }
       }
   
-      // 4. 최종 페이로드(payload) 생성
       const payload = {
         title: planDetails?.title || "새 여행 계획",
         totalPrice: Number(planDetails?.usedBudget || 0),
         places,
       };
   
-      // 5. 확정된 ID(currentPlanId)를 사용하여 PATCH 요청
       await api.patch(`/plans/${currentPlanId}`, payload);
   
       alert("여행 계획이 저장되었습니다.");
   
-      // 6. 모든 작업 성공 후, 확정된 ID의 URL로 안전하게 이동
-      // (URL이 변경되면 페이지가 리렌더링되고, useParams의 planId가 갱신됩니다)
       navigate(`/myplan/${currentPlanId}`, { replace: true, state: { isNewPlan: false } });
   
     } catch (e) {
@@ -578,7 +574,6 @@ const MyPlanPage = () => {
     return (
       <div className="myplan-page-container">
         <Header />
-        <div className="loading-box">페이지를 불러오는 중…</div>
       </div>
     );
   }
