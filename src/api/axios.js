@@ -1,3 +1,4 @@
+// src/api/axios.js
 import axios from "axios";
 import useUserStore from "./userStore.js";
 
@@ -23,7 +24,7 @@ const parseJwt = (token) => {
 };
 
 // exp 기반 만료 임박 체크 (기본 90초 이내면 true)
-const willExpireSoon = (token, thresholdSec = 90) => {
+export const willExpireSoon = (token, thresholdSec = 90) => {
   const payload = parseJwt(token);
   if (!payload?.exp) return true;
   const now = Math.floor(Date.now() / 1000);

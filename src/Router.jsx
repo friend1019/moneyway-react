@@ -93,10 +93,10 @@ function AppRouter() {
           }
         />
 
-        <Route path="/community" element={<CommunityMain />} />
-        <Route path="/posts/create" element={<PostCreate />} />
-        <Route path="/posts/:postId" element={<PostDetail />} />
-        <Route path="/posts/:postId/edit" element={<PostEditForm />} />
+        <Route path="/community" element={<ProtectedRoute><CommunityMain /></ProtectedRoute>} />
+        <Route path="/posts/create" element={<ProtectedRoute><PostCreate /></ProtectedRoute>} />
+        <Route path="/posts/:postId" element={<ProtectedRoute><PostDetail /></ProtectedRoute>} />
+        <Route path="/posts/:postId/edit" element={<ProtectedRoute><PostEditForm /></ProtectedRoute>} />
 
         <Route
           path="/schedule"
