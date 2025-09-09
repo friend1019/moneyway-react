@@ -56,6 +56,22 @@
   color: #7F7F7F;
 }
 
+.header-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.map-view-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 3rem;
+  padding: 1rem 5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 
 .save-button {
     background-color: #007bff;

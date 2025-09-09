@@ -157,7 +157,6 @@ const Schedule = ({
     }));
   };
 
-  // ✅ Day 열림 상태 관리
   const [openDays, setOpenDays] = useState(1);
   const [planDurationStr, setPlanDurationStr] = useState("0박 1일");
 
@@ -166,14 +165,44 @@ const Schedule = ({
     setPlanDurationStr(`${nights}박 ${openDays}일`);
   }, [openDays]);
 
+  // 기본 이미지 fallback 함수
+  const getProfileImage = () => {
+    // 1. profileImageUrl이 있으면 사용
+    if (planDetails.profileImageUrl) {
+      return planDetails.profileImageUrl;
+    }
+    
+    // 2. thumbnailUrl이 있으면 사용
+    if (planDetails.thumbnailUrl) {
+      return planDetails.thumbnailUrl;
+    }
+    
+    // 3. 둘 다 없으면 기본 이미지 생성
+    const username = planDetails.username || planDetails.author || '사용자';
+    const firstChar = username.charAt(0).toUpperCase();
+    
+    return `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%20%20%20%20%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23FFD3E0%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20font-family%3D%22%27Arial%27%2C%20sans-serif%22%20font-size%3D%2250%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3E${firstChar}%3C%2Ftext%3E%0A%3C%2Fsvg%3E%0A`;
+  };
+
+  const handleImageError = (e) => {
+    // 이미지 로드 실패 시 기본 이미지로 대체
+    console.warn('Profile image failed to load, using fallback');
+    const username = planDetails.username || planDetails.author || '사용자';
+    const firstChar = username.charAt(0).toUpperCase();
+    
+    e.target.src = `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%20%20%20%20%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23FFD3E0%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20font-family%3D%22%27Arial%27%2C%20sans-serif%22%20font-size%3D%2250%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3E${firstChar}%3C%2Ftext%3E%0A%3C%2Fsvg%3E%0A`;
+  };
+
   return (
     <>
       <div className='plan-info-card'>
         <div className='plan-details-left'>
           <img
-            src={planDetails.profileImageUrl}
+            src={getProfileImage()}
             alt="user avatar"
             className='user-avatar'
+            onError={handleImageError}
+            onLoad={() => console.log('Profile image loaded successfully')}
           />
           <div className='plan-text-info'>
             {isEditingTitle ? (
@@ -274,8 +303,6 @@ const Schedule = ({
             );
           })}
         </div>
-            
-        
       </div>
     </>
   );

@@ -111,32 +111,35 @@ const MyPlanPage = () => {
     try {
       const res = await api.get(`/plans/${id}`);
       const data = res.data;
-
+  
       const finalThumbnail =
         data.thumbnailUrl ||
         data.profileImageUrl ||
         "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='80'><rect width='100%' height='100%' fill='%23eef2ff'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='12'>No Image</text></svg>";
-
+  
       setPlanDetails({
         id: String(data.id ?? data.planId ?? id),
         title: data.title ?? '',
+        username: data.username ?? '', // username 추가
+        profileImageUrl: finalThumbnail, 
         thumbnailUrl: finalThumbnail,       
         totalBudget: Number(data.totalPrice ?? 0),
         usedBudget: Number(data.currentPrice ?? 0),
         period: data.period ?? null,
         places: data.places || [],
       });
+  
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
       (data.places || []).forEach(place => {
         const day = `Day ${place.dayNumber}`;
         if (!newSchedules[day]) newSchedules[day] = [];
-
+  
         const start = (place.startTime || '09:00:00').slice(0,5);
         const end = (place.endTime || '10:00:00').slice(0,5);
         const [sh, sm] = start.split(':').map(Number);
         const [eh, em] = end.split(':').map(Number);
         const duration = Math.max(1, ((eh*60 + em) - (sh*60 + sm)) / 60);
-
+  
         newSchedules[day].push({
           id: place.placeId || Date.now() + Math.random(),
           name: place.placeName,
@@ -146,13 +149,21 @@ const MyPlanPage = () => {
           cartId: place.cartId,
           placeId: place.placeId,
           category: place.category,
+          thumbnailUrl: finalThumbnail, // 통일된 이미지 사용
         });
       });
       setDailySchedules(newSchedules);
       setIsDirty(false);
     } catch (e) {
       console.error('GET /plans/{id} 실패:', e);
-      setPlanDetails({ id: String(id ?? ''), title: '', author: '', totalBudget: 0, usedBudget: 0 });
+      setPlanDetails({ 
+        id: String(id ?? ''), 
+        title: '', 
+        username: '',
+        profileImageUrl: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='80'><rect width='100%' height='100%' fill='%23eef2ff'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='12'>No Image</text></svg>",
+        totalBudget: 0, 
+        usedBudget: 0 
+      });
       setDailySchedules(emptyDays);
     } finally {
       setLoadingPlan(false);
@@ -402,7 +413,6 @@ const MyPlanPage = () => {
   const handleViewDetails = useCallback(() => {
     const { selectedItem } = menuState;
     if (!selectedItem) return;
-    alert(`'${selectedItem.name}'의 상세 보기 페이지로 이동합니다.`);
     closeMenu();
   }, [menuState, closeMenu]);
 
@@ -573,6 +583,9 @@ const MyPlanPage = () => {
     );
   }
 
+  const handleMapView = () => {
+    navigate('/map');
+  };
   return (
     <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>
       <Header />
@@ -610,11 +623,19 @@ const MyPlanPage = () => {
                 &gt;
               </button>
             </div>
-            {isEditMode ? (
-              <button className='save-button' onClick={handleSave}>저장하기</button>
-            ) : (
-              <button className='edit-button' onClick={handleEdit}>수정하기</button>
-            )}
+            <div className="header-buttons">
+              {!isEditMode && (
+                <button className='map-view-button' onClick={handleMapView}>
+                  지도보기
+                </button>
+              )}
+              
+              {isEditMode ? (
+                <button className='save-button' onClick={handleSave}>저장하기</button>
+              ) : (
+                <button className='edit-button' onClick={handleEdit}>수정하기</button>
+              )}
+            </div>
           </div>
 
           {(loadingPlan || loadingCart) && (
