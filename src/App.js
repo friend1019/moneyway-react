@@ -46,6 +46,7 @@ function App() {
       />
       <AppRouter />
     </div>
+    
   );
 }
 
