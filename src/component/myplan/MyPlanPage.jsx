@@ -445,10 +445,7 @@ const MyPlanPage = () => {
   }, [titleInput]);
   const handleTitleKeyDown = useCallback((e) => { if (e.key === 'Enter') handleTitleBlur(); }, [handleTitleBlur]);
 
-  const initialPlaceIds = useMemo(() => 
-    new Set(Object.values(planDetails.places || {}).flat().map(p => p.placeId)), 
-    [planDetails.places]
-);
+  
   /** ---------- 저장 ---------- */
   const handleSave = async () => {
     const places = [];
@@ -500,17 +497,15 @@ const MyPlanPage = () => {
       });
     });
   
-    // 저장할 일정이 없으면 함수 종료
-    if (!places.length && isDirty) { // isDirty 조건 추가: 변경사항이 있을때만 알림
+   
+    if (!places.length && isDirty) { 
       alert('스케줄에 추가된 일정이 없습니다!');
       return;
     }
   
     try {
-      // 2. 현재 planId를 지역 변수로 복사하여 상태 동기화 문제 해결
       let currentPlanId = planId;
   
-      // 3. 첫 저장일 경우 (planId가 'new' 또는 비어있음), 서버에서 새 planId를 먼저 발급받음
       if (!currentPlanId || currentPlanId === "new") {
         const res = await api.post("/plans/empty", {
           title: planDetails?.title || "새 여행 계획",

@@ -230,45 +230,52 @@ const Schedule = ({
               <div key={day} className={`day-column ${!isOpen ? "disabled" : ""}`}>
                 <div className='header-cell'>{day}</div>
 
-                {isOpen ? (
-                  <div
-                    className="planner-content-wrapper"
-                    style={{ minHeight: `${timeSlots.length * 10}rem` }}
-                  >
-                    {timeSlots.map(time => (
-                      <DroppablePlannerCell key={time} day={day} time={time} />
-                    ))}
-                    {(schedules[day] || []).map(item => (
-                      <ScheduleItem
-                        key={item.id || item.cartId || item.placeId}
-                        item={item}
-                        day={day}
-                        slotHeight={slotHeight}
-                        isEditMode={isEditMode}
-                        onItemDeleted={handleItemDeleted}
-                        onItemUpdated={handleItemUpdated}
-                        onContextMenu={onContextMenu}
-                        timeSlotsLength={timeSlots.length}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="day-locked-mask">
-                    <div
-                      className="day-locked-overlay"
-                      onClick={(e) => {
-                        e.stopPropagation(); // 이벤트 버블링 방지
-                        setOpenDays(prev => Math.min(prev + 1, 4));
-                      }}
-                    >
-                      <span className="plus">+</span>
+                {/* 1. 이 Wrapper는 항상 렌더링하여 그리드의 배경을 만듭니다. */}
+                <div
+                  className="planner-content-wrapper"
+                  style={{ minHeight: `${timeSlots.length * 10}rem` }}
+                >
+                  {/* 2. 그리드 선(PlannerCell)은 항상 렌더링되도록 바깥으로 뺍니다. */}
+                  {timeSlots.map(time => (
+                    <DroppablePlannerCell key={time} day={day} time={time} />
+                  ))}
+
+                  {/* 3. 날짜가 열려있으면 스케줄 아이템을 보여줍니다. */}
+                  {isOpen && (schedules[day] || []).map(item => (
+                    <ScheduleItem
+                      key={item.id || item.cartId || item.placeId}
+                      item={item}
+                      day={day}
+                      slotHeight={slotHeight}
+                      isEditMode={isEditMode}
+                      onItemDeleted={handleItemDeleted}
+                      onItemUpdated={handleItemUpdated}
+                      onContextMenu={onContextMenu}
+                      timeSlotsLength={timeSlots.length}
+                    />
+                  ))}
+                  
+                  {/* 4. 날짜가 닫혀있고 수정 모드일 때, 그리드 위에 오버레이를 겹칩니다. */}
+                  {!isOpen && isEditMode && (
+                    <div className="day-locked-mask">
+                      <div
+                        className="day-locked-overlay"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpenDays(prev => Math.min(prev + 1, 4));
+                        }}
+                      >
+                        <span className="plus">+</span>
+                      </div>
                     </div>
-                  </div>
-                   )}
+                  )}
+                </div>
               </div>
             );
           })}
         </div>
+            
+        
       </div>
     </>
   );
