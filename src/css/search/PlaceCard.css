@@ -75,6 +75,12 @@
   color: #0066f9;
 }
 
+.no-rating {
+  font-size: 1.3rem;
+  color: #999;
+}
+
+
 
 /* 이미지 영역 */
 .place-images {

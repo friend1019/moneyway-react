@@ -20,7 +20,7 @@
   --shadow-lg: 0 8px 20px rgba(0,0,0,0.15);
   --ring: rgba(0,102,249,0.36);
   --accent-grad: linear-gradient(90deg, #307ef1, #0066f9);
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 /* 스크롤 페이드 힌트 */
@@ -59,19 +59,40 @@
   justify-content: space-between;
 }
 
-/* 뒤로가기 */
+/* 뒤로가기 버튼: 왼쪽으로 이동 + 스크롤 고정 */
 .back-btn {
+  position: fixed;         /* ✅ 스크롤해도 화면에 고정 */
+  left: 3.2rem !important;            /* ✅ 왼쪽에 더 붙임 */
+  top: 18.5rem !important;             /* 헤더 높이에 맞춰 조정 */
+  z-index: 1000;
   background: none;
   border: none;
   font-size: 3rem;
   color: #333;
   cursor: pointer;
-  margin-left: 1.4rem;
+  margin-left: 0;          /* 기존 여백 제거 */
   transition: transform .15s ease, color .2s ease;
 }
 .back-btn:hover { transform: translateX(-.2rem) rotate(-5deg); color: var(--brand-2); }
 .back-btn:active { transform: translateX(-.1rem) scale(.98); }
 .back-btn:focus-visible { outline: 3px solid var(--ring); border-radius: .6rem; }
+
+/* (선택) 노치/세이프 에어리어 대응 */
+@supports (padding: max(0px)) {
+  .back-btn {
+    left: max(1.2rem, env(safe-area-inset-left, 0px) + 1.2rem);
+    top:  max(8.8rem, env(safe-area-inset-top, 0px) + 1.2rem);
+  }
+}
+
+/* (선택) 모바일에서 조금 더 붙이기 */
+@media (max-width: 640px) {
+  .back-btn {
+    left: 0.8rem;
+    top: 7.6rem;
+    font-size: 2.6rem;
+  }
+}
 
 /* 타이틀 */
 .title-section h2 {
@@ -119,21 +140,39 @@
 .meta .category:active { transform: translateY(1px); }
 .meta .rating svg { font-size: 1.8rem; }
 
-/* 좋아요(하트) */
-.like-section {
+.rating-section {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-size: 1.6rem;
-  color: #e63946;
+  gap: .6rem;
 }
-.heart-icon {
-  font-size: 1.6rem;
-  transition: transform .12s ease, filter .2s ease;
+
+.rating-wrap {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
 }
-.like-section:hover .heart-icon { transform: scale(1.15); filter: drop-shadow(0 0 6px rgba(230,57,70,.25)); }
-.like-section.is-liked .heart-icon { color: #ff3158; filter: drop-shadow(0 0 6px rgba(255,49,88,.25)); }
-.like-section.is-liked span { color: #ff3158; font-weight: 800; }
+
+.stars {
+  display: inline-flex;
+  align-items: center;
+  gap: .2rem;
+}
+
+.star-icon {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.rating-num {
+  font-weight: 700;
+  font-size: 1.4rem;
+}
+
+.no-rating {
+  font-size: 1.3rem;
+  color: #999;
+}
 
 /* =============================
    이미지 영역
@@ -194,8 +233,6 @@
   border-radius: 1.8rem;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-
-  /* 추가 이펙트 */
   position: relative;
   overflow: hidden;
   border: 2px solid transparent;
@@ -238,8 +275,6 @@
   border-radius: 1.3rem;
   background-color: #fff;
   box-shadow: var(--shadow-md);
-
-  /* hover elevation */
   position: relative;
   transition: box-shadow .2s ease, transform .15s ease, background .2s ease;
 }
@@ -250,12 +285,10 @@
   align-items: flex-start;
 }
 
-
 .info-icon {
   font-size: 2rem;
   color: #3478f6;
   margin-top: 0.7rem;
-
   transition: transform .15s ease, color .2s ease;
 }
 
@@ -284,7 +317,6 @@
   padding: 0.5rem 1rem;
   border-radius: 2rem;
   font-size: 1.2rem;
-
   transition: background .2s ease, transform .08s ease, box-shadow .2s ease;
   box-shadow: var(--shadow-sm);
 }
@@ -310,8 +342,6 @@
   margin-bottom: 2rem;
   cursor: pointer;
   box-shadow: var(--shadow-md);
-
-  /* gradient + shine */
   background: linear-gradient(90deg, #0066f9, #307ef1);
   transition: transform .12s ease, box-shadow .2s ease, filter .2s ease, background-position .45s ease;
   background-size: 200% 100%;

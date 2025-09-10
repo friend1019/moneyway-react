@@ -9,6 +9,27 @@ import CategorySelector from "./CategorySelector";
 import SearchInput from "./SearchInput";
 import { getPlacesByCategory, searchPlacesByKeyword } from "../../api/tourApi";
 
+/* =======================
+   🔧 디버그 유틸
+======================= */
+const logSample = (label, data) => {
+  try {
+    if (Array.isArray(data)) {
+      console.log(`${label} (length: ${data.length})`);
+      if (data.length > 0) {
+        // 첫 아이템만 보기 좋게
+        console.log(`${label} [0]`, data[0]);
+        // 표로 보고 싶으면 아래 주석 해제
+        // console.table([data[0]]);
+      }
+    } else {
+      console.log(label, data);
+    }
+  } catch (e) {
+    console.warn("logSample error:", e);
+  }
+};
+
 // ✅ 위경도 유효성 검사 함수 (지도 마커용)
 const isValidJejuCoordinate = (lat, lng) => {
   return (
@@ -54,6 +75,12 @@ const SearchMain = () => {
       // 기존 오버레이 제거
       if (overlayRef.current) overlayRef.current.setMap(null);
 
+      // 디버그: 오버레이 표시 로그
+      console.groupCollapsed("[Overlay] Show");
+      console.log("place:", place);
+      console.log("position:", position?.toString?.() ?? position);
+      console.groupEnd();
+
       const content = document.createElement("div");
       content.className = "custom-overlay-card";
       content.innerHTML = `
@@ -79,6 +106,7 @@ const SearchMain = () => {
         const btn = document.getElementById("detail-btn");
         if (btn) {
           btn.onclick = () => {
+            console.log("[Overlay] '자세히 보기' 클릭 → setSelectedPlace", place);
             setSelectedPlace(place);
             overlay.setMap(null);
           };
@@ -97,6 +125,11 @@ const SearchMain = () => {
         overlay = false,      // 오버레이 표시
         zoomLevel = 4,        // 이동 시 레벨
       } = opts;
+
+      console.groupCollapsed("[Select] handlePlaceSelect");
+      console.log("place:", place);
+      console.log("options:", opts);
+      console.groupEnd();
 
       const hasCoord =
         isValidJejuCoordinate(place?.latitude, place?.longitude);
@@ -123,6 +156,7 @@ const SearchMain = () => {
   );
 
   const handleBack = () => {
+    console.log("[Back] 상세 닫기");
     setSelectedPlace(null);
     if (overlayRef.current) {
       overlayRef.current.setMap(null);
@@ -137,6 +171,7 @@ const SearchMain = () => {
         center: new window.kakao.maps.LatLng(33.3839982207, 126.5895708953),
         level: 9,
       });
+      console.log("[Map] kakao map init", mapInstance);
       setMap(mapInstance);
     });
   }, []);
@@ -144,9 +179,35 @@ const SearchMain = () => {
   const loadPlaces = useCallback(async () => {
     try {
       const categoryCode = CATEGORY_MAP[category];
+      console.groupCollapsed("[API] getPlacesByCategory");
+      console.log("category:", category, "→ code:", categoryCode);
+
       const data = await getPlacesByCategory(categoryCode);
-      console.log(`📦 ${category} 전체 개수:`, data.length);
-      setPlaces(data);
+
+      // 응답 확인 로그
+      logSample("response data", data);
+
+      // 타입/필드 간단 확인
+      if (Array.isArray(data)) {
+        const first = data[0];
+        if (first) {
+          console.log("fields of first item:", Object.keys(first));
+          // 자주 쓰는 필드 빠르게 확인
+          console.log("sample fields:", {
+            placeId: first.placeId,
+            title: first.title,
+            categoryName: first.categoryName,
+            address: first.address,
+            latitude: first.latitude,
+            longitude: first.longitude,
+            rating: first.rating,
+            imageUrls: first.imageUrls?.length,
+          });
+        }
+      }
+      console.groupEnd();
+
+      setPlaces(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("카테고리별 관광지 로딩 실패:", err);
     }
@@ -163,18 +224,23 @@ const SearchMain = () => {
     if (clustererRef.current) clustererRef.current.clear();
 
     // ✅ 유효한 좌표만 마커 생성
-    const newMarkers = places
-      .filter((p) => isValidJejuCoordinate(p.latitude, p.longitude))
-      .map((place) => {
-        const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
-        const marker = new window.kakao.maps.Marker({ position });
-        marker._placeData = place;
-        window.kakao.maps.event.addListener(marker, "click", () => {
-          // 마커 클릭: 지도 이동 + 오버레이
-          handlePlaceSelect(place, { panMap: true, overlay: true, showDetail: false, zoomLevel: 4 });
-        });
-        return marker;
+    const validPlaces = places.filter((p) => isValidJejuCoordinate(p.latitude, p.longitude));
+    console.groupCollapsed("[Map] Marker build");
+    console.log("places.length:", places.length);
+    console.log("validPlaces.length:", validPlaces.length);
+    console.groupEnd();
+
+    const newMarkers = validPlaces.map((place) => {
+      const position = new window.kakao.maps.LatLng(place.latitude, place.longitude);
+      const marker = new window.kakao.maps.Marker({ position });
+      marker._placeData = place;
+      window.kakao.maps.event.addListener(marker, "click", () => {
+        console.log("[Marker] clicked:", place?.title, place);
+        // 마커 클릭: 지도 이동 + 오버레이
+        handlePlaceSelect(place, { panMap: true, overlay: true, showDetail: false, zoomLevel: 4 });
       });
+      return marker;
+    });
 
     if (newMarkers.length === 0) {
       console.warn("⚠️ 유효한 좌표를 가진 장소가 없어 마커를 표시할 수 없습니다.");
@@ -188,6 +254,8 @@ const SearchMain = () => {
       averageCenter: true,
       minLevel: 7,
     });
+
+    console.log("[Map] Clusterer created. markers:", newMarkers.length);
 
     clustererRef.current = clusterer;
 
@@ -203,17 +271,33 @@ const SearchMain = () => {
     }
 
     const fetchSearch = async () => {
-      const results = await searchPlacesByKeyword(searchTerm);
-      setSearchResults(results);
+      try {
+        console.groupCollapsed("[API] searchPlacesByKeyword");
+        console.log("keyword:", searchTerm);
+        const results = await searchPlacesByKeyword(searchTerm);
+        logSample("search results", results);
+        console.groupEnd();
+        setSearchResults(Array.isArray(results) ? results : []);
+      } catch (e) {
+        console.error("검색 실패:", e);
+        setSearchResults([]);
+      }
     };
 
     fetchSearch();
   }, [searchTerm]);
 
+  // 선택된 장소 변경 로깅
+  useEffect(() => {
+    if (!selectedPlace) return;
+    console.groupCollapsed("[Detail] Open");
+    console.log("selectedPlace:", selectedPlace);
+    console.groupEnd();
+  }, [selectedPlace]);
+
   return (
     <>
-      <div className="map-header">
-      </div>
+      <div className="map-header"></div>
       <div className="map-container">
         <div className={`category-container ${selectedPlace ? "detail-mode" : ""}`}>
           {selectedPlace ? (

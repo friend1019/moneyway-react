@@ -1,12 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "../../css/search/PlaceReview.css";
 
-/**
- * 보기 전용 리뷰 리스트 (작성자 + 내용만)
- * - props.reviews 있으면 그대로 사용
- * - 없으면 placeId 기준 더미 데이터 사용
- * - placeId 매칭 실패 시 기본 3건 노출
- */
 export default function PlaceReview({
   placeId,
   reviews: reviewsProp,
@@ -18,13 +12,18 @@ export default function PlaceReview({
   const [reviews, setReviews] = useState([]);
   const [showCount, setShowCount] = useState(initialCount);
 
+  const normalizedFromProp = useMemo(
+    () => normalizeReviews(reviewsProp, placeId),
+    [reviewsProp, placeId]
+  );
+
   useEffect(() => {
     setLoading(true);
     const t = setTimeout(() => {
       let base = [];
 
-      if (Array.isArray(reviewsProp) && reviewsProp.length > 0) {
-        base = reviewsProp;
+      if (normalizedFromProp.length > 0) {
+        base = normalizedFromProp;
       } else {
         const matched = DUMMY.filter((r) => r.placeId === placeId);
         base = matched.length > 0 ? matched : (useStrictMatch ? [] : DUMMY.slice(0, 3));
@@ -35,7 +34,7 @@ export default function PlaceReview({
     }, 120);
 
     return () => clearTimeout(t);
-  }, [placeId, reviewsProp, useStrictMatch]);
+  }, [placeId, normalizedFromProp, useStrictMatch]);
 
   const visible = reviews.slice(0, showCount);
 
@@ -62,7 +61,7 @@ export default function PlaceReview({
           <ul className="rv-list">
             {visible.map((r) => (
               <li className="rv-item" key={r.id}>
-                <div className="rv-name">{r.userName ?? "익명"}</div>
+                {/* 작성자 제거, 내용만 */}
                 <p className="rv-content">{r.content}</p>
               </li>
             ))}
@@ -80,24 +79,54 @@ export default function PlaceReview({
   );
 }
 
+/* 리뷰 정규화 유틸 */
+function normalizeReviews(input, placeId) {
+  if (!input) return [];
+
+  if (typeof input === "string") {
+    const content = input.trim();
+    if (!content) return [];
+    return [{ id: `${placeId || "p"}-r0`, placeId, content }];
+  }
+
+  if (Array.isArray(input) && input.every((v) => typeof v === "string")) {
+    return input
+      .map((content, i) => ({
+        id: `${placeId || "p"}-rs${i}`,
+        placeId,
+        content: content.trim(),
+      }))
+      .filter((r) => r.content);
+  }
+
+  if (Array.isArray(input) && input.every((v) => typeof v === "object" && v)) {
+    return input
+      .map((r, i) => {
+        const content = (r.content ?? "").toString().trim();
+        if (!content) return null;
+        return { id: r.id || `${placeId || "p"}-ro${i}`, placeId, content };
+      })
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
 /* 더미 데이터 */
 const DUMMY = [
   {
     id: "r1",
     placeId: "demo-1",
-    userName: "민지",
     content: "사진보다 실제가 더 예뻐요. 주차 편하고 근처에 카페도 많아서 동선 짜기 좋아요.",
   },
   {
     id: "r2",
     placeId: "demo-1",
-    userName: "현수",
     content: "뷰가 좋아요. 다만 주말엔 대기줄이 길었어요. 우천 시 실내 대체 동선 있으면 더 좋을 듯.",
   },
   {
     id: "r3",
     placeId: "demo-2",
-    userName: "Yuna",
     content: "무난합니다. 아침 일찍 가면 조용해요. 기대치가 높았던 탓에 약간의 아쉬움은 있었어요.",
   },
 ];
