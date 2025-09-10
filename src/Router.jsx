@@ -25,6 +25,7 @@ import PostCreate from "./component/community/PostCreate";
 import PostDetail from "./component/community/PostDetail";
 import PostEditForm from "./component/community/PostEditForm";
 import MyPlanPage from "./component/myplan/MyPlanPage";
+import MapContainer from "./component/myplan/MapContainer";
 
 import AppLayout from "./component/common/AppLayout"; // ✅ 레이아웃
 
@@ -112,6 +113,15 @@ function AppRouter() {
           element={
             <ProtectedRoute>
               <MyPlanPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/map"
+          element={
+            <ProtectedRoute>
+              <MapContainer />
             </ProtectedRoute>
           }
         />

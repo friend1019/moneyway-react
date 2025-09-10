@@ -19,13 +19,23 @@ const CommunityMain = () => {
 
             {/* 오른쪽: 최신순 + 좋아요순 */}
             <div className="list-dropdown">
-              <button className="list-dropdown-btn">
+              <button
+                type="button"
+                className="list-dropdown-btn"
+                aria-haspopup="menu"
+                aria-expanded="false"
+              >
                 <span className="label">{getSortLabel(sortOption)}</span>
                 <span className="icon">▼</span>
               </button>
-              <div className="list-dropdown-menu">
-                <div onClick={() => setSortOption("LATEST")}>최신순</div>
-                <div onClick={() => setSortOption("LIKES")}>좋아요순</div>
+
+              <div className="list-dropdown-menu" role="menu">
+                <div role="menuitem" tabIndex={0} onClick={() => setSortOption("LATEST")}>
+                  최신순
+                </div>
+                <div role="menuitem" tabIndex={0} onClick={() => setSortOption("LIKES")}>
+                  좋아요순
+                </div>
               </div>
             </div>
           </div>
