@@ -102,6 +102,7 @@ const MyPlan = ({ onClose }) => {
       )}
 
       {plans.map((plan, idx) => {
+
         return (
           <section key={plan.id} className="plan-section">
             <p className="section-label">{orderLabel(idx)}</p>
@@ -134,7 +135,8 @@ const MyPlan = ({ onClose }) => {
                     onBudgetChange={() => {}} 
                     onBudgetBlur={() => {}} 
                     onBudgetKeyDown={() => {}} 
-                    budgetInput="" 
+                    budgetInput=""
+                    zeroBudgetDisplay="number"
                   />
 
                   {/* 화살표 버튼: hover/클릭 시 우측 액션패널 open */}

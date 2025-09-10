@@ -2,7 +2,6 @@ import React from "react";
 import "../../css/common/PlanList.css";
 import MyPlan from "../mypage/Myplan";
 import Header from "../common/Header";
-import Footer from "../common/Footer";
 
 const PlanList = ({ plans, onPlanClick }) => {
   return (
@@ -13,7 +12,6 @@ const PlanList = ({ plans, onPlanClick }) => {
           <MyPlan />
         </div>
       </div>
-      <Footer />
     </>
   );
 };

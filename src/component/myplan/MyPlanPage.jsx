@@ -2,13 +2,13 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import '../../css/myplan/MyPlanPage.css';
-import Header from "../common/Header";
 import Schedule from './Schedule';
 import ScheduleCart from './ScheduleCart';
 import LodgingCart from './LodgingCart'; 
 import ContextMenu from './ContextMenu';
 import TimeSelectionModal from './TimeSelectionModal';
 import api from "../../api/axios";
+import useUserStore from '../../api/userStore'
 
 const SLOT_START_HOUR = 8;
 const SLOT_END_HOUR = 23;
@@ -16,6 +16,7 @@ const toSlotIndex = (time) => {
   const [h] = String(time || '08:00').split(':').map(Number);
   return h - SLOT_START_HOUR;
 };
+
 const isOverlapping = (newSchedule, existingSchedules) => {
   const newStart = toSlotIndex(newSchedule.time);
   const newEnd = newStart + Math.round(newSchedule.duration);
@@ -32,7 +33,7 @@ const MyPlanPage = () => {
   const { planId: planIdParam } = useParams();
   const planId = String(planIdParam ?? '');
   const navigate = useNavigate();
-
+  const { user: loggedInUser } = useUserStore(); 
   const [planDetails, setPlanDetails] = useState({
     id: null,
     title: '',
@@ -109,18 +110,15 @@ const MyPlanPage = () => {
     try {
       const res = await api.get(`/plans/${id}`);
       const data = res.data;
-  
-      const finalThumbnail =
-        data.thumbnailUrl ||
-        data.profileImageUrl ||
-        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='80'><rect width='100%' height='100%' fill='%23eef2ff'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='12'>No Image</text></svg>";
+
+      const finalProfileImageUrl = loggedInUser?.profileImageUrl || data.profileImageUrl || "기본 SVG...";
+
   
       setPlanDetails({
         id: String(data.id ?? data.planId ?? id),
         title: data.title ?? '',
-        username: data.username ?? '', // username 추가
-        profileImageUrl: finalThumbnail, 
-        thumbnailUrl: finalThumbnail,      
+        username: data.username ?? '', 
+        profileImageUrl: finalProfileImageUrl,      
         totalBudget: Number(data.totalPrice ?? 0),
         usedBudget: Number(data.currentPrice ?? 0),
         period: data.period ?? null,
@@ -147,7 +145,10 @@ const MyPlanPage = () => {
           cartId: place.cartId,
           placeId: place.placeId,
           category: place.category,
-          thumbnailUrl: finalThumbnail, 
+          profileImageUrl: finalProfileImageUrl,
+          // 기존 DB에서 가져온 좌표 정보도 보존
+          mapX: place.mapX || null,
+          mapY: place.mapY || null,
         });
       });
       setDailySchedules(newSchedules);
@@ -166,7 +167,7 @@ const MyPlanPage = () => {
     } finally {
       setLoadingPlan(false);
     }
-  }, [emptyDays]); 
+  }, [loggedInUser, emptyDays]); 
 
 
   const fetchAllPlanIds = useCallback(async () => {
@@ -271,7 +272,8 @@ const MyPlanPage = () => {
             placeId: place.placeId,
             category: place.categoryName, 
             thumbnailUrl: place.thumbnailUrl || "기본 이미지 URL",
-            mapX: place.mapX, 
+            // AI 플랜 데이터의 좌표 정보 보존
+            mapX: place.mapX,
             mapY: place.mapY,
           });
         });
@@ -285,12 +287,8 @@ const MyPlanPage = () => {
       });
       
       const daysLength = aiPlanData.days?.length || 1;
-
       setEnabledDays(daysLength);
-  
-
       setIsEditMode(false); 
-      
       setIsDirty(true);
     }
   }, [location.state]);
@@ -373,16 +371,19 @@ const MyPlanPage = () => {
 
     const newScheduleItem = {
       id: Date.now(),
-      name: draggedItem.placeName,
+      name: draggedItem.placeName, 
       cost: draggedItem.price,
       category: draggedItem.category,
       time: startTime,
       duration: durationHours,
       cartId: draggedItem.cartId,
-      placeId: draggedItem.placeId ,
-      mapX: draggedItem.mapX, 
+      placeId: draggedItem.placeId,
+      // 카트 API에서 받은 좌표 데이터 그대로 사용
+      mapX: draggedItem.mapX,
       mapY: draggedItem.mapY,
     };
+
+    console.log('카트에서 추가되는 스케줄 아이템:', newScheduleItem);
 
     if (isOverlapping(newScheduleItem, dailySchedules[targetDay] || [])) {
       alert('해당 시간에는 이미 다른 일정이 있습니다.');
@@ -458,9 +459,13 @@ const MyPlanPage = () => {
     if (!isLodging && selectedItem.cartId) {
       const cartItem = {
         cartId: selectedItem.cartId,
-        placeName: selectedItem.name,
+        placeId: selectedItem.placeId,
+        placeName: selectedItem.name, // 카트에서는 placeName 사용
         category: selectedItem.category,
         price: selectedItem.cost,
+        // 좌표 정보도 함께 보존
+        mapX: selectedItem.mapX,
+        mapY: selectedItem.mapY,
       };
       setCartItems(prev => [...prev, cartItem]);
     }
@@ -514,13 +519,9 @@ const MyPlanPage = () => {
   }, [titleInput]);
   const handleTitleKeyDown = useCallback((e) => { if (e.key === 'Enter') handleTitleBlur(); }, [handleTitleBlur]);
 
-
-
-  /** ---------- 저장 ---------- */
   const handleSave = async () => {
     const places = [];
   
-    // 1. UI 상태(dailySchedules)를 API가 요구하는 형식(places 배열)으로 변환
     Object.entries(dailySchedules).forEach(([day, items]) => {
       const dayNumber = Number(String(day).replace('Day ', '')) || Number(day);
   
@@ -592,8 +593,17 @@ const MyPlanPage = () => {
       await api.patch(`/plans/${currentPlanId}`, payload);
   
       alert("여행 계획이 저장되었습니다.");
-  
-      navigate(`/myplan/${currentPlanId}`, { replace: true, state: { isNewPlan: false } });
+      setIsEditMode(false);
+      
+      // 4. 로컬 상태 업데이트 (화면 깜빡임 방지)
+      setCartItems([]); // 로컬 카트 비우기
+      setIsDirty(false); // 저장되었으므로 '변경사항 없음'으로 상태 변경
+
+       navigate(`/myplan/${currentPlanId}`, { 
+        replace: true, 
+        state: { isNewPlan: false } 
+      });
+
   
     } catch (e) {
       const msg = e?.response?.data?.message || e.message;
@@ -627,31 +637,82 @@ const MyPlanPage = () => {
     ];
   }, [menuState, handleViewDetails, handleDeleteItem, closeMenu]);
 
-  if (pageLoading) {
-    return (
-      <div className="myplan-page-container">
-        <Header />
-      </div>
-    );
-  }
+
 
   //지도 위치 프롭스
   const handleMapView = () => {
-    const allPlaces = Object.values(dailySchedules).flat();
+    const toHHMM = (mins) => {
+        const clamped = Math.max(0, Math.min(1439, mins));
+        const H = String(Math.floor(clamped / 60)).padStart(2, '0');
+        const M = String(clamped % 60).padStart(2, '0');
+        return `${H}:${M}`;
+    };
 
-    const placesForMap = allPlaces.map(item => ({
-      id: item.placeId || item.cartId || item.id,
-      name: item.name,
-      category: item.category,
-      lat: item.mapY, 
-      lng: item.mapX, 
-    }));
+    const placesByDay = Object.entries(dailySchedules)
+        .filter(([day, items]) => {
+            const dayNumber = parseInt(day.replace('Day ', ''), 10);
+            return dayNumber <= enabledDays && items.length > 0;
+        })
+        .map(([day, items]) => {
+            const dayNumber = parseInt(day.replace('Day ', ''), 10);
+            
+            const places = items
+                .filter(item => {
+                    // 좌표 데이터 체크 (문자열로 올 수도 있으니 parseFloat 사용)
+                    const lat = parseFloat(item.mapY);
+                    const lng = parseFloat(item.mapX);
+                    
+                    const hasLocation = !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+                    
+                    if (!hasLocation) {
+                        console.warn(`위치 정보가 없는 항목: ${item.name}`, {
+                            mapX: item.mapX,
+                            mapY: item.mapY,
+                            parsedLng: lng,
+                            parsedLat: lat
+                        });
+                    }
+                    
+                    return hasLocation;
+                })
+                .map(item => {
+                    const [h, m] = String(item.time || '00:00').split(':').map(Number);
+                    const startMinutes = h * 60 + m;
+                    const durationMinutes = Math.round((item.duration || 1) * 60);
+                    const endMinutes = startMinutes + durationMinutes;
 
-    navigate('/map', { state: { places: placesForMap } });
-  };
+                    return {
+                        id: item.placeId || item.cartId || item.id,
+                        name: item.name,
+                        category: item.category,
+                        lat: parseFloat(item.mapY), 
+                        lng: parseFloat(item.mapX), 
+                        startTime: item.time,        
+                        endTime: toHHMM(endMinutes),
+                    };
+                });
+
+            // 시간순 정렬
+            places.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+            return {
+                day: dayNumber,
+                places: places,
+            };
+        })
+        .filter(dayData => dayData.places.length > 0);
+
+    
+    if (placesByDay.length === 0 || placesByDay.every(day => day.places.length === 0)) {
+        alert('지도에 표시할 위치 정보가 없습니다. 장소를 추가하거나 위치 정보를 확인해주세요.');
+        return;
+    }
+
+    navigate('/map', { state: { placesByDay: placesByDay } });
+};
+
   return (
     <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>
-      <Header />
       <div className='myplan-page-container'>
         {isEditMode ? (
           <LodgingCart 

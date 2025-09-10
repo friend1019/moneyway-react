@@ -13,6 +13,7 @@ const BudgetDisplay = ({
   onBudgetBlur,
   onBudgetKeyDown,
   budgetInput,
+  zeroBudgetDisplay = 'text',
 }) => {
   const isOverBudget = usedBudget > totalBudget;
   const overAmount = usedBudget - totalBudget;
@@ -76,10 +77,14 @@ const BudgetDisplay = ({
           style={{ display: "flex", alignItems: "center", gap: "0.4rem", cursor: isEditMode ? "pointer" : "default" }}
         >
           <FiEdit />
-          {totalBudget > 0 
-            ? `₩${totalBudget.toLocaleString()}`
-            : <span className="budget-placeholder">예산을 설정해주세요</span>}
-        </span>
+             {totalBudget > 0 ? (
+                `₩${totalBudget.toLocaleString()}`
+            ) : zeroBudgetDisplay === 'number' ? (
+              `₩${totalBudget.toLocaleString()}`
+            ) : (
+               <span className="budget-placeholder">예산을 설정해주세요</span>
+            )}
+             </span>
       )}
     </div>
   </div>
