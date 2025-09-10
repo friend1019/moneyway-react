@@ -53,17 +53,17 @@ function Header() {
             </li>
 
             <li className="nav-item">
-              <button className="nav-link" onClick={toggleMenu}>
-                <img src={menu} alt="menu" className="nav-icon" />
-              </button>
-            </li>
-
-            <li className="nav-item">
               <button
                 className="nav-link"
                 onClick={() => handleProtectedRoute("/cart")}
               >
                 <img src={cartlogo} alt="cart" className="nav-icon" />
+              </button>
+            </li>
+
+            <li className="nav-item">
+              <button className="nav-link" onClick={toggleMenu}>
+                <img src={menu} alt="menu" className="nav-icon" />
               </button>
             </li>
 

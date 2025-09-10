@@ -197,27 +197,41 @@
   max-height: var(--desc-open-max);
 }
 
-/* ===== 오른쪽 스테이지(프리뷰) ===== */
 .together__right {
   position: relative;
-  min-height: 56rem;
+  min-height: 56rem;      /* 필요에 따라 조절 */
   border-radius: 2rem;
   overflow: hidden;
 }
 
-/* 슬라이드 */
+/* 슬라이드 이미지 공통: 컨테이너를 채우되 비율 보존 */
 .ph {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 95%;
+  object-fit: cover;       /* ✅ 기본: 꽉 채우기(양옆/상하 잘릴 수 있음) */
+  object-position: center;
+
   border-radius: 2rem;
   opacity: 0;
-  transform: scale(0.98);
+  transform: scale(0.85);
   transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
   z-index: 0;
 }
-.together__right .ph:nth-child(1) { background: #eee; }
-.together__right .ph:nth-child(2) { background: #e3e3e3; }
-.together__right .ph:nth-child(3) { background: #d9d9d9; }
+
+/* “전체 보이기(여백 허용)”로 쓰고 싶을 때 이 클래스 추가 */
+.ph.ph--contain {
+  object-fit: contain;     /* ✅ 전부 보이되, 여백(레터박스) 생김 */
+  background: #fff;        /* 여백 배경색 (원하면 투명으로) */
+}
+
+/* (이전 배경색 데코는 <img> 사용 시 불필요하면 지워도 됨) */
+.together__right .ph:nth-child(1) { background: #fff; }
+.together__right .ph:nth-child(2) { background: #fff; }
+.together__right .ph:nth-child(3) { background: #fff; }
+
+/* 활성 상태 */
 .ph.is-show { opacity: 1; transform: scale(1); z-index: 1; }
 
 /* CTA 고정 */

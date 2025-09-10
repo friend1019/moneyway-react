@@ -45,7 +45,7 @@
   margin-right: -20rem;
 }
 .list-dropdown-title {
-  margin-left: -5rem;
+  margin-left: -24rem;
 }
 .list-dropdown-title p {
   font-size: 2rem;
@@ -92,6 +92,28 @@
   margin-left: -3rem;
   margin-bottom: 0;    /* ✅ 아래로 밀리던 여백 제거 */
 }
+
+.list-dropdown { position: relative; display: inline-block; }
+.list-dropdown-btn { display: inline-flex; align-items: center; gap: .6rem; padding: .4rem .6rem; }
+.list-dropdown-btn .icon { margin: 0; } /* 음수 마진 제거 */
+
+.list-dropdown-menu {
+  position: absolute;
+  top: 100%;                 /* 버튼 바로 아래 */
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: .4rem;
+  display: none;             /* 기본 닫힘 */
+  z-index: 999;
+  /* 나머지 스타일은 기존 유지 */
+}
+
+/* hover 중 + 내부에 포커스가 있을 때도 열림 유지 */
+.list-dropdown:hover .list-dropdown-menu,
+.list-dropdown:focus-within .list-dropdown-menu {
+  display: flex;
+}
+
 
 
 /* =============================

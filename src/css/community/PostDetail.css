@@ -5,6 +5,9 @@
   min-height: 88rem;
   background-color: #f6f6f6;
   padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .post-detail-container {
   width: 55%;
@@ -41,6 +44,25 @@
   border-radius: 1.2rem;
   object-fit: cover;
 }
+
+/* 기존 2장 grid/flex 레이아웃 제거 */
+.post-images {
+  display: none; /* 더 이상 사용 안 함 */
+}
+
+/* 새 단일 이미지 */
+.post-image {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.post-image img {
+  width: 100%;
+  height: auto;        /* 비율 유지 */
+  border-radius: 1rem; /* 원하시면 */
+  object-fit: cover;   /* 꽉 차게 */
+}
+
 
 /* =============================
    헤더/작성자/예산
@@ -601,4 +623,89 @@
     animation: none !important;
     transform: none !important;
   }
+}
+/* --------- 본문 접기/펼치기 (최종) --------- */
+.post-content-wrap { position: relative; }
+
+/* 기본 본문 */
+.post-content {
+  white-space: pre-line;      /* 줄바꿈 유지 */
+  line-height: 1.6;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  word-break: keep-all;       /* 한글 자연 줄바꿈 */
+}
+
+/* ✅ 접힘: 라인 단위로 자르기 + 페이드 오버레이 (우선순위 강화) */
+.post-content-wrap.is-collapsed > .post-content {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: var(--lines, 7) !important;  /* 줄 수 조절 */
+  line-clamp: var(--lines, 7) !important;          /* 표준 속성 */
+  overflow: hidden !important;
+  position: relative;
+  padding-bottom: 2.2rem;                           /* 버튼 자리 */
+
+  /* 예전 max-height/mask 규칙이 남아있어도 무력화 */
+  max-height: none !important;
+  -webkit-mask-image: none !important;
+          mask-image: none !important;
+}
+
+/* 아래쪽 페이드(딱 끊긴 느낌 제거) */
+.post-content-wrap.is-collapsed > .post-content::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3rem;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 85%);
+  pointer-events: none;
+}
+
+/* 펼침: 전체 보이기 */
+.post-content-wrap.is-expanded > .post-content {
+  display: block !important;
+}
+
+/* 더보기/접기 버튼 */
+.post-content-more {
+  position: absolute;
+  right: 0; bottom: 0;
+  border: none;
+  background: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #307ef1;
+  cursor: pointer;
+  padding: .2rem .4rem;
+  border-radius: .4rem;
+  z-index: 2;
+}
+.post-content-more:hover { background:#f4f7ff; }
+
+/* --------- 리스트용 본문 미리보기(페이드만) --------- */
+.post-excerpt {
+  position: relative;
+  white-space: pre-line;     /* 줄바꿈 유지 */
+  line-height: 1.6;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  word-break: keep-all;      /* 한글 자연 줄바꿈 */
+  overflow-wrap: anywhere;
+
+  /* 라인 단위로 깔끔하게 자르기 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lines, 6); /* 줄 수 조절 (기본 6) */
+  overflow: hidden;
+}
+
+/* 아래쪽 은은한 페이드 (더 내용 있음을 암시) */
+.post-excerpt::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3rem;
+  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff 85%);
+  pointer-events: none;
 }
