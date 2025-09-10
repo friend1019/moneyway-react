@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { DndContext } from '@dnd-kit/core';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import '../../css/myplan/MyPlanPage.css';
-import Header from "../common/Header";
 import Schedule from './Schedule';
 import ScheduleCart from './ScheduleCart';
 import LodgingCart from './LodgingCart'; 
@@ -372,7 +371,7 @@ const MyPlanPage = () => {
 
     const newScheduleItem = {
       id: Date.now(),
-      name: draggedItem.placeName, // 카트 아이템에서는 placeName 사용
+      name: draggedItem.placeName, 
       cost: draggedItem.price,
       category: draggedItem.category,
       time: startTime,
@@ -638,13 +637,7 @@ const MyPlanPage = () => {
     ];
   }, [menuState, handleViewDetails, handleDeleteItem, closeMenu]);
 
-  if (pageLoading) {
-    return (
-      <div className="myplan-page-container">
-        <Header />
-      </div>
-    );
-  }
+
 
   //지도 위치 프롭스
   const handleMapView = () => {
@@ -692,8 +685,8 @@ const MyPlanPage = () => {
                         id: item.placeId || item.cartId || item.id,
                         name: item.name,
                         category: item.category,
-                        lat: parseFloat(item.mapY), // 문자열을 숫자로 변환
-                        lng: parseFloat(item.mapX), // 문자열을 숫자로 변환
+                        lat: parseFloat(item.mapY), 
+                        lng: parseFloat(item.mapX), 
                         startTime: item.time,        
                         endTime: toHHMM(endMinutes),
                     };
@@ -720,7 +713,6 @@ const MyPlanPage = () => {
 
   return (
     <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>
-      <Header />
       <div className='myplan-page-container'>
         {isEditMode ? (
           <LodgingCart 
