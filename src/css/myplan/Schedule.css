@@ -170,20 +170,9 @@
     color: #007bff;
 }
 
-.budget-progress-bar {
-    width: 15rem; /* 200px */
-    height: 0.5rem; /* 8px */
-    background-color: #e9ecef;
-    border-radius: 0.25rem;
-    overflow: hidden;
-}
 
-.budget-progress-fill {
-    height: 100%;
-    background-color: #007bff;
-    border-radius: 0.25rem;
-    transition: width 0.5s ease-in-out;
-}
+
+
 
 .total-budget {
     padding-top: 1rem;
@@ -245,14 +234,6 @@
     font-size: 1.3rem;
 }
 
-/* 예산 초과 시 프로그레스 바 색상 변경 (기존 코드) */
-.budget-progress-bar.over {
-    background-color: #fcc2c2;
-}
-
-.budget-progress-fill.over {
-    background-color: #e03131;
-}
 
 .budget-input:focus {
     outline: none;

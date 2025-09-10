@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import MyPlan from "../mypage/Myplan";
+// src/components/cart/TotalCart.js
+
+import React from "react";
 import hotelIcon from "../../images/shopping/hotel.svg";
 import cafeIcon from "../../images/shopping/cafe.svg";
 import activityIcon from "../../images/shopping/activity.svg";
@@ -17,8 +18,9 @@ const CATEGORY_ORDER = [
   { name: "쇼핑", icon: shoppingIcon },
 ];
 
-const TotalCart = ({ cartItems }) => {
-  const [showPlanModal, setShowPlanModal] = useState(false);
+// 💡 1. props로 onOpenModal 함수를 받음
+const TotalCart = ({ cartItems, onOpenModal }) => {
+  // 💡 2. 모달 상태(showPlanModal)는 여기서 모두 제거됨
 
   const getCategoryTotal = (categoryName) => {
     return cartItems
@@ -58,24 +60,10 @@ const TotalCart = ({ cartItems }) => {
       <button
         className="totalcart-button"
         disabled={totalPrice === 0}
-        onClick={() => setShowPlanModal(true)}
+        onClick={onOpenModal} 
       >
         내 플랜 이동하기
       </button>
-      {showPlanModal && (
-        <div className="modal-overlay" onClick={() => setShowPlanModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="modal-close-button"
-              onClick={() => setShowPlanModal(false)}
-            >
-              &times;
-            </button>
-            <h3>플랜 선택</h3>
-            <MyPlan onClose={() => setShowPlanModal(false)} />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
