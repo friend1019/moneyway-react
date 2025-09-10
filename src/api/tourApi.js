@@ -50,6 +50,8 @@ export const mapPlace = (item) => {
     longitude: lng,
     description: item.description || "",
     menu: item.menu || "",
+    review: item.topReview || "",
+    rating : item.rating || 0,
   };
 };
 

@@ -4,15 +4,49 @@ import api from "../../api/axios.js";
 import { toast } from "react-toastify";
 import {
   FaArrowLeft,
-  FaHeart,
   FaPhone,
   FaMapMarkerAlt,
   FaShareAlt,
   FaCopy,
+  FaStar,
+  FaStarHalfAlt,
+  FaRegStar,
 } from "react-icons/fa";
 
 /* ✅ 리뷰 컴포넌트 임포트 (같은 폴더라고 가정) */
 import PlaceReview from "./PlaceReview";
+
+/* =========================
+   ⭐ 별점 표시 컴포넌트
+   - value: 0~5 (소수 1자리까지 표시)
+   - 0.25~0.74 => 하프, 0.75 이상 => 풀로 반올림
+========================= */
+function StarRating({ value = 0 }) {
+  const v = Math.max(0, Math.min(5, Number(value) || 0));
+  const full = Math.floor(v);
+  const decimal = v - full;
+
+  const hasHalf = decimal >= 0.25 && decimal < 0.75;
+  const extraFull = decimal >= 0.75 ? 1 : 0;
+
+  const stars = [];
+  for (let i = 0; i < 5; i++) {
+    if (i < full + extraFull) {
+      stars.push(<FaStar key={i} className="star-icon" />);
+    } else if (i === full && hasHalf && extraFull === 0) {
+      stars.push(<FaStarHalfAlt key={i} className="star-icon" />);
+    } else {
+      stars.push(<FaRegStar key={i} className="star-icon" />);
+    }
+  }
+
+  return (
+    <div className="rating-wrap">
+      <div className="stars">{stars}</div>
+      <span className="rating-num">{v.toFixed(1)}</span>
+    </div>
+  );
+}
 
 const PlaceDetailView = ({ place, onBack }) => {
   const handleCopyAddress = () => {
@@ -37,11 +71,7 @@ const PlaceDetailView = ({ place, onBack }) => {
 
   const handleAddToCart = async () => {
     try {
-      console.log("추가할 placeId:", place.placeId);
-
-      await api.post("/cart", {
-        placeId: place.placeId,
-      });
+      await api.post("/cart", { placeId: place.placeId });
       toast.success("일정에 추가되었습니다!");
     } catch (err) {
       toast.error("로그인이 필요한 기능입니다.");
@@ -64,9 +94,13 @@ const PlaceDetailView = ({ place, onBack }) => {
             </div>
           </div>
 
-          <div className="like-section">
-            <FaHeart className="heart-icon" />
-            <span>567</span>
+          {/* 💛 별점 표시 */}
+          <div className="rating-section">
+            {place.rating ? (
+              <StarRating value={place.rating} />
+            ) : (
+              <span className="no-rating">평가 없음</span>
+            )}
           </div>
         </div>
 
@@ -164,8 +198,8 @@ const PlaceDetailView = ({ place, onBack }) => {
           )}
         </div>
 
-        {/* ✅ 더미 리뷰 표시 */}
-        <PlaceReview placeId={place.placeId} />
+        {/* ✅ 리뷰: 이름 제거 버전, prop은 reviews로 통일 */}
+        <PlaceReview placeId={place.placeId} reviews={place.review} />
       </div>
     </>
   );
