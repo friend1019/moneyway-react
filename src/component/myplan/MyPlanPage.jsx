@@ -17,7 +17,6 @@ const toSlotIndex = (time) => {
   return h - SLOT_START_HOUR;
 };
 
-
 const isOverlapping = (newSchedule, existingSchedules) => {
   const newStart = toSlotIndex(newSchedule.time);
   const newEnd = newStart + Math.round(newSchedule.duration);
@@ -119,8 +118,6 @@ const MyPlanPage = () => {
         title: data.title ?? '',
         username: data.username ?? '', 
         profileImageUrl: finalProfileImageUrl,      
-        username: data.username ?? '', 
-        profileImageUrl: finalProfileImageUrl,      
         totalBudget: Number(data.totalPrice ?? 0),
         usedBudget: Number(data.currentPrice ?? 0),
         period: data.period ?? null,
@@ -147,10 +144,6 @@ const MyPlanPage = () => {
           cartId: place.cartId,
           placeId: place.placeId,
           category: place.category,
-          profileImageUrl: finalProfileImageUrl,
-          // 기존 DB에서 가져온 좌표 정보도 보존
-          mapX: place.mapX || null,
-          mapY: place.mapY || null,
           profileImageUrl: finalProfileImageUrl,
           // 기존 DB에서 가져온 좌표 정보도 보존
           mapX: place.mapX || null,
@@ -224,9 +217,7 @@ const MyPlanPage = () => {
     navigate(`/myplan/${targetPlanId}`);
   }, [isDirty, navigate]);
 
-  // 데이터 로딩
   useEffect(() => {
-    // AI 플랜 데이터가 이미 처리된 경우 fetchPlanDetail을 건너뛰도록 조건 추가
     if (location.state?.isAIPlan) {
       // AI 플랜의 경우 카트 아이템만 불러오면 됨
       fetchCartItems();
@@ -285,8 +276,6 @@ const MyPlanPage = () => {
             placeId: place.placeId,
             category: place.categoryName, 
             thumbnailUrl: place.thumbnailUrl || "기본 이미지 URL",
-            // AI 플랜 데이터의 좌표 정보 보존
-            mapX: place.mapX,
             // AI 플랜 데이터의 좌표 정보 보존
             mapX: place.mapX,
             mapY: place.mapY,
@@ -395,13 +384,8 @@ const MyPlanPage = () => {
       placeId: draggedItem.placeId,
       // 카트 API에서 받은 좌표 데이터 그대로 사용
       mapX: draggedItem.mapX,
-      placeId: draggedItem.placeId,
-      // 카트 API에서 받은 좌표 데이터 그대로 사용
-      mapX: draggedItem.mapX,
       mapY: draggedItem.mapY,
     };
-
-    console.log('카트에서 추가되는 스케줄 아이템:', newScheduleItem);
 
     console.log('카트에서 추가되는 스케줄 아이템:', newScheduleItem);
 
@@ -481,13 +465,8 @@ const MyPlanPage = () => {
         cartId: selectedItem.cartId,
         placeId: selectedItem.placeId,
         placeName: selectedItem.name, // 카트에서는 placeName 사용
-        placeId: selectedItem.placeId,
-        placeName: selectedItem.name, // 카트에서는 placeName 사용
         category: selectedItem.category,
         price: selectedItem.cost,
-        // 좌표 정보도 함께 보존
-        mapX: selectedItem.mapX,
-        mapY: selectedItem.mapY,
         // 좌표 정보도 함께 보존
         mapX: selectedItem.mapX,
         mapY: selectedItem.mapY,
@@ -618,17 +597,6 @@ const MyPlanPage = () => {
       await api.patch(`/plans/${currentPlanId}`, payload);
   
       alert("여행 계획이 저장되었습니다.");
-      setIsEditMode(false);
-      
-      // 4. 로컬 상태 업데이트 (화면 깜빡임 방지)
-      setCartItems([]); // 로컬 카트 비우기
-      setIsDirty(false); // 저장되었으므로 '변경사항 없음'으로 상태 변경
-
-       navigate(`/myplan/${currentPlanId}`, { 
-        replace: true, 
-        state: { isNewPlan: false } 
-      });
-
       setIsEditMode(false);
       
       // 4. 로컬 상태 업데이트 (화면 깜빡임 방지)
