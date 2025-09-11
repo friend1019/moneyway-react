@@ -8,6 +8,7 @@ import MainSlider from "./MainSlider";
 import mainIcons2 from "../../images/main/mainIcons2.png";
 import cartIcon from "../../images/main/cartIcon.svg";
 import RotatingTextWave from "./RotatingTextWave";
+import Footer from "../common/Footer";
 
 export default function StickyTest() {
   useEffect(() => {
@@ -38,6 +39,7 @@ export default function StickyTest() {
       <TogetherSection />
       <ThirdPanel />
       <MainSlider />
+      <Footer />
     </main>
   );
 }

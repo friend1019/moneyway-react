@@ -1,6 +1,6 @@
 // src/components/common/Header.jsx
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import SideMenu from "./SideMenu";
 import useUserStore from "../../api/userStore";
 import "../../css/common/Header.css";
@@ -21,19 +21,43 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 현재 경로가 "/cart"면 hover 효과 활성화
+  // ✅ 흰 배경을 적용할 경로 규칙
+  const whiteBgPaths = useMemo(
+    () => [
+      "/mypage",
+      "/cart",
+      "/planlist",
+      "/search",
+      // 필요하면 더 추가
+    ],
+    []
+  );
+
+  // ✅ 동적 라우트 대응 헬퍼: startsWith 매칭 + 패턴 일부 예시
+  const isWhiteBg = useMemo(() => {
+    const p = location.pathname;
+    if (whiteBgPaths.includes(p)) return true;
+
+    // 예: /post/:id, /article/:id, /event/:id 등
+    const dynamicStarts = ["/post/", "/article/", "/event/"];
+    if (dynamicStarts.some((s) => p.startsWith(s))) return true;
+
+    // 예: 홈도 흰색을 쓰고싶다면 아래 주석 해제
+    // if (p === "/") return true;
+
+    return false;
+  }, [location.pathname, whiteBgPaths]);
+
+  // 기존: /cart 에서 hover 효과 활성화
   const hoverEnabled = location.pathname.startsWith("/cart");
 
   const handleProtectedRoute = (path) => {
-    if (isLoggedIn) {
-      navigate(path);
-    } else {
-      navigate("/login");
-    }
+    if (isLoggedIn) navigate(path);
+    else navigate("/login");
   };
 
   return (
-    <div className={`header ${hoverEnabled ? "hover-enabled" : ""}`}>
+    <div className={`header ${hoverEnabled ? "hover-enabled" : ""} ${isWhiteBg ? "white-bg" : ""}`}>
       <header className="header-top">
         <div className="header-top-container">
           <div className="logo-area">

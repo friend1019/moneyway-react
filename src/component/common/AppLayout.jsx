@@ -41,7 +41,7 @@ export default function AppLayout() {
 
   return (
     <>
-      <Header />
+      <Header whiteBg={location.pathname === "/login"} /> {/* ✅ 조건 */}
       <AnimatePresence mode="wait">
         <motion.main
           key={location.pathname}
@@ -60,7 +60,6 @@ export default function AppLayout() {
           <Outlet />
         </motion.main>
       </AnimatePresence>
-      <Footer />
     </>
   );
 }

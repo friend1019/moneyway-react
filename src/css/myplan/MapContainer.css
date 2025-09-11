@@ -20,6 +20,7 @@
   position: relative;
   width: 100vw;
   height: 100vh;
+  margin-top: -10rem;
   background: var(--mc-bg);
   overflow: hidden;
 }
@@ -445,4 +446,131 @@
   0%   { transform: scale(0.8); opacity: 0.55; }
   70%  { transform: scale(1.8); opacity: 0.08; }
   100% { transform: scale(2.2); opacity: 0; }
+}
+
+/* ===== Day Tabs: 상단 고정/스크롤/강조 ===== */
+.seosan-day-tabs-wrap {
+  position: absolute;
+  top: 1.2rem;
+  left: 0;
+  right: 0;
+  z-index: 7;
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* 내부 버튼만 포인터 허용 */
+}
+
+.seosan-day-tabs {
+  --tab-bg: rgba(255, 255, 255, 0.75);
+  --tab-bd: rgba(0, 0, 0, 0.08);
+  --tab-accent: #307ef1;
+  --tab-txt: #111827;
+  --tab-txt-dim: #6b7280;
+
+  display: flex;
+  gap: 0.6rem;
+  background: var(--tab-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--tab-bd);
+  border-radius: 999px;
+  padding: 0.4rem;
+  max-width: min(92vw, 56rem);
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  pointer-events: auto;
+}
+.seosan-day-tabs::-webkit-scrollbar { display: none; }
+
+.seosan-day-tab {
+  --pad-x: 1.1rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.64rem var(--pad-x);
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--tab-txt);
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform .16s ease, background-color .16s ease, color .16s ease, border-color .16s ease;
+}
+
+.seosan-day-tab:hover {
+  background: rgba(48, 126, 241, 0.07);
+}
+
+.seosan-day-tab:active {
+  transform: translateY(1px);
+}
+
+.seosan-day-tab.active {
+  color: var(--tab-accent);
+  background: rgba(48, 126, 241, 0.12);
+  border-color: rgba(48, 126, 241, 0.28);
+}
+
+/* 활성 언더라인 */
+.seosan-day-tab::after {
+  content: "";
+  position: absolute;
+  left: calc(var(--pad-x) - 0.2rem);
+  right: calc(var(--pad-x) - 0.2rem);
+  bottom: 0.25rem;
+  height: 3px;
+  background: var(--tab-accent);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .22s ease;
+  opacity: 0.9;
+}
+.seosan-day-tab.active::after {
+  transform: scaleX(1);
+}
+
+/* 배지(장소 개수) */
+.seosan-day-count-badge {
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  background: #111827;
+  color: #fff;
+  opacity: 0.85;
+}
+.seosan-day-tab.active .seosan-day-count-badge {
+  background: #307ef1;
+}
+
+/* 빈 Day 스타일 */
+.seosan-day-tab.is-empty {
+  color: var(--tab-txt-dim);
+  opacity: 0.7;
+}
+.seosan-day-tab.is-empty:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+.seosan-day-tab.is-empty.active {
+  color: var(--tab-accent);
+  opacity: 0.9;
+}
+
+/* 라벨 축약 시 줄바꿈 방지 */
+.seosan-day-label {
+  white-space: nowrap;
+}
+
+/* 탭 컨테이너가 지도 클릭을 막지 않도록 (wrap에 pointer-events: none 처리) */
+.seosan-map-fullscreen-container {
+  position: relative; /* 이미 있을 가능성 높음 */
 }

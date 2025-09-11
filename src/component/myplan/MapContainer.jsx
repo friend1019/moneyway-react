@@ -1,5 +1,11 @@
 // src/COMPONENTS/AI/MapContainer.jsx
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiChevronLeft } from "react-icons/fi";
 
@@ -59,10 +65,16 @@ const hasCoord = (p) => Number.isFinite(p.lat) && Number.isFinite(p.lng);
 
 /* 얕은 비교용 시그니처(내용이 같으면 문자열도 같게) */
 const placeSig = (p) =>
-  [p.name, p.lat, p.lng, p.startTime ?? "", p.endTime ?? "", p.id ?? ""].join("|");
+  [p.name, p.lat, p.lng, p.startTime ?? "", p.endTime ?? "", p.id ?? ""].join(
+    "|"
+  );
 const daysSig = (arr) =>
   JSON.stringify(
-    (arr || []).map((d) => [d.day, d.places.length, d.places.map(placeSig).join(";")])
+    (arr || []).map((d) => [
+      d.day,
+      d.places.length,
+      d.places.map(placeSig).join(";"),
+    ])
   );
 
 /* 안전한 equals */
@@ -74,8 +86,8 @@ const samePlaces = (a, b) =>
   a.every((v, i) => placeSig(v) === placeSig(b[i]));
 
 export default function MapContainer({
-  places: propPlaces = [],       // 평면 배열도 지원 (Day 1로 간주)
-  placesByDay: propPlacesByDay,  // 일자 배열 우선 사용
+  places: propPlaces = [], // 평면 배열도 지원 (Day 1로 간주)
+  placesByDay: propPlacesByDay, // 일자 배열 우선 사용
   initialMode = "driving",
   onMapReady,
   onRouteComputed,
@@ -84,9 +96,9 @@ export default function MapContainer({
   const navigate = useNavigate();
 
   /* === 상태 === */
-  const [days, setDays] = useState([]);       // [{ day, places: [...] }]
+  const [days, setDays] = useState([]); // [{ day, places: [...] }]
   const [activeDayIdx, setActiveDayIdx] = useState(0);
-  const [places, setPlaces] = useState([]);   // 현재 일자 places
+  const [places, setPlaces] = useState([]); // 현재 일자 places
   const [selectedMode, setSelectedMode] = useState(initialMode);
   const [routeInfo, setRouteInfo] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -106,8 +118,12 @@ export default function MapContainer({
   const firstCardOpenedOnceRef = useRef(false);
 
   /* 최신 콜백 ref 동기화 (state 변경 없음 → 루프 유발 X) */
-  useEffect(() => { onMapReadyRef.current = onMapReady; }, [onMapReady]);
-  useEffect(() => { onRouteComputedRef.current = onRouteComputed; }, [onRouteComputed]);
+  useEffect(() => {
+    onMapReadyRef.current = onMapReady;
+  }, [onMapReady]);
+  useEffect(() => {
+    onRouteComputedRef.current = onRouteComputed;
+  }, [onRouteComputed]);
 
   /* ---- 들어온 데이터 한 번 확인용 로그 ---- */
   useEffect(() => {
@@ -142,10 +158,15 @@ export default function MapContainer({
       const lat = nNum(p.lat ?? p.latitude ?? p.mapY);
       const lng = nNum(p.lng ?? p.longitude ?? p.mapX);
       return {
-        id: p.id ?? p.placeId ?? p.cartId ?? `${p.name ?? "장소"}-${p.startTime ?? ""}-${idx}`,
+        id:
+          p.id ??
+          p.placeId ??
+          p.cartId ??
+          `${p.name ?? "장소"}-${p.startTime ?? ""}-${idx}`,
         name: p.name ?? "장소",
         category: p.category ?? p.type ?? "",
-        lat, lng,
+        lat,
+        lng,
         startTime: p.startTime ?? p.time ?? "",
         endTime: p.endTime ?? "",
         naverPlaceId: p.naverPlaceId,
@@ -158,20 +179,29 @@ export default function MapContainer({
         const norm = list
           .map(normalizePlace)
           .filter(hasCoord)
-          .sort((a, b) => String(a.startTime).localeCompare(String(b.startTime)));
+          .sort((a, b) =>
+            String(a.startTime).localeCompare(String(b.startTime))
+          );
         return { day: Number(d.day ?? di + 1), places: norm };
       })
       .filter((d) => d.places.length > 0);
 
     return normalized;
-  }, [location?.state?.placesByDay, location?.state?.places, propPlacesByDay, propPlaces]);
+  }, [
+    location?.state?.placesByDay,
+    location?.state?.places,
+    propPlacesByDay,
+    propPlaces,
+  ]);
 
   /* === days 세팅: 바뀔 때만 === */
   const prevDaysSigRef = useRef("");
   useEffect(() => {
     const nextSig = daysSig(normalizedFromInputs);
     if (prevDaysSigRef.current !== nextSig) {
-      setDays((prev) => (sameDays(prev, normalizedFromInputs) ? prev : normalizedFromInputs));
+      setDays((prev) =>
+        sameDays(prev, normalizedFromInputs) ? prev : normalizedFromInputs
+      );
       // 기존 activeDayIdx가 범위를 넘으면 0으로만 리셋
       setActiveDayIdx((prev) =>
         prev >= normalizedFromInputs.length ? 0 : prev
@@ -254,13 +284,23 @@ export default function MapContainer({
     const pos = new kakao.maps.LatLng(place.lat, place.lng);
 
     const image = makePinImage(kakao, "#80A5F6");
-    const marker = new kakao.maps.Marker({ position: pos, map, image, zIndex: 4 });
+    const marker = new kakao.maps.Marker({
+      position: pos,
+      map,
+      image,
+      zIndex: 4,
+    });
     markersRef.current.push(marker);
 
     const pulseEl = document.createElement("div");
     pulseEl.className = "seosan-pin-pulse";
     const pulseOverlay = new kakao.maps.CustomOverlay({
-      position: pos, content: pulseEl, xAnchor: 0.5, yAnchor: 1.0, zIndex: 3, clickable: false,
+      position: pos,
+      content: pulseEl,
+      xAnchor: 0.5,
+      yAnchor: 1.0,
+      zIndex: 3,
+      clickable: false,
     });
     pulseOverlay.setMap(map);
     pulseOverlaysRef.current.push(pulseOverlay);
@@ -274,13 +314,28 @@ export default function MapContainer({
     `;
 
     const overlay = new kakao.maps.CustomOverlay({
-      position: pos, content: container, yAnchor: 1.15, xAnchor: 0.5, zIndex: 5, clickable: true,
+      position: pos,
+      content: container,
+      yAnchor: 1.15,
+      xAnchor: 0.5,
+      zIndex: 5,
+      clickable: true,
     });
     overlaysRef.current.push(overlay);
 
     let visible = false;
-    const show = () => { if (!visible) { overlay.setMap(map); visible = true; } };
-    const hide = () => { if (visible) { overlay.setMap(null); visible = false; } };
+    const show = () => {
+      if (!visible) {
+        overlay.setMap(map);
+        visible = true;
+      }
+    };
+    const hide = () => {
+      if (visible) {
+        overlay.setMap(null);
+        visible = false;
+      }
+    };
 
     if (openNow && !firstCardOpenedOnceRef.current) {
       show();
@@ -300,74 +355,107 @@ export default function MapContainer({
   }
 
   /* === 경로 그리기 === */
-  const drawRoute = useCallback(async (placesArg, mode, map) => {
-    if (!map || !window.kakao?.maps) return;
-    clearSegments();
+  const drawRoute = useCallback(
+    async (placesArg, mode, map) => {
+      if (!map || !window.kakao?.maps) return;
+      clearSegments();
 
-    if (!placesArg || placesArg.length < 2) {
-      setRouteInfo((prev) => (prev.length ? [] : prev));
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const info = [];
-      const { kakao } = window;
-
-      const COLORS = ["#80A5F6", "#03C75A", "#FF7A59", "#FFD400", "#9B59B6", "#E74C3C"];
-      const STYLES = ["solid", "shortdash", "dash", "shortdot"];
-
-      for (let i = 0; i < placesArg.length - 1; i++) {
-        const o = placesArg[i], d = placesArg[i + 1];
-        const r = getMockDistanceAndTime(o.lat, o.lng, d.lat, d.lng, mode);
-        info.push({ from: o.name, to: d.name, distance: r.distance, time: r.time,
-          window: `${o.startTime || "-"} ~ ${d.endTime || "-"}` });
-
-        const path = [new kakao.maps.LatLng(o.lat, o.lng), new kakao.maps.LatLng(d.lat, d.lng)];
-        const color = COLORS[i % COLORS.length];
-        const style = STYLES[i % STYLES.length];
-
-        const outline = new kakao.maps.Polyline({
-          path, strokeWeight: 8, strokeColor: "rgba(0,0,0,0.45)", strokeOpacity: 0.7, strokeStyle: "solid", zIndex: 2,
-        });
-        outline.setMap(map);
-
-        const polyline = new kakao.maps.Polyline({
-          path, strokeWeight: 6, strokeColor: color, strokeOpacity: 0.95, strokeStyle: style, zIndex: 3,
-        });
-        polyline.setMap(map);
-
-        const midLat = (o.lat + d.lat) / 2;
-        const midLng = (o.lng + d.lng) / 2;
-        const labelEl = document.createElement("div");
-        labelEl.className = "seosan-seg-label";
-        labelEl.textContent = `코스 ${i + 1}`;
-        labelEl.style.borderColor = color;
-
-        const labelOverlay = new kakao.maps.CustomOverlay({
-          position: new kakao.maps.LatLng(midLat, midLng),
-          content: labelEl, xAnchor: 0.5, yAnchor: 0.5, zIndex: 4, clickable: false,
-        });
-        labelOverlay.setMap(map);
-
-        segmentRefs.current.push({ outline, polyline, label: labelOverlay });
+      if (!placesArg || placesArg.length < 2) {
+        setRouteInfo((prev) => (prev.length ? [] : prev));
+        return;
       }
 
-      // 루프 방지: 내용이 달라질 때만 갱신
-      const nextSig = JSON.stringify(info);
-      const prevSig = JSON.stringify(routeInfo);
-      if (nextSig !== prevSig) setRouteInfo(info);
+      setLoading(true);
+      try {
+        const info = [];
+        const { kakao } = window;
 
-      onRouteComputedRef.current?.(info, {
-        day: days[activeDayIdx]?.day ?? 1,
-        mode,
-      });
-    } finally {
-      setLoading(false);
-    }
-  // drawRoute는 days/activeDayIdx에만 의존 (안정화)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeDayIdx, days]);
+        const COLORS = [
+          "#80A5F6",
+          "#03C75A",
+          "#FF7A59",
+          "#FFD400",
+          "#9B59B6",
+          "#E74C3C",
+        ];
+        const STYLES = ["solid", "shortdash", "dash", "shortdot"];
+
+        for (let i = 0; i < placesArg.length - 1; i++) {
+          const o = placesArg[i],
+            d = placesArg[i + 1];
+          const r = getMockDistanceAndTime(o.lat, o.lng, d.lat, d.lng, mode);
+          info.push({
+            from: o.name,
+            to: d.name,
+            distance: r.distance,
+            time: r.time,
+            window: `${o.startTime || "-"} ~ ${d.endTime || "-"}`,
+          });
+
+          const path = [
+            new kakao.maps.LatLng(o.lat, o.lng),
+            new kakao.maps.LatLng(d.lat, d.lng),
+          ];
+          const color = COLORS[i % COLORS.length];
+          const style = STYLES[i % STYLES.length];
+
+          const outline = new kakao.maps.Polyline({
+            path,
+            strokeWeight: 8,
+            strokeColor: "rgba(0,0,0,0.45)",
+            strokeOpacity: 0.7,
+            strokeStyle: "solid",
+            zIndex: 2,
+          });
+          outline.setMap(map);
+
+          const polyline = new kakao.maps.Polyline({
+            path,
+            strokeWeight: 6,
+            strokeColor: color,
+            strokeOpacity: 0.95,
+            strokeStyle: style,
+            zIndex: 3,
+          });
+          polyline.setMap(map);
+
+          const midLat = (o.lat + d.lat) / 2;
+          const midLng = (o.lng + d.lng) / 2;
+          const labelEl = document.createElement("div");
+          labelEl.className = "seosan-seg-label";
+          labelEl.textContent = `코스 ${i + 1}`;
+          labelEl.style.borderColor = color;
+
+          const labelOverlay = new kakao.maps.CustomOverlay({
+            position: new kakao.maps.LatLng(midLat, midLng),
+            content: labelEl,
+            xAnchor: 0.5,
+            yAnchor: 0.5,
+            zIndex: 4,
+            clickable: false,
+          });
+          labelOverlay.setMap(map);
+
+          segmentRefs.current.push({ outline, polyline, label: labelOverlay });
+        }
+
+        // 루프 방지: 내용이 달라질 때만 갱신
+        const nextSig = JSON.stringify(info);
+        const prevSig = JSON.stringify(routeInfo);
+        if (nextSig !== prevSig) setRouteInfo(info);
+
+        onRouteComputedRef.current?.(info, {
+          day: days[activeDayIdx]?.day ?? 1,
+          mode,
+        });
+      } finally {
+        setLoading(false);
+      }
+      // drawRoute는 days/activeDayIdx에만 의존 (안정화)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [activeDayIdx, days]
+  );
 
   /* === 지도 범위 맞추기 === */
   const fitBoundsForAll = useCallback(() => {
@@ -381,39 +469,42 @@ export default function MapContainer({
   }, []);
 
   /* === 구간 포커스 === */
-  const focusSegmentCenter = useCallback((i, delay = 0) => {
-    const map = mapRef.current;
-    if (!map || !places[i] || !places[i + 1]) return;
+  const focusSegmentCenter = useCallback(
+    (i, delay = 0) => {
+      const map = mapRef.current;
+      if (!map || !places[i] || !places[i + 1]) return;
 
-    const midLat = (places[i].lat + places[i + 1].lat) / 2;
-    const midLng = (places[i].lng + places[i + 1].lng) / 2;
+      const midLat = (places[i].lat + places[i + 1].lat) / 2;
+      const midLng = (places[i].lng + places[i + 1].lng) / 2;
 
-    const run = () => {
-      map.relayout();
-      const proj = map.getProjection?.();
-      const { kakao } = window;
-      const midLatLng = new kakao.maps.LatLng(midLat, midLng);
+      const run = () => {
+        map.relayout();
+        const proj = map.getProjection?.();
+        const { kakao } = window;
+        const midLatLng = new kakao.maps.LatLng(midLat, midLng);
 
-      let yOffset = 0;
-      const sheet = document.querySelector(".seosan-route-info-list");
-      if (sheet) {
-        const h = sheet.clientHeight || 0;
-        yOffset = Math.min(Math.round(h * 0.35), 220);
-      }
+        let yOffset = 0;
+        const sheet = document.querySelector(".seosan-route-info-list");
+        if (sheet) {
+          const h = sheet.clientHeight || 0;
+          yOffset = Math.min(Math.round(h * 0.35), 220);
+        }
 
-      if (proj?.containerPointFromCoords && proj?.coordsFromContainerPoint) {
-        const pt = proj.containerPointFromCoords(midLatLng);
-        const adjPt = new kakao.maps.Point(pt.x, pt.y + yOffset);
-        const target = proj.coordsFromContainerPoint(adjPt);
-        map.panTo(target);
-      } else {
-        map.panTo(midLatLng);
-      }
-    };
+        if (proj?.containerPointFromCoords && proj?.coordsFromContainerPoint) {
+          const pt = proj.containerPointFromCoords(midLatLng);
+          const adjPt = new kakao.maps.Point(pt.x, pt.y + yOffset);
+          const target = proj.coordsFromContainerPoint(adjPt);
+          map.panTo(target);
+        } else {
+          map.panTo(midLatLng);
+        }
+      };
 
-    if (delay > 0) setTimeout(run, delay);
-    else run();
-  }, [places]);
+      if (delay > 0) setTimeout(run, delay);
+      else run();
+    },
+    [places]
+  );
 
   const applySegmentVisibility = useCallback((idx) => {
     const map = mapRef.current;
@@ -455,7 +546,12 @@ export default function MapContainer({
       if (!showRouteInfo) setShowRouteInfo(true);
       focusSegmentCenter(i, needDelay ? 300 : 0);
     },
-    [applySegmentVisibility, showOverlaysForSegment, focusSegmentCenter, showRouteInfo]
+    [
+      applySegmentVisibility,
+      showOverlaysForSegment,
+      focusSegmentCenter,
+      showRouteInfo,
+    ]
   );
 
   const handleShowAllSegments = useCallback(() => {
@@ -516,12 +612,14 @@ export default function MapContainer({
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [
-    places,               // 실제로 바뀔 때만
+    places, // 실제로 바뀔 때만
     selectedMode,
-    loadKakao,            // 안정 useCallback
-    drawRoute,            // days/activeDayIdx에만 의존 → 안정
+    loadKakao, // 안정 useCallback
+    drawRoute, // days/activeDayIdx에만 의존 → 안정
     applySegmentVisibility,
     selectedSegmentIndex,
     fitBoundsForAll,
@@ -538,19 +636,25 @@ export default function MapContainer({
     return [x, y];
   };
   const fmt = (n) => (Math.round(n * 1e7) / 1e7).toString();
-  const openNaverSegment = useCallback((i) => {
-    const segP = (p) => {
-      if (!Number.isFinite(p?.lat) || !Number.isFinite(p?.lng)) return "";
-      const [x, y] = toMercator(p.lat, p.lng);
-      const name = encodeURIComponent(p.name || "");
-      const poi = p.naverPlaceId ? `,${p.naverPlaceId},PLACE_POI` : "";
-      return `${fmt(x)},${fmt(y)},${name}${poi}`;
-    };
-    if (!Array.isArray(places) || i < 0 || i >= places.length - 1) return;
-    const o = places[i], d = places[i + 1];
-    const url = `https://map.naver.com/p/directions/${segP(o)}/${segP(d)}/-/transit?c=14.00,0,0,0,dh`;
-    window.open(url, "_blank", "noopener");
-  }, [places]);
+  const openNaverSegment = useCallback(
+    (i) => {
+      const segP = (p) => {
+        if (!Number.isFinite(p?.lat) || !Number.isFinite(p?.lng)) return "";
+        const [x, y] = toMercator(p.lat, p.lng);
+        const name = encodeURIComponent(p.name || "");
+        const poi = p.naverPlaceId ? `,${p.naverPlaceId},PLACE_POI` : "";
+        return `${fmt(x)},${fmt(y)},${name}${poi}`;
+      };
+      if (!Array.isArray(places) || i < 0 || i >= places.length - 1) return;
+      const o = places[i],
+        d = places[i + 1];
+      const url = `https://map.naver.com/p/directions/${segP(o)}/${segP(
+        d
+      )}/-/transit?c=14.00,0,0,0,dh`;
+      window.open(url, "_blank", "noopener");
+    },
+    [places]
+  );
 
   /* === 뒤로가기 === */
   const prevStep = useCallback(() => navigate(-1), [navigate]);
@@ -559,23 +663,43 @@ export default function MapContainer({
 
   return (
     <div className="seosan-map-fullscreen-container">
-      <button className="step-interest-prev-btn" onClick={prevStep} aria-label="이전 단계로">
+      <button
+        className="step-interest-prev-btn"
+        onClick={prevStep}
+        aria-label="이전 단계로"
+      >
         <FiChevronLeft style={{ fontSize: "2.1rem", color: "black" }} />
       </button>
 
-      {/* 일자 탭 */}
+      {/* 일자 탭 (업그레이드) */}
       {days.length > 0 && (
-        <div className="seosan-day-tabs">
-          {days.map((d, idx) => (
-            <button
-              key={d.day ?? idx}
-              className={`seosan-day-tab ${idx === activeDayIdx ? "active" : ""}`}
-              onClick={() => setActiveDayIdx(idx)}
-              aria-pressed={idx === activeDayIdx}
-            >
-              {`Day ${d.day ?? idx + 1}`}
-            </button>
-          ))}
+        <div className="seosan-day-tabs-wrap">
+          <div className="seosan-day-tabs scroller">
+            {days.map((d, idx) => {
+              const count = d?.places?.length ?? 0;
+              const isActive = idx === activeDayIdx;
+              const isEmpty = count === 0;
+              return (
+                <button
+                  key={d.day ?? idx}
+                  className={[
+                    "seosan-day-tab",
+                    isActive ? "active" : "",
+                    isEmpty ? "is-empty" : "has-places",
+                  ].join(" ")}
+                  onClick={() => setActiveDayIdx(idx)}
+                  aria-pressed={isActive}
+                  aria-label={`Day ${d.day ?? idx + 1} (${count}개)`}
+                  title={`Day ${d.day ?? idx + 1} · 장소 ${count}개`}
+                >
+                  <span className="seosan-day-label">
+                    Day {d.day ?? idx + 1}
+                  </span>
+                  <span className="seosan-day-count-badge">{count}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -587,11 +711,15 @@ export default function MapContainer({
             {transportModes.map((m) => (
               <button
                 key={m.value}
-                className={`seosan-mode-button ${selectedMode === m.value ? "active" : ""}`}
+                className={`seosan-mode-button ${
+                  selectedMode === m.value ? "active" : ""
+                }`}
                 onClick={() => setSelectedMode(m.value)}
               >
                 <span className="seosan-mode-icon">{m.icon}</span>
-                <span className="seosan-mode-label">{m.label.split(" ")[1]}</span>
+                <span className="seosan-mode-label">
+                  {m.label.split(" ")[1]}
+                </span>
               </button>
             ))}
           </div>
@@ -607,22 +735,46 @@ export default function MapContainer({
         <div className="seosan-no-places-overlay">
           <div className="seosan-no-places-message">
             <h3>장소 데이터가 없습니다</h3>
-            <p>AI 추천에서 ‘지도 보기’를 눌러 이동하거나, 샘플 데이터를 로드하세요.</p>
+            <p>
+              AI 추천에서 ‘지도 보기’를 눌러 이동하거나, 샘플 데이터를
+              로드하세요.
+            </p>
             <div className="seosan-command-examples">
-              <div className="seosan-command"><strong>서산9경:</strong><code>loadSeosan9ScenicOnStart()</code></div>
-              <div className="seosan-command"><strong>서울 관광지:</strong><code>loadSeoulOnStart()</code></div>
-              <div className="seosan-command"><strong>샘플:</strong><code>saveSamplePlaces()</code></div>
-              <div className="seosan-command"><strong>삭제:</strong><code>clearPlacesAndReload()</code></div>
+              <div className="seosan-command">
+                <strong>서산9경:</strong>
+                <code>loadSeosan9ScenicOnStart()</code>
+              </div>
+              <div className="seosan-command">
+                <strong>서울 관광지:</strong>
+                <code>loadSeoulOnStart()</code>
+              </div>
+              <div className="seosan-command">
+                <strong>샘플:</strong>
+                <code>saveSamplePlaces()</code>
+              </div>
+              <div className="seosan-command">
+                <strong>삭제:</strong>
+                <code>clearPlacesAndReload()</code>
+              </div>
             </div>
-            <div className="seosan-note">💡 개발자도구(Console)에서 실행하세요.</div>
+            <div className="seosan-note">
+              💡 개발자도구(Console)에서 실행하세요.
+            </div>
           </div>
         </div>
       )}
 
       {/* 하단 패널 */}
       {places.length > 0 && (
-        <div className={`seosan-route-info-overlay ${showRouteInfo ? "active" : ""}`}>
-          <button className="seosan-route-toggle-button" onClick={() => setShowRouteInfo((s) => !s)}>
+        <div
+          className={`seosan-route-info-overlay ${
+            showRouteInfo ? "active" : ""
+          }`}
+        >
+          <button
+            className="seosan-route-toggle-button"
+            onClick={() => setShowRouteInfo((s) => !s)}
+          >
             <span className="seosan-toggle-icon">—</span>
           </button>
 
@@ -643,7 +795,12 @@ export default function MapContainer({
             {routeInfo.length > 0 ? (
               <div className="seosan-route-cards">
                 {routeInfo.map((r, i) => (
-                  <div key={i} className={`seosan-route-card ${selectedSegmentIndex === i ? "active" : ""}`}>
+                  <div
+                    key={i}
+                    className={`seosan-route-card ${
+                      selectedSegmentIndex === i ? "active" : ""
+                    }`}
+                  >
                     <div className="seosan-route-card-header">
                       <div className="seosan-route-number">코스 {i + 1}</div>
                     </div>
@@ -651,11 +808,15 @@ export default function MapContainer({
                     <div className="seosan-route-card-content">
                       <div className="seosan-route-info-item">
                         <div className="seosan-route-label">경로</div>
-                        <div className="seosan-route-value">{r.from} → {r.to}</div>
+                        <div className="seosan-route-value">
+                          {r.from} → {r.to}
+                        </div>
                       </div>
                       <div className="seosan-route-info-item">
                         <div className="seosan-route-label">거리</div>
-                        <div className="seosan-route-value">{r.distance} km</div>
+                        <div className="seosan-route-value">
+                          {r.distance} km
+                        </div>
                       </div>
                       <div className="seosan-route-info-item">
                         <div className="seosan-route-label">시간</div>
@@ -669,12 +830,17 @@ export default function MapContainer({
 
                     <div className="seosan-seg-actions">
                       <button
-                        className={`seosan-seg-view-button ${selectedSegmentIndex === i ? "active" : ""}`}
+                        className={`seosan-seg-view-button ${
+                          selectedSegmentIndex === i ? "active" : ""
+                        }`}
                         onClick={() => handleFocusSegment(i)}
                       >
                         구간 보기
                       </button>
-                      <button className="seosan-seg-naver-button" onClick={() => openNaverSegment(i)}>
+                      <button
+                        className="seosan-seg-naver-button"
+                        onClick={() => openNaverSegment(i)}
+                      >
                         네이버 지도
                       </button>
                     </div>
@@ -683,7 +849,9 @@ export default function MapContainer({
               </div>
             ) : (
               <div className="seosan-no-route-message">
-                {loading ? "경로 정보를 계산 중입니다..." : "경로 정보가 없습니다."}
+                {loading
+                  ? "경로 정보를 계산 중입니다..."
+                  : "경로 정보가 없습니다."}
               </div>
             )}
           </div>
