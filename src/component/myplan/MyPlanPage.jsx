@@ -52,7 +52,6 @@ const MyPlanPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loadingCart, setLoadingCart] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState(false);
-  const [pageLoading, setPageLoading] = useState(false);
 
   const [isEditingBudget, setIsEditingBudget] = useState(false);
   const [budgetInput, setBudgetInput] = useState('');
@@ -158,7 +157,15 @@ const MyPlanPage = () => {
           mapY: place.mapY || null,
         });
       });
+      
       setDailySchedules(newSchedules);
+
+      const maxDay = (data.places || []).reduce(
+        (max, place) => Math.max(max, place.dayNumber || 0), 0
+      );
+
+      setEnabledDays(Math.max(1, maxDay));
+
       setIsDirty(false);
     } catch (e) {
       console.error('GET /plans/{id} 실패:', e);
@@ -224,7 +231,6 @@ const MyPlanPage = () => {
       // AI 플랜의 경우 카트 아이템만 불러오면 됨
       fetchCartItems();
       fetchAllPlanIds();
-      setPageLoading(false);
       return; 
     }
     let mounted = true;
@@ -238,7 +244,7 @@ const MyPlanPage = () => {
         } catch (error) {
         console.error('데이터 로딩 중 오류:', error);
         } finally {
-         if (mounted) setPageLoading(false);
+        if (mounted);
       }
     };
     loadData();

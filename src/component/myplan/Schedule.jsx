@@ -185,12 +185,12 @@ const Schedule = ({
         <>
             <div className='plan-info-card'>
                 <div className='plan-details-left'>
-                    <img
-                        src={getProfileImage()}
-                        alt="user avatar"
-                        className='user-avatar'
-                        onError={handleImageError}
-                    />
+                <img
+                    src={getProfileImage()} 
+                    alt="user avatar"
+                    className='user-avatar'
+                    onError={handleImageError} 
+                />
                     <div className='plan-text-info'>
                         {isEditingTitle ? (
                             <input
