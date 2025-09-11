@@ -454,7 +454,7 @@ export default function MapContainer({
       // drawRoute는 days/activeDayIdx에만 의존 (안정화)
       // eslint-disable-next-line react-hooks/exhaustive-deps
     },
-    [activeDayIdx, days]
+    [activeDayIdx, days, routeInfo]
   );
 
   /* === 지도 범위 맞추기 === */
@@ -671,10 +671,9 @@ export default function MapContainer({
         <FiChevronLeft style={{ fontSize: "2.1rem", color: "black" }} />
       </button>
 
-      {/* 일자 탭 (업그레이드) */}
       {days.length > 0 && (
-        <div className="seosan-day-tabs-wrap">
-          <div className="seosan-day-tabs scroller">
+        <aside className="seosan-day-rail" aria-label="여행 일자">
+          <div className="seosan-day-rail-inner">
             {days.map((d, idx) => {
               const count = d?.places?.length ?? 0;
               const isActive = idx === activeDayIdx;
@@ -683,7 +682,7 @@ export default function MapContainer({
                 <button
                   key={d.day ?? idx}
                   className={[
-                    "seosan-day-tab",
+                    "seosan-day-rail-item",
                     isActive ? "active" : "",
                     isEmpty ? "is-empty" : "has-places",
                   ].join(" ")}
@@ -692,15 +691,15 @@ export default function MapContainer({
                   aria-label={`Day ${d.day ?? idx + 1} (${count}개)`}
                   title={`Day ${d.day ?? idx + 1} · 장소 ${count}개`}
                 >
-                  <span className="seosan-day-label">
+                  <div className="seosan-day-rail-day">
                     Day {d.day ?? idx + 1}
-                  </span>
-                  <span className="seosan-day-count-badge">{count}</span>
+                  </div>
+                  <div className="seosan-day-rail-badge">{count}</div>
                 </button>
               );
             })}
           </div>
-        </div>
+        </aside>
       )}
 
       {/* 교통수단 */}
