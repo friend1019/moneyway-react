@@ -3,9 +3,11 @@
   position: relative;
   z-index: 1;                    /* 다음 섹션이 위에서 덮도록 */
   min-height: 97vh;
-  background: linear-gradient(135deg, #1aadf6, #0ecedb);
-  color: black;
-  padding-top: 80px;
+  background: url("../../images/main/background.jpg") no-repeat center center;
+  background-size: cover; /* 꽉 채우기 */  color: rgb(255, 255, 255);
+  background-attachment: fixed;
+  padding-top: 140px;
+  margin-top: -10rem;
 }
 
 /* 센티넬(표시용 보이지 않는 라인) */

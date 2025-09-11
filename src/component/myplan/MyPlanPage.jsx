@@ -9,7 +9,6 @@ import ContextMenu from './ContextMenu';
 import TimeSelectionModal from './TimeSelectionModal';
 import api from "../../api/axios";
 import useUserStore from '../../api/userStore'
-import useUserStore from '../../api/userStore'
 
 const SLOT_START_HOUR = 8;
 const SLOT_END_HOUR = 23;
@@ -35,7 +34,6 @@ const MyPlanPage = () => {
   const { planId: planIdParam } = useParams();
   const planId = String(planIdParam ?? '');
   const navigate = useNavigate();
-  const { user: loggedInUser } = useUserStore(); 
   const { user: loggedInUser } = useUserStore(); 
   const [planDetails, setPlanDetails] = useState({
     id: null,
@@ -116,9 +114,6 @@ const MyPlanPage = () => {
 
       const finalProfileImageUrl = loggedInUser?.profileImageUrl || data.profileImageUrl || "기본 SVG...";
 
-
-      const finalProfileImageUrl = loggedInUser?.profileImageUrl || data.profileImageUrl || "기본 SVG...";
-
   
       setPlanDetails({
         id: String(data.id ?? data.planId ?? id),
@@ -179,7 +174,6 @@ const MyPlanPage = () => {
     } finally {
       setLoadingPlan(false);
     }
-  }, [loggedInUser, emptyDays]); 
   }, [loggedInUser, emptyDays]); 
 
 
