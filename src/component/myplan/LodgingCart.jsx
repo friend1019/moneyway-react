@@ -1,4 +1,3 @@
-// src/components/myplan/LodgingCart.js
 import React from 'react';
 import { useDraggable } from '@dnd-kit/core';
 import hotelIcon from "../../images/shopping/hotel.svg";
