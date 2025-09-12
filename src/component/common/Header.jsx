@@ -24,10 +24,12 @@ function Header() {
   // ✅ 흰 배경을 적용할 경로 규칙
   const whiteBgPaths = useMemo(
     () => [
+      "/community",
       "/mypage",
       "/cart",
       "/planlist",
       "/search",
+      "/myplan"
       // 필요하면 더 추가
     ],
     []
@@ -37,6 +39,8 @@ function Header() {
   const isWhiteBg = useMemo(() => {
     const p = location.pathname;
     if (whiteBgPaths.includes(p)) return true;
+
+    if (p.startsWith("/myplan/")) return true;
 
     // 예: /post/:id, /article/:id, /event/:id 등
     const dynamicStarts = ["/post/", "/article/", "/event/"];

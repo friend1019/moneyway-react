@@ -77,13 +77,11 @@ const BudgetDisplay = ({
           style={{ display: "flex", alignItems: "center", gap: "0.4rem", cursor: isEditMode ? "pointer" : "default" }}
         >
           <FiEdit />
-             {totalBudget > 0 ? (
-                `₩${totalBudget.toLocaleString()}`
-            ) : zeroBudgetDisplay === 'number' ? (
-              `₩${totalBudget.toLocaleString()}`
-            ) : (
-               <span className="budget-placeholder">예산을 설정해주세요</span>
-            )}
+          {isEditMode && totalBudget === 0 ? (
+            <span className="budget-placeholder">예산을 설정해주세요</span>
+          ) : (
+            `₩${(totalBudget || 0).toLocaleString()}`
+          )}
              </span>
       )}
     </div>

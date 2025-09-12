@@ -467,7 +467,6 @@ const MyPlanPage = () => {
         placeName: selectedItem.name, // 카트에서는 placeName 사용
         category: selectedItem.category,
         price: selectedItem.cost,
-        // 좌표 정보도 함께 보존
         mapX: selectedItem.mapX,
         mapY: selectedItem.mapY,
       };
@@ -478,11 +477,6 @@ const MyPlanPage = () => {
     closeMenu();
   }, [menuState, closeMenu]);
 
-  const handleViewDetails = useCallback(() => {
-    const { selectedItem } = menuState;
-    if (!selectedItem) return;
-    closeMenu();
-  }, [menuState, closeMenu]);
 
   useEffect(() => {
     if (menuState.visible) {
@@ -501,10 +495,16 @@ const MyPlanPage = () => {
 
   // 예산
   const handleBudgetClick = useCallback(() => {
-    setBudgetInput(planDetails.totalBudget);
+    if (planDetails.totalBudget > 0) {
+      setBudgetInput(String(planDetails.totalBudget));
+    } else {
+      setBudgetInput('');
+    }
     setIsEditingBudget(true);
   }, [planDetails.totalBudget]);
+
   const handleBudgetChange = useCallback((e) => setBudgetInput(e.target.value), []);
+  
   const handleBudgetBlur = useCallback(() => {
     const newTotalBudget = parseInt(budgetInput, 10) || 0;
     setPlanDetails(prev => ({ ...prev, totalBudget: newTotalBudget }));
@@ -590,16 +590,15 @@ const MyPlanPage = () => {
   
       const payload = {
         title: planDetails?.title || "새 여행 계획",
-        totalPrice: Number(planDetails?.usedBudget || 0),
+        totalPrice: Number(planDetails.totalBudget || 0),
         places,
       };
-  
       await api.patch(`/plans/${currentPlanId}`, payload);
   
       alert("여행 계획이 저장되었습니다.");
       setIsEditMode(false);
       
-      // 4. 로컬 상태 업데이트 (화면 깜빡임 방지)
+    
       setCartItems([]); // 로컬 카트 비우기
       setIsDirty(false); // 저장되었으므로 '변경사항 없음'으로 상태 변경
 
@@ -636,10 +635,9 @@ const MyPlanPage = () => {
       ];
     }
     return [
-      { label: '일정 상세보기', action: handleViewDetails },
       { label: '삭제하기', action: handleDeleteItem },
     ];
-  }, [menuState, handleViewDetails, handleDeleteItem, closeMenu]);
+  }, [menuState, handleDeleteItem, closeMenu]);
 
 
 

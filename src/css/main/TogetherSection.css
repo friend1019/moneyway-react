@@ -46,9 +46,9 @@
 }
 
 /* ===== 타이포 ===== */
-.eyebrow { font-weight: 700; color: var(--brand-sky); margin: 0 0 0.8rem; font-size: 3rem; }
-.title   { margin: 0 0 2.4rem; font-size: 4rem; line-height: 1.2; font-weight: 900; color: #111; }
-.lede    { margin: 0 0 3.2rem; font-size: 2rem; line-height: 1.8; color: #6b7280; word-break: keep-all; }
+.eyebrow { font-weight: 700; color: var(--brand-sky); margin: 0 0 0.8rem; font-size: 2.5rem; }
+.title   { margin: 0 0 2.4rem; font-size: 3rem; line-height: 1.2; font-weight: 900; color: #111; }
+.lede    { margin: 0 0 3.2rem; font-size: 1.8rem; line-height: 1.8; color: #6b7280; word-break: keep-all; }
 
 /* ===== 타임라인(리스트) ===== */
 .steps--cards {

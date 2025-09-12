@@ -95,13 +95,13 @@ function TogetherSection() {
       <div className="together__inner">
         {/* 왼쪽 */}
         <aside className="together__left">
-          <p className="eyebrow">내 손안의 여행 편집샵</p>
-          <h2 className="title">가장 아름다운 제주를 만날 시간</h2>
+          <p className="eyebrow">AI로 완성하는 나만의 제주 여행</p>
+          <h2 className="title">몇 번의 클릭으로 시작되는 스마트한 여정</h2>
 
           <p className="lede">
-            돌담길, 귤밭, 바다 내음을 가득한 골목까지.
+            넘쳐나는 정보 속에서 고민은 이제 그만. 예산과 기간
             <br />
-            제주 여행, 어디부터 정해야 할지 막막하시죠?
+            만 입력하면, AI가 알아서 똑똑하게 계획해 주니까요.
           </p>
 
           <ol className="steps steps--cards" aria-label="단계">
