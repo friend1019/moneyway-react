@@ -147,7 +147,7 @@ function PanelSection() {
             />
             <a href="/search" className="panel-btn">
               <span className="panel-btn__text">카트 채우러 가기</span>
-              <span className="panel-btn__arrow" aria-hidden="true">›</span>
+              <span className="panel-btn__arrow" aria-hidden="true"></span>
             </a>
           </div>
         </div>

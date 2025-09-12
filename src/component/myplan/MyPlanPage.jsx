@@ -712,6 +712,12 @@ const MyPlanPage = () => {
 
     navigate('/map', { state: { placesByDay: placesByDay } });
 };
+const handleTimeBack = () => {
+  setTimeModal((prev) => ({
+    ...prev,
+    step: "start" 
+  }));
+};
 
   return (
     <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>
@@ -801,6 +807,7 @@ const MyPlanPage = () => {
               itemName={timeModal.draggedItem?.placeName}
               category={timeModal.draggedItem?.category}
               step={timeModal.step}
+              onBack={handleTimeBack} 
             />
           </div>
         </div>
