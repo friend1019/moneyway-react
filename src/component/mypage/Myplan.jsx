@@ -98,7 +98,12 @@ const MyPlan = ({ onClose }) => {
     <div className="myplan-container">
       {loading && <div className="plan-loading">불러오는 중…</div>}
       {!loading && plans.length === 0 && (
-        <p className="plan-empty-text">아직 저장된 여행 계획이 없어요.</p>
+        <>
+          <h1>새로운 제주 여행 계획하기</h1>
+          <p className="plan-empty-text">
+            '+'버튼을 눌러 당신의 여정을 시작하세요.<br />
+          여행의 이름을 설정하고 나만의 플랜을 만들 수 있습니다.</p>
+        </>
       )}
 
       {plans.map((plan, idx) => {
