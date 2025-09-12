@@ -292,7 +292,7 @@ const MyPlanPage = () => {
       
       const daysLength = aiPlanData.days?.length || 1;
       setEnabledDays(daysLength);
-      setIsEditMode(false); 
+      setIsEditMode(true); 
       setIsDirty(true);
     }
   }, [location.state]);
@@ -382,7 +382,7 @@ const MyPlanPage = () => {
       duration: durationHours,
       cartId: draggedItem.cartId,
       placeId: draggedItem.placeId,
-      // 카트 API에서 받은 좌표 데이터 그대로 사용
+      
       mapX: draggedItem.mapX,
       mapY: draggedItem.mapY,
     };
@@ -635,11 +635,11 @@ const MyPlanPage = () => {
       ];
     }
     return [
-      { label: '삭제하기', action: handleDeleteItem },
+      { label: '카트로 옮기기', action: handleDeleteItem },
     ];
   }, [menuState, handleDeleteItem, closeMenu]);
 
-
+  
 
   //지도 위치 프롭스
   const handleMapView = () => {

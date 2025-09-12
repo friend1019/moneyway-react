@@ -67,16 +67,16 @@ const toCssCategory = (apiCategory) => {
 const ScheduleItem = ({
     item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated, onContextMenu, timeSlotsLength,
 }) => {
-    const uniqueId = item.id || item.cartId || item.placeId;
+    const dndId = item.id;
     const displayCategory = translateCategory(item.category);
     
     const cssCategoryClass = toCssCategory(item.category);
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-        id: uniqueId,
+        id: dndId,
         data: { ...item, origin: 'schedule', originalDay: day },
         disabled: !isEditMode,
-    });
+    })
 
     function getTimeTop(time) {
         const [h, m] = time.split(':').map(Number);
