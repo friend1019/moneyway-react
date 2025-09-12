@@ -249,6 +249,13 @@ const MyPlanPage = () => {
     else setIsEditMode(false);
   }, [planId, isNewPlan]);
 
+  // 새로 생성된 플랜은 사용자가 손대지 않아도 이탈 시 경고를 띄우기 위해 dirty로 취급
+  useEffect(() => {
+    if (isNewPlan) {
+      setIsDirty(true);
+    }
+  }, [isNewPlan]);
+
   useEffect(() => {
     if (location.state?.isAIPlan && location.state?.planData) {
       console.log("AI가 생성한 플랜 데이터를 받아 처리합니다:", location.state);
@@ -439,6 +446,18 @@ const MyPlanPage = () => {
       setIsDirty(true);
     }
   }, []);
+
+  // 변경사항 존재 여부를 전역 플래그로 동기화하여 헤더 내비게이션에서 확인할 수 있게 함
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.__MYPLAN_DIRTY__ = !!isDirty;
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.__MYPLAN_DIRTY__ = false;
+      }
+    };
+  }, [isDirty]);
 
   useEffect(() => {
     const handleClickOutside = () => closeMenu();

@@ -46,8 +46,6 @@ function Header() {
     const dynamicStarts = ["/post/", "/article/", "/event/"];
     if (dynamicStarts.some((s) => p.startsWith(s))) return true;
 
-    // 예: 홈도 흰색을 쓰고싶다면 아래 주석 해제
-    // if (p === "/") return true;
 
     return false;
   }, [location.pathname, whiteBgPaths]);
@@ -55,7 +53,18 @@ function Header() {
   // 기존: /cart 에서 hover 효과 활성화
   const hoverEnabled = location.pathname.startsWith("/cart");
 
+  const confirmIfDirty = () => {
+    try {
+      const isOnMyPlan = location.pathname.startsWith('/myplan');
+      if (isOnMyPlan && typeof window !== 'undefined' && window.__MYPLAN_DIRTY__) {
+        return window.confirm('저장되지 않은 변경사항이 있습니다. 이동하시겠어요?');
+      }
+    } catch (_) {}
+    return true;
+  };
+
   const handleProtectedRoute = (path) => {
+    if (!confirmIfDirty()) return;
     if (isLoggedIn) navigate(path);
     else navigate("/login");
   };
@@ -65,7 +74,17 @@ function Header() {
       <header className="header-top">
         <div className="header-top-container">
           <div className="logo-area">
-            <Link to="/" className="logo-link">
+            <Link
+              to="/"
+              className="logo-link"
+              onClick={(e) => {
+                // /myplan* 에서 편집중일 때 이동 확인
+                const ok = confirmIfDirty();
+                if (!ok) {
+                  e.preventDefault();
+                }
+              }}
+            >
               <img src={logo} alt="logo" />
             </Link>
           </div>

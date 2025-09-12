@@ -217,36 +217,34 @@
 .plan-card {
   --act-size: 8rem;   
   --act-gap: 0.75rem;   
-  --act-pad: 0.75rem;   /* 패널 안쪽 좌우 패딩 */
+  --act-pad: 0.75rem;   
 }
 
 .plan-card.is-reveal .card-track {
-  transform: translateX(calc(-1 * ((2 * var(--act-size)) + var(--act-gap))));
+  transform: translateX(calc(-1 * ((2 * var(--act-size)) + var(--act-gap) + 2rem)));
 }
 .plan-card.is-reveal .card-actions { 
   opacity: 1; 
   pointer-events: auto; 
 }
 
-/* ▶ 정사각형 버튼 */
 .action-btn {
-  width: var(--act-size);
-  height: var(--act-size);
-  flex: 0 0 var(--act-size);
+  min-width: 10rem;       
+  height: 4.4rem;         
+  flex: 0 0 auto;        
   border-radius: 0.75rem;
-  padding: 1rem;
+  padding: 0 1.5rem;    
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   line-height: 1.15;
   font-size: 1.5rem;
-  font-weight: 700;
-  border: 0.2rem solid transparent;
+  font-weight: 600;
+  border: 0.1rem solid #C1C1C1;
   cursor: pointer;
-  white-space: pre-line;
-  word-break: keep-all;
-  gap: 1rem;
+  white-space: nowrap;   
+  gap: 0.8rem;           
 }
 
 .action-btn.primary { background:#ffffff; color:#111827; border-color:#9aa1ac; }
