@@ -16,10 +16,12 @@
   grid-template-columns: 1.1fr 1.9fr;
   align-items: stretch;
   gap: var(--gap);
-  max-width: 75vw;
+  max-width: 100vw;
   margin: 0 auto;
-  padding: 18rem 2rem;
+  margin-top: -3rem;
+  padding: 20rem 25rem;
   z-index: 10;
+  background-color: #fff;
 }
 
 /* 좌측 블록 */

@@ -1,5 +1,5 @@
 // src/components/common/Header.jsx
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, matchPath } from "react-router-dom";
 import { useState, useMemo } from "react";
 import SideMenu from "./SideMenu";
 import useUserStore from "../../api/userStore";
@@ -21,34 +21,35 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ 흰 배경을 적용할 경로 규칙
-  const whiteBgPaths = useMemo(
+  // ✅ 흰 배경을 적용할 경로 패턴 (정확/부분 매칭 혼합)
+  // - end: true  → 해당 경로 '정확히' 일치할 때만
+  // - end: false → 해당 경로로 '시작하는' 모든 하위 경로 포함 (prefix 매칭)
+  const whiteBgPatterns = useMemo(
     () => [
-      "/mypage",
-      "/cart",
-      "/planlist",
-      "/search",
-      // 필요하면 더 추가
+      { path: "/mypage", end: true },
+      { path: "/cart", end: true },
+      { path: "/planlist", end: true },
+      { path: "/search", end: true },
+      { path: "/login", end: true },
+      { path: "/signup", end: true },
+      { path: "/community", end: true },
+
+      // ✅ posts 전용: 리스트/작성/상세/수정 등 전체 포함
+      //   - /posts                (리스트)
+      //   - /posts/create         (작성)
+      //   - /posts/1              (상세)
+      //   - /posts/1/edit         (수정)
+      { path: "/posts", end: false }, // prefix 매칭으로 자식 경로 모두 포함
     ],
     []
   );
 
-  // ✅ 동적 라우트 대응 헬퍼: startsWith 매칭 + 패턴 일부 예시
   const isWhiteBg = useMemo(() => {
-    const p = location.pathname;
-    if (whiteBgPaths.includes(p)) return true;
+    const pathname = location.pathname;
+    return whiteBgPatterns.some((p) => matchPath({ path: p.path, end: p.end }, pathname));
+  }, [location.pathname, whiteBgPatterns]);
 
-    // 예: /post/:id, /article/:id, /event/:id 등
-    const dynamicStarts = ["/post/", "/article/", "/event/"];
-    if (dynamicStarts.some((s) => p.startsWith(s))) return true;
-
-    // 예: 홈도 흰색을 쓰고싶다면 아래 주석 해제
-    // if (p === "/") return true;
-
-    return false;
-  }, [location.pathname, whiteBgPaths]);
-
-  // 기존: /cart 에서 hover 효과 활성화
+  // 기존: /cart 에서 hover 효과 활성화 (그대로 유지)
   const hoverEnabled = location.pathname.startsWith("/cart");
 
   const handleProtectedRoute = (path) => {
