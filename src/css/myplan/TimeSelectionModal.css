@@ -24,8 +24,16 @@
   border-bottom: 1px solid #f1f3f5;
 }
 
+.time-back-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6b7280;
+}
 
-  .activity-badge {
+.activity-badge {
+  flex: 1; 
   display: inline-flex; align-items: center; gap: .375rem;
   background: transparent; 
   padding: 0; border-radius: 0;

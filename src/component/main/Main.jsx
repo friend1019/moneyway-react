@@ -164,7 +164,7 @@ function PanelSection() {
 
       <div className="panel-grid">
         <div className="panel-left">
-          <p className="panel-eyebrow">당신을 위한 JEJU</p>
+          <p className="panel-eyebrow">내 손안의 여행 편집샵</p>
           <h2 className="panel-title">
             머니웨이에서 찾으세요, <br />
             당신에게 딱 맞는 맞춤 여행 플랜
@@ -182,9 +182,7 @@ function PanelSection() {
             />
             <a href="/search" className="panel-btn">
               <span className="panel-btn__text">카트 채우러 가기</span>
-              <span className="panel-btn__arrow" aria-hidden="true">
-                ›
-              </span>
+              <span className="panel-btn__arrow" aria-hidden="true"></span>
             </a>
           </div>
         </div>

@@ -25,7 +25,8 @@ const TimeSelectionModal = ({
   onConfirm, 
   itemName, 
   category,
-  step = 'start'
+  step = 'start',
+  onBack 
 }) => {
   const [selectedTime, setSelectedTime] = useState('14:00'); // 기본값 오후 2:00
 
@@ -58,11 +59,21 @@ const TimeSelectionModal = ({
     <div className="time-modal-overlay" onClick={handleBackdropClick}>
       <div className="time-modal-container">
         <div className="time-modal-header">
+          <button className='time-back-button' onClick={() => {
+            if (step === "start") {
+              onClose(); 
+            } else {
+              onBack();    
+            }
+          }}
+          >←</button>
+
           <div className="activity-badge">
             <img src={icon} alt={category} className="activity-icon-img" style={{ width: '2rem', height: '2rem' }} />
             <span className="activity-text" style={{ color }}>{category || '액티비티'}</span>
             <span className="activity-category">[{itemName}]</span>
           </div>
+
           <button className="close-button" onClick={onClose}>✕</button>
         </div>
         

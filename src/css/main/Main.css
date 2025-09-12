@@ -266,6 +266,11 @@
   font-weight: 900;
   line-height: 1; /* ✅ 글리프 위아래 여백 제거 */
 }
+.panel-btn__arrow::before {
+  content: "›"; 
+  transform: translateY(-0.05em); 
+  display: inline-block;
+}
 /* 호버/포커스 미세 인터랙션 (색상 변경 없음) */
 .panel-btn:hover {
   transform: translateY(-2px);

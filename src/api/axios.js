@@ -59,7 +59,7 @@ const doRefresh = async () => {
 };
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL,
+  baseURL: "https://moneyway.cloud/api",
   withCredentials: true,
 });
 

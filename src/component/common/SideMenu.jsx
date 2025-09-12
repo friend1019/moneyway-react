@@ -58,6 +58,23 @@ const SideMenu = ({ onClose }) => {
     }
   };
 
+  const handleAddPlanClick = async () => {
+    try {
+      const res = await api.post("/plans/empty");
+      const newPlanId = res?.data?.id ?? res?.data?.planId;
+      if (!newPlanId) {
+        toast.error("새 여행 계획 ID를 확인할 수 없습니다.");
+        return;
+      }
+      navigate(`/myplan/${newPlanId}`, { state: { isNewPlan: true } });
+      startClose(); // 메뉴 닫기
+    } catch (err) {
+      console.error("POST /plans/empty 실패:", err);
+      toast.error("새 여행 계획을 만들 수 없어요. 잠시 후 다시 시도해주세요.");
+    }
+  };
+  
+
   return (
     <>
       {/* 오버레이 */}
@@ -118,9 +135,9 @@ const SideMenu = ({ onClose }) => {
             </Link>
           </li>
           <li>
-            <Link to="/create-plan" onClick={startClose}>
+            <button className="menu-list a" onClick={handleAddPlanClick}>
               나만의 플랜 생성
-            </Link>
+            </button>
           </li>
           <li>
             <Link to="/community" onClick={startClose}>

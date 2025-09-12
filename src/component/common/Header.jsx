@@ -1,4 +1,3 @@
-// src/components/common/Header.jsx
 import { Link, useNavigate, useLocation, matchPath } from "react-router-dom";
 import { useState, useMemo } from "react";
 import SideMenu from "./SideMenu";
@@ -21,38 +20,40 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ 흰 배경을 적용할 경로 패턴 (정확/부분 매칭 혼합)
-  // - end: true  → 해당 경로 '정확히' 일치할 때만
-  // - end: false → 해당 경로로 '시작하는' 모든 하위 경로 포함 (prefix 매칭)
+
   const whiteBgPatterns = useMemo(
     () => [
+      { path: "/community", end: true },
       { path: "/mypage", end: true },
       { path: "/cart", end: true },
       { path: "/planlist", end: true },
       { path: "/search", end: true },
-      { path: "/login", end: true },
-      { path: "/signup", end: true },
-      { path: "/community", end: true },
-
-      // ✅ posts 전용: 리스트/작성/상세/수정 등 전체 포함
-      //   - /posts                (리스트)
-      //   - /posts/create         (작성)
-      //   - /posts/1              (상세)
-      //   - /posts/1/edit         (수정)
-      { path: "/posts", end: false }, // prefix 매칭으로 자식 경로 모두 포함
+      { path: "/myplan", end: false },
     ],
     []
   );
 
   const isWhiteBg = useMemo(() => {
     const pathname = location.pathname;
-    return whiteBgPatterns.some((p) => matchPath({ path: p.path, end: p.end }, pathname));
+    return whiteBgPatterns.some((pattern) =>
+      matchPath({ path: pattern.path, end: pattern.end }, pathname)
+    );
   }, [location.pathname, whiteBgPatterns]);
 
-  // 기존: /cart 에서 hover 효과 활성화 (그대로 유지)
   const hoverEnabled = location.pathname.startsWith("/cart");
 
+  const confirmIfDirty = () => {
+    try {
+      const isOnMyPlan = location.pathname.startsWith('/myplan');
+      if (isOnMyPlan && typeof window !== 'undefined' && window.__MYPLAN_DIRTY__) {
+        return window.confirm('저장되지 않은 변경사항이 있습니다. 이동하시겠어요?');
+      }
+    } catch (_) {}
+    return true;
+  };
+
   const handleProtectedRoute = (path) => {
+    if (!confirmIfDirty()) return;
     if (isLoggedIn) navigate(path);
     else navigate("/login");
   };
@@ -62,7 +63,17 @@ function Header() {
       <header className="header-top">
         <div className="header-top-container">
           <div className="logo-area">
-            <Link to="/" className="logo-link">
+            <Link
+              to="/"
+              className="logo-link"
+              onClick={(e) => {
+                // /myplan* 에서 편집중일 때 이동 확인
+                const ok = confirmIfDirty();
+                if (!ok) {
+                  e.preventDefault();
+                }
+              }}
+            >
               <img src={logo} alt="logo" />
             </Link>
           </div>

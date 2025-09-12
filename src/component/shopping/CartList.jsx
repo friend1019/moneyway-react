@@ -75,7 +75,6 @@ const CartList = ({ cartItems, setCartItems }) => {
       </div>
 
       <div className="cartlist-table-header">
-        <div className="cartlist-table-title"></div>
         <div className="cartlist-table-title">수량 및 가격</div>
       </div>
 
