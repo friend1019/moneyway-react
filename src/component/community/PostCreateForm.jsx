@@ -26,19 +26,24 @@ const PostCreateForm = () => {
   const [thumbPreview, setThumbPreview] = useState(null);
 
   // 본문 이미지
-  const [photoFiles, setPhotoFiles] = useState([]);
-  const [photoPreviews, setPhotoPreviews] = useState([]);
+  const [photoFiles, setPhotoFiles] = useState([]);       // File[]
+  const [photoPreviews, setPhotoPreviews] = useState([]); // objectURL[]
 
   const navigate = useNavigate();
   const isFormValid = title.trim() !== "" && content.trim() !== "";
 
+  // ---- 안전한 revoke ----
+  const revokeURLSafe = useCallback((url) => {
+    try { URL.revokeObjectURL(url); } catch (_) {}
+  }, []);
+
+  // ---- 언마운트/리셋 시 URL 정리 ----
   useEffect(() => {
     return () => {
       if (thumbPreview) URL.revokeObjectURL(thumbPreview);
-      photoPreviews.forEach(URL.revokeObjectURL);
+      photoPreviews.forEach((u) => URL.revokeObjectURL(u));
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [thumbPreview, photoPreviews]);
 
   // ===== 통화 포맷 유틸 =====
   const nfKR = useMemo(() => new Intl.NumberFormat("ko-KR"), []);
@@ -82,10 +87,17 @@ const PostCreateForm = () => {
       toast.warn(`썸네일은 ${MAX_FILE_MB}MB 이하만 가능해요.`);
       return;
     }
-    if (thumbPreview) URL.revokeObjectURL(thumbPreview);
+    if (thumbPreview) revokeURLSafe(thumbPreview);
     setThumbFile(f);
     setThumbPreview(URL.createObjectURL(f));
   };
+
+  // ✅ 썸네일 삭제
+  const handleRemoveThumbnail = useCallback(() => {
+    if (thumbPreview) revokeURLSafe(thumbPreview);
+    setThumbFile(null);
+    setThumbPreview(null);
+  }, [thumbPreview, revokeURLSafe]);
 
   // 파일 선택(본문 이미지)
   const handleSelectPhotos = (e) => {
@@ -106,7 +118,8 @@ const PostCreateForm = () => {
     }
 
     const merged = [...photoFiles, ...next].slice(0, MAX_IMAGES);
-    photoPreviews.forEach(URL.revokeObjectURL);
+    // 기존 URL 정리 후 새로 생성
+    photoPreviews.forEach((u) => revokeURLSafe(u));
     const previews = merged.map((f) => URL.createObjectURL(f));
 
     setPhotoFiles(merged);
@@ -116,6 +129,21 @@ const PostCreateForm = () => {
       toast.info(`이미지는 최대 ${MAX_IMAGES}장까지 업로드할 수 있어요.`);
     }
   };
+
+  // ✅ 본문 이미지 개별 삭제 (index 기반)
+  const handleRemovePhoto = useCallback((idx) => {
+    setPhotoFiles((prev) => {
+      const copy = [...prev];
+      copy.splice(idx, 1);
+      return copy;
+    });
+    setPhotoPreviews((prev) => {
+      const copy = [...prev];
+      const [removedUrl] = copy.splice(idx, 1);
+      if (removedUrl) revokeURLSafe(removedUrl);
+      return copy;
+    });
+  }, [revokeURLSafe]);
 
   // 제출
   const handleSubmit = async () => {
@@ -133,8 +161,9 @@ const PostCreateForm = () => {
       await api.post("/posts", fd);
       toast.success("글이 등록되었습니다!");
 
-      if (thumbPreview) URL.revokeObjectURL(thumbPreview);
-      photoPreviews.forEach(URL.revokeObjectURL);
+      // URL 정리
+      if (thumbPreview) revokeURLSafe(thumbPreview);
+      photoPreviews.forEach((u) => revokeURLSafe(u));
 
       // reset
       setTitle("");
@@ -178,7 +207,7 @@ const PostCreateForm = () => {
             alt="프로필"
             className="profile-img"
           />
-        <textarea
+          <textarea
             className="post-content-input"
             placeholder="나의 여행을 공유해보세요!"
             value={content}
@@ -244,18 +273,29 @@ const PostCreateForm = () => {
           </div>
         </div>
 
-        {/* 썸네일 미리보기 */}
+        {/* 썸네일 미리보기 + 삭제 버튼(위 중앙) */}
         {thumbPreview && (
           <>
             <div className="divider" />
             <div className="thumbnail-selector">
               <p className="thumbnail-title">썸네일 미리보기</p>
-              <img src={thumbPreview} alt="thumbnail" className="thumbnail-image selected" />
+              <div className="thumbnail-single-wrap">
+                <img src={thumbPreview} alt="thumbnail" className="thumbnail-image selected" />
+                <button
+                  type="button"
+                  className="thumb-remove-btn"
+                  onClick={handleRemoveThumbnail}
+                  aria-label="썸네일 삭제"
+                  title="썸네일 삭제"
+                >
+                  ×
+                </button>
+              </div>
             </div>
           </>
         )}
 
-        {/* 본문 이미지 미리보기 */}
+        {/* 본문 이미지 미리보기 + 개별 삭제(위 중앙) */}
         {photoPreviews.length > 0 && (
           <>
             <div className="divider" />
@@ -263,7 +303,18 @@ const PostCreateForm = () => {
               <p className="thumbnail-title">업로드될 이미지 목록</p>
               <div className="thumbnail-image-list">
                 {photoPreviews.map((url, idx) => (
-                  <img key={idx} src={url} alt={`uploaded-${idx}`} className="thumbnail-image" />
+                  <div key={idx} className="thumbnail-item">
+                    <img src={url} alt={`uploaded-${idx}`} className="thumbnail-image" />
+                    <button
+                      type="button"
+                      className="remove-photo-btn"
+                      onClick={() => handleRemovePhoto(idx)}
+                      aria-label={`이미지 ${idx + 1} 삭제`}
+                      title="이미지 삭제"
+                    >
+                      ×
+                    </button>
+                  </div>
                 ))}
               </div>
             </div>

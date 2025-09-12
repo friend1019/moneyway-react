@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Lenis from "@studio-freight/lenis";
 
 import "../../css/main/Main.css";
@@ -9,6 +9,14 @@ import mainIcons2 from "../../images/main/mainIcons2.png";
 import cartIcon from "../../images/main/cartIcon.svg";
 import RotatingTextWave from "./RotatingTextWave";
 import Footer from "../common/Footer";
+
+// ✅ 배경 이미지 3장 import
+import bg1 from "../../images/main/background1.svg";
+import bg2 from "../../images/main/background2.svg";
+import bg3 from "../../images/main/background3.svg";
+
+const images = [bg1, bg2, bg3];
+const DURATION = 5000; // 한 장 유지 시간(ms)
 
 export default function StickyTest() {
   useEffect(() => {
@@ -44,24 +52,38 @@ export default function StickyTest() {
   );
 }
 
+/* ---------------- HeroSection ---------------- */
 function HeroSection() {
   const pinRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
+  // ✅ 배경 전환 타이머
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveIndex((i) => (i + 1) % images.length);
+    }, DURATION);
+    return () => clearInterval(timer);
+  }, []);
+
+  // ✅ 이미지 미리 로딩
+  useEffect(() => {
+    images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
+
+  // ✅ 기존 pin hide 로직
   useEffect(() => {
     const pin = pinRef.current;
     const panel = document.querySelector(".test-panel"); // 첫 패널
-
     if (!pin || !panel) return;
 
     const update = () => {
-      // 패널의 top(Y)과 핀의 '화면 중앙 기준 bottom' 계산
       const panelTop = panel.getBoundingClientRect().top;
       const pinRect = pin.getBoundingClientRect();
-      // pin 은 fixed + top:50vh + translateY(-50%) 이라서 화면 중앙이 pin의 수직 중심
       const pinBottomY = window.innerHeight * 0.5 + pinRect.height * 0.5;
-
-      // 패널 top이 pin bottom을 지나면(= 완전히 덮음) 숨김
-      const fullyCovered = panelTop <= pinBottomY - 400; // 여유 4px
+      const fullyCovered = panelTop <= pinBottomY - 400;
       pin.classList.toggle("is-hidden", fullyCovered);
     };
 
@@ -77,9 +99,22 @@ function HeroSection() {
 
   return (
     <section className="test-hero">
+      {/* ✅ 페이드 전환 배경 */}
+      <div className="hero-bg">
+        {images.map((src, i) => (
+          <div
+            key={i}
+            className={`bg-slide ${i === activeIndex ? "active" : ""}`}
+            style={{ backgroundImage: `url(${src})` }}
+            aria-hidden="true"
+          />
+        ))}
+      </div>
+
+      {/* 고정 문구 */}
       <div ref={pinRef} className="test-hero__pin">
-        <h1>제주도 여행, 아직도 어렵게 하세요?</h1>
-        <p>돈 걱정 없이, 돈 쓰러가는 제주여행!</p>
+        <p>여행을 쇼핑하다,<br />제주를 담다</p>
+        <h1>제주도 여행 아직도 어렵게 하세요? <br />머니웨이에서 가장 완벽한 제주 여행이 시작됩니다.</h1>
         <ScrollDown />
       </div>
       <div className="test-hero__spacer" />
@@ -97,11 +132,11 @@ function ScrollDown() {
   );
 }
 
+/* ---------------- PanelSection ---------------- */
 function PanelSection() {
   return (
     <section className="test-panel">
       <div className="title-strip">
-        {/* ✅ 여기 교체: 회전 + 웨이브 */}
         <p className="title-eyebrow">
           <RotatingTextWave
             phrases={[
@@ -109,11 +144,11 @@ function PanelSection() {
               "내 여행이 실현되는 곳,",
               "내 추억이 기록되는 곳,",
             ]}
-            interval={2000} // 문구당 2초 유지
-            height={64} // 한 줄 높이(px) — title-eyebrow에 맞추어 조절
-            align="center" // 'left' | 'center' | 'right'
-            amplitude={10} // 웨이브 높이(px)
-            charDelay={0.035} // 파도 속도(글자당 지연)
+            interval={2000}
+            height={64}
+            align="center"
+            amplitude={10}
+            charDelay={0.035}
           />
         </p>
 
@@ -162,6 +197,7 @@ function PanelSection() {
   );
 }
 
+/* ---------------- ThirdPanel ---------------- */
 function ThirdPanel() {
   return (
     <section className="third-panel-container">

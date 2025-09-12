@@ -1,13 +1,39 @@
 /* ========== Hero ========== */
 .test-hero {
   position: relative;
-  z-index: 1;                    /* 다음 섹션이 위에서 덮도록 */
+  z-index: -99999;                 /* 다음 섹션이 위에서 덮도록 */
   min-height: 97vh;
-  background: url("../../images/main/background.jpg") no-repeat center center;
-  background-size: cover; /* 꽉 채우기 */  color: rgb(255, 255, 255);
-  background-attachment: fixed;
+  color: #fff;
   padding-top: 140px;
   margin-top: -10rem;
+  overflow: hidden;           /* 배경 레이어 클리핑 */
+}
+
+/* ✅ 페이드 전환 배경 레이어 컨테이너 */
+.hero-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -99999;
+  pointer-events: none;       /* 배경은 클릭 불가 */
+}
+
+/* ✅ 각 슬라이드: 겹쳐놓고 opacity로 페이드 */
+.bg-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center center;
+  /* 모바일 fixed 이슈 방지: translateZ로 성능 보정 */
+  will-change: opacity, transform;
+  transform: translateZ(0);
+
+  opacity: 0;
+  transition: opacity 1.6s ease;  /* JS의 전환 시간과 맞추기 */
+}
+
+.bg-slide.active {
+  opacity: 1;
+  z-index: 1;
 }
 
 /* 센티넬(표시용 보이지 않는 라인) */
@@ -41,23 +67,24 @@
 /* 등장 애니메이션 */
 .test-hero__pin h1 {
   margin: 0 0 1rem;
-  font-size: 3rem;
+  font-size: 2rem;
   font-weight: 900;
   visibility: hidden;
   opacity: 0;
   transform: translateY(20px);
   animation: fadeUp 1s ease-out 0.2s forwards;
 }
+
 .test-hero__pin p {
   margin: 0 0 2rem;
   font-size: 5rem;
   font-weight: 900;
   opacity: 0.9;
   visibility: hidden;
-  opacity: 0;
   transform: translateY(20px);
   animation: fadeUp 1s ease-out 0.6s forwards;
 }
+
 .scroll-down {
   margin-top: 3rem;
   font-size: 1.6rem;
@@ -67,7 +94,6 @@
   flex-direction: column;
   align-items: center;
   visibility: hidden;
-  opacity: 0;
   transform: translateY(20px);
   animation: fadeUp 1s ease-out 1.2s forwards;
 }
@@ -82,8 +108,16 @@
   0%   { visibility: hidden; opacity: 0; transform: translateY(20px); }
   100% { visibility: visible; opacity: 1; transform: translateY(0); }
 }
-@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(8px); }
+}
 
+/* 접근성: 모션 줄이기 설정일 때는 즉시 전환 */
+@media (prefers-reduced-motion: reduce) {
+  .bg-slide { transition: none !important; }
+  .scroll-icon { animation: none !important; }
+}
 
 /* ========== Panel ========== */
 .test-panel {
@@ -306,7 +340,7 @@
 
   position: relative;
   min-height: 100vh;
-  padding: 4rem 0;
+  padding: 0rem 0;
   display: flex;
   align-items: center;
   justify-content: center;

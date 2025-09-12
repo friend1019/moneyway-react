@@ -3,7 +3,6 @@ import "../../css/main/Main.css";
 import "../../css/main/TogetherSection.css";
 import PlanIcon from "../../images/main/planIcon.svg";
 
-// ✅ 오른쪽 프리뷰 이미지 import
 import Together1 from "../../images/main/together1.png";
 import Together2 from "../../images/main/together2.png";
 import Together3 from "../../images/main/together3.png";
@@ -96,12 +95,14 @@ function TogetherSection() {
         {/* 왼쪽 */}
         <aside className="together__left">
           <p className="eyebrow">AI로 완성하는 나만의 제주 여행</p>
+
           <h2 className="title">몇 번의 클릭으로 시작되는 스마트한 여정</h2>
 
           <p className="lede">
             넘쳐나는 정보 속에서 고민은 이제 그만. 예산과 기간
             <br />
             만 입력하면, AI가 알아서 똑똑하게 계획해 주니까요.
+
           </p>
 
           <ol className="steps steps--cards" aria-label="단계">

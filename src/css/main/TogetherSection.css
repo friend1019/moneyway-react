@@ -17,6 +17,7 @@
   padding: 12rem 0;
   overscroll-behavior: contain;
   z-index: 3;
+  margin-bottom: -3rem;
 }
 
 /* ===== 레이아웃 ===== */
@@ -209,7 +210,7 @@
   position: absolute;
   inset: 0;
   width: 100%;
-  height: 95%;
+  height: 90%;
   object-fit: cover;       /* ✅ 기본: 꽉 채우기(양옆/상하 잘릴 수 있음) */
   object-position: center;
 
@@ -238,7 +239,7 @@
 .ph-cta {
   position: absolute;
   right: 3.6rem;
-  bottom: 1.6rem;
+  bottom: -0rem;
   z-index: 2;
   display: flex;
   align-items: center;

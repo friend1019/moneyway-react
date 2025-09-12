@@ -1,5 +1,4 @@
-// src/components/common/Header.jsx
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation, matchPath } from "react-router-dom";
 import { useState, useMemo } from "react";
 import SideMenu from "./SideMenu";
 import useUserStore from "../../api/userStore";
@@ -21,36 +20,26 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ 흰 배경을 적용할 경로 규칙
-  const whiteBgPaths = useMemo(
+
+  const whiteBgPatterns = useMemo(
     () => [
-      "/community",
-      "/mypage",
-      "/cart",
-      "/planlist",
-      "/search",
-      "/myplan"
-      // 필요하면 더 추가
+      { path: "/community", end: true },
+      { path: "/mypage", end: true },
+      { path: "/cart", end: true },
+      { path: "/planlist", end: true },
+      { path: "/search", end: true },
+      { path: "/myplan", end: false },
     ],
     []
   );
 
-  // ✅ 동적 라우트 대응 헬퍼: startsWith 매칭 + 패턴 일부 예시
   const isWhiteBg = useMemo(() => {
-    const p = location.pathname;
-    if (whiteBgPaths.includes(p)) return true;
+    const pathname = location.pathname;
+    return whiteBgPatterns.some((pattern) =>
+      matchPath({ path: pattern.path, end: pattern.end }, pathname)
+    );
+  }, [location.pathname, whiteBgPatterns]);
 
-    if (p.startsWith("/myplan/")) return true;
-
-    // 예: /post/:id, /article/:id, /event/:id 등
-    const dynamicStarts = ["/post/", "/article/", "/event/"];
-    if (dynamicStarts.some((s) => p.startsWith(s))) return true;
-
-
-    return false;
-  }, [location.pathname, whiteBgPaths]);
-
-  // 기존: /cart 에서 hover 효과 활성화
   const hoverEnabled = location.pathname.startsWith("/cart");
 
   const confirmIfDirty = () => {
