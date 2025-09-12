@@ -176,7 +176,7 @@
   position: relative;  /* 밑줄 기준점 */
   transition: color 0.18s ease;
 }
-.cart-category-header:hover .cart-category-title { color: #0f63ff; }
+
 .cart-category-title::after {
   content: "";
   position: absolute;
@@ -187,7 +187,6 @@
   background: #0f63ff;
   transition: width 0.22s ease;
 }
-.cart-category-header:hover .cart-category-title::after { width: 100%; }
 
 .cart-category-icon {
   transition: transform 0.18s ease, filter 0.18s ease;

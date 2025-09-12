@@ -111,7 +111,7 @@
 }
 
 /* 링크 효과: 좌측 포인트바 + 화살표 슬라이드 + 백그라운드 하이라이트 */
-.menu-list li a {
+.menu-list li a{
   position: relative;
   display: block;
   color: inherit;
@@ -122,8 +122,27 @@
   outline: none;
 }
 
+
+.menu-list li button {
+  position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  padding: 1.2rem 3.2rem 1.2rem 3.2rem;
+  border-radius: 0.8rem;
+  transition: color 220ms ease, background-color 220ms ease, transform 220ms ease, opacity 220ms ease;
+  outline: none;
+  background: transparent;  
+  border: none;           
+  font: inherit;  
+  width: 100%;       
+  text-align: left;   
+  cursor: pointer;
+}
+
 /* 좌측 포인트 바 */
-.menu-list li a::before {
+.menu-list li a::before,
+.menu-list li button::before {
   content: "";
   position: absolute;
   left: 0;
@@ -139,7 +158,8 @@
 }
 
 /* 우측 화살표 */
-.menu-list li a::after {
+.menu-list li a::after,
+.menu-list li button::after {
   content: "›";
   position: absolute;
   right: 1.2rem;
@@ -152,33 +172,53 @@
 
 /* Hover / Focus */
 .menu-list li a:hover,
-.menu-list li a:focus-visible {
+.menu-list li button:hover,
+.menu-list li a:focus-visible,
+.menu-list li button:focus-visible {
   color: var(--brand);
   background: rgba(33,118,255,0.07);
   transform: translateX(2px);
 }
 .menu-list li a:hover::before,
-.menu-list li a:focus-visible::before { transform: scaleY(1); }
+.menu-list li button:hover::before,
+.menu-list li a:focus-visible::before,
+.menu-list li button:focus-visible::before {
+  transform: scaleY(1);
+}
 .menu-list li a:hover::after,
-.menu-list li a:focus-visible::after {
+.menu-list li button:hover::after,
+.menu-list li a:focus-visible::after,
+.menu-list li button:focus-visible::after {
   opacity: 1;
   transform: translateY(-50%) translateX(0);
 }
 
 /* Active(클릭 중) */
-.menu-list li a:active { transform: translateX(0) scale(0.98); }
+.menu-list li a:active,
+.menu-list li button:active {
+  transform: translateX(0) scale(0.98);
+}
 
-/* 현재 라우트 활성화 표시 (NavLink 사용 시 aria-current=page 자동 적용) */
+/* 현재 라우트 활성화 표시 (NavLink 경우) */
 .menu-list li a.is-active,
-.menu-list li a[aria-current="page"] {
+.menu-list li a[aria-current="page"],
+.menu-list li button.is-active,
+.menu-list li button[aria-current="page"] {
   color: var(--brand);
   background: rgba(33,118,255,0.07);
 }
 .menu-list li a.is-active::before,
-.menu-list li a[aria-current="page"]::before { transform: scaleY(1); }
+.menu-list li a[aria-current="page"]::before,
+.menu-list li button.is-active::before,
+.menu-list li button[aria-current="page"]::before {
+  transform: scaleY(1);
+}
 .menu-list li a.is-active::after,
-.menu-list li a[aria-current="page"]::after {
-  opacity: 1; transform: translateY(-50%) translateX(0);
+.menu-list li a[aria-current="page"]::after,
+.menu-list li button.is-active::after,
+.menu-list li button[aria-current="page"]::after {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
 }
 
 /* 로그인 버튼 */
