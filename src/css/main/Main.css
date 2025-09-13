@@ -268,7 +268,7 @@
 }
 .panel-btn__arrow::before {
   content: "›"; 
-  transform: translateY(-0.05em); 
+  transform: translateY(-0.08em); 
   display: inline-block;
 }
 /* 호버/포커스 미세 인터랙션 (색상 변경 없음) */
