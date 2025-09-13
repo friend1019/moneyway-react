@@ -59,14 +59,6 @@ const TimeSelectionModal = ({
     <div className="time-modal-overlay" onClick={handleBackdropClick}>
       <div className="time-modal-container">
         <div className="time-modal-header">
-          <button className='time-back-button' onClick={() => {
-            if (step === "start") {
-              onClose(); 
-            } else {
-              onBack();    
-            }
-          }}
-          >←</button>
 
           <div className="activity-badge">
             <img src={icon} alt={category} className="activity-icon-img" style={{ width: '2rem', height: '2rem' }} />
@@ -78,7 +70,23 @@ const TimeSelectionModal = ({
         </div>
         
         <div className="time-modal-content">
+          
+        <div className="time-modal-backarrow">
+          <button 
+            className="time-back-button"
+            onClick={() => {
+              if (step === "start") {
+                onClose(); 
+              } else {
+                onBack();    
+              }
+            }}
+          >
+            ←
+          </button>
           <h2 className="time-modal-title">{starttitle}</h2>
+        </div>
+
           <p className="time-modal-subtitle">{subtitle}</p>
           
           <div className="time-selection-area">

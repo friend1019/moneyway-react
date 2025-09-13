@@ -24,13 +24,6 @@
   border-bottom: 1px solid #f1f3f5;
 }
 
-.time-back-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #6b7280;
-}
 
 .activity-badge {
   flex: 1; 
@@ -54,6 +47,22 @@
 .time-modal-content {
   padding: 1.25rem 1.25rem 1.5rem;
   text-align: center;
+}
+
+.time-modal-backarrow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;       
+}
+
+.time-back-button {
+  position: absolute;
+  left: 0;             
+  background: none;
+  border: none;
+  font-size: 3rem;
+  cursor: pointer;
 }
 
 .time-modal-title {

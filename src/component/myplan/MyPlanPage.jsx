@@ -62,6 +62,7 @@ const MyPlanPage = () => {
   const [titleInput, setTitleInput] = useState('');
 
   const [isDirty, setIsDirty] = useState(false);
+  const [isAIPlan, setIsAIPlan] = useState(false);
 
   const location = useLocation();
   const isNewPlan = location.state?.isNewPlan;
@@ -242,14 +243,13 @@ const MyPlanPage = () => {
     return () => { mounted = false; };
   }, [planId, location.state, fetchAllPlanIds, fetchCartItems, fetchPlanDetail]);
 
-  // 새 플랜 플래그 반영
   useEffect(() => {
     if (!planId) return;
     if (isNewPlan) setIsEditMode(true);
     else setIsEditMode(false);
   }, [planId, isNewPlan]);
 
-  // 새로 생성된 플랜은 사용자가 손대지 않아도 이탈 시 경고를 띄우기 위해 dirty로 취급
+ 
   useEffect(() => {
     if (isNewPlan) {
       setIsDirty(true);
@@ -258,7 +258,8 @@ const MyPlanPage = () => {
 
   useEffect(() => {
     if (location.state?.isAIPlan && location.state?.planData) {
-      console.log("AI가 생성한 플랜 데이터를 받아 처리합니다:", location.state);
+      
+      setIsAIPlan(true); 
       
       const aiPlanData = location.state.planData;
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
@@ -283,18 +284,19 @@ const MyPlanPage = () => {
             placeId: place.placeId,
             category: place.categoryName, 
             thumbnailUrl: place.thumbnailUrl || "기본 이미지 URL",
-            // AI 플랜 데이터의 좌표 정보 보존
             mapX: place.mapX,
             mapY: place.mapY,
+            isAI: true, 
           });
         });
       });
       setDailySchedules(newSchedules);
 
       setPlanDetails({
-        id: location.state.planId,
-        title: location.state.planTitle,
-        totalBudget: location.state.budget
+      id: location.state.planId,
+      title: location.state.planTitle,
+      totalBudget: location.state.budget,
+      profileImageUrl: loggedInUser?.profileImageUrl || null,
       });
       
       const daysLength = aiPlanData.days?.length || 1;
@@ -302,7 +304,7 @@ const MyPlanPage = () => {
       setIsEditMode(true); 
       setIsDirty(true);
     }
-  }, [location.state]);
+  }, [location.state, loggedInUser]);
 
   const planDurationStr = `${Math.max(0, enabledDays - 1)}박 ${enabledDays}일`;
   const SLOT_HEIGHT_PX = 90;
@@ -472,7 +474,7 @@ const MyPlanPage = () => {
   const handleDeleteItem = useCallback(() => {
     const { selectedItem, day } = menuState;
     if (!selectedItem || !day) return;
-
+ 
     setDailySchedules(prev => ({
       ...prev,
       [day]: (prev[day] || []).filter(item => item.id !== selectedItem.id)
@@ -491,7 +493,20 @@ const MyPlanPage = () => {
       };
       setCartItems(prev => [...prev, cartItem]);
     }
+ 
+    setIsDirty(true);
+    closeMenu();
+  }, [menuState, closeMenu]);
 
+  const handleDeleteAIItem = useCallback(() => {
+    const { selectedItem, day } = menuState;
+    if (!selectedItem || !day) return;
+ 
+    setDailySchedules(prev => ({
+      ...prev,
+      [day]: (prev[day] || []).filter(item => item.id !== selectedItem.id)
+    }));
+ 
     setIsDirty(true);
     closeMenu();
   }, [menuState, closeMenu]);
@@ -653,10 +668,20 @@ const MyPlanPage = () => {
         }
       ];
     }
+    
+    // AI 플랜 아이템인지 확인
+    const isAIItem = menuState.selectedItem?.isAI || isAIPlan;
+    
+    if (isAIItem) {
+      return [
+        { label: '삭제하기', action: handleDeleteAIItem },
+      ];
+    }
+    
     return [
       { label: '카트로 옮기기', action: handleDeleteItem },
     ];
-  }, [menuState, handleDeleteItem, closeMenu]);
+  }, [menuState, handleDeleteItem, handleDeleteAIItem, closeMenu, isAIPlan]);
 
   
 

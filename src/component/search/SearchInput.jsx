@@ -1,6 +1,6 @@
 import React from 'react';
 
-const SearchInput = ({ searchTerm, setSearchTerm, onSubmit, onFocus }) => {
+const SearchInput = ({ searchTerm, setSearchTerm, onSubmit, onFocus, onBlur }) => {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -18,6 +18,7 @@ const SearchInput = ({ searchTerm, setSearchTerm, onSubmit, onFocus }) => {
         onChange={(e) => setSearchTerm(e.target.value)}
         onKeyDown={handleKeyDown}
         onFocus={onFocus}
+        onBlur={onBlur}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation, matchPath } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import SideMenu from "./SideMenu";
 import useUserStore from "../../api/userStore";
 import "../../css/common/Header.css";
@@ -42,7 +42,7 @@ function Header() {
 
   const hoverEnabled = location.pathname.startsWith("/cart");
 
-  const confirmIfDirty = () => {
+  const confirmIfDirty = useCallback(() => {
     try {
       const isOnMyPlan = location.pathname.startsWith('/myplan');
       if (isOnMyPlan && typeof window !== 'undefined' && window.__MYPLAN_DIRTY__) {
@@ -50,13 +50,13 @@ function Header() {
       }
     } catch (_) {}
     return true;
-  };
+  }, [location.pathname]);
 
-  const handleProtectedRoute = (path) => {
+  const handleProtectedRoute = useCallback((path) => {
     if (!confirmIfDirty()) return;
     if (isLoggedIn) navigate(path);
     else navigate("/login");
-  };
+  }, [confirmIfDirty, isLoggedIn, navigate]);
 
   return (
     <div className={`header ${hoverEnabled ? "hover-enabled" : ""} ${isWhiteBg ? "white-bg" : ""}`}>

@@ -61,6 +61,7 @@ const SearchMain = () => {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
@@ -162,6 +163,16 @@ const SearchMain = () => {
       overlayRef.current.setMap(null);
       overlayRef.current = null;
     }
+  };
+
+  const handleSearchFocus = () => {
+    setShowSearchResults(true);
+  };
+
+  const handleSearchBlur = () => {
+    setTimeout(() => {
+      setShowSearchResults(false);
+    }, 50);
   };
 
   useEffect(() => {
@@ -310,13 +321,19 @@ const SearchMain = () => {
                 나만의 <span className="highlight-blue">계획</span>을 짜세요
               </h1>
               <div className="search-container">
-                <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-                {searchTerm && (
+                <SearchInput 
+                  searchTerm={searchTerm} 
+                  setSearchTerm={setSearchTerm} 
+                  onFocus={handleSearchFocus}
+                  onBlur={handleSearchBlur}
+                />
+                {searchTerm && showSearchResults && (
                   <SearchPlaceBox
                     results={searchResults}
-                    onSelect={(place) =>
-                      handlePlaceSelect(place, { showDetail: true, panMap: true, overlay: false, zoomLevel: 4 })
-                    }
+                    onSelect={(place) => {
+                      handlePlaceSelect(place, { showDetail: true, panMap: true, overlay: false, zoomLevel: 4 });
+                      setShowSearchResults(false); // 검색 결과 선택 시 숨기기
+                    }}
                   />
                 )}
               </div>
