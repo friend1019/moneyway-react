@@ -62,7 +62,7 @@ const SideMenu = ({ onClose }) => {
     try {
       const isOnMyPlan = window.location.pathname.startsWith('/myplan');
       if (isOnMyPlan && typeof window !== 'undefined' && window.__MYPLAN_DIRTY__) {
-        return window.confirm('저장되지 않은 변경사항이 있습니다. 이동하시겠어요?');
+        return window.confirm('저장되지 않은 변경사항이 있습니다. 이동하시겠습니까?');
       }
     } catch (_) {}
     return true;

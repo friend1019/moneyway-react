@@ -28,7 +28,6 @@ const isOverlapping = (newSchedule, existingSchedules) => {
   });
 };
 
-/** ---------- 페이지 ---------- */
 const MyPlanPage = () => {
   const { planId: planIdParam } = useParams();
   const planId = String(planIdParam ?? '');
@@ -73,7 +72,6 @@ const MyPlanPage = () => {
     setEnabledDays((d) => Math.min(4, d + 1));
   }, []);
 
-  // 시간 선택 모달
   const [timeModal, setTimeModal] = useState({
     isOpen: false,
     step: 'start',
@@ -82,7 +80,6 @@ const MyPlanPage = () => {
     selectedStartTime: null,
   });
 
-  // 컨텍스트 메뉴
   const [menuState, setMenuState] = useState({
     visible: false,
     position: { x: 0, y: 0 },
@@ -91,7 +88,6 @@ const MyPlanPage = () => {
     contextType: 'schedule',
   });
 
-  /** ---------- 외부 데이터 ---------- */
   const fetchCartItems = useCallback(async () => {
     setLoadingCart(true);
     try {
@@ -146,7 +142,6 @@ const MyPlanPage = () => {
           placeId: place.placeId,
           category: place.category,
           profileImageUrl: finalProfileImageUrl,
-          // 기존 DB에서 가져온 좌표 정보도 보존
           mapX: place.mapX || null,
           mapY: place.mapY || null,
         });
@@ -199,7 +194,7 @@ const MyPlanPage = () => {
     }
   }, [planId]);
 
-  // prev/next 계산
+
   const { prevPlanId, nextPlanId } = useMemo(() => {
     const currentIndex = allPlanIds.indexOf(String(planId));
     if (currentIndex === -1) {
@@ -212,7 +207,7 @@ const MyPlanPage = () => {
 
   const navigateToPlan = useCallback((targetPlanId) => {
     if (!targetPlanId) return;
-    if (isDirty && !window.confirm('저장되지 않은 변경사항이 있습니다. 정말 이동하시겠습니까?')) {
+    if (isDirty && !window.confirm('저장되지 않은 변경사항이 있습니다. 이동하시겠습니까?')) {
       return;
     }
     navigate(`/myplan/${targetPlanId}`);
