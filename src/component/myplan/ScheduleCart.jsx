@@ -115,7 +115,9 @@ const ScheduleCart = ({ cartItems: initialCartItems = [], dailySchedules = {} })
 
   // 숙소가 아닌 항목만 필터링하고, 이미 스케줄에 추가된 것은 제외
   const nonLodgingItems = cartItems.filter(item => 
-    !item.category?.includes("숙소") && !scheduledCartIds.has(item.cartId)
+    !item.category?.includes("숙소") && 
+    !scheduledCartIds.has(item.cartId) &&
+    item.cartId // cartId가 있는 아이템만 표시
   );
 
   return (

@@ -238,7 +238,8 @@ const Schedule = ({
 
                 <div className='days-column-container'>
                     {Array.from({ length: 4 }, (_, i) => `Day ${i + 1}`).map((day, idx) => {
-                        const isOpen = idx < enabledDays;
+                        // DAY1은 항상 열려있고, 나머지는 enabledDays에 따라 결정
+                        const isOpen = idx === 0 || idx < enabledDays;
                         const isNextDay = idx === enabledDays;
 
                         return (

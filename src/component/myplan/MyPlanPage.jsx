@@ -215,7 +215,6 @@ const MyPlanPage = () => {
 
   useEffect(() => {
     if (location.state?.isAIPlan) {
-      // AI 플랜의 경우 카트 아이템만 불러오면 됨
       fetchCartItems();
       fetchAllPlanIds();
       return; 
@@ -520,6 +519,24 @@ const MyPlanPage = () => {
     const allScheduleItems = Object.values(dailySchedules).flat();
     const totalCost = allScheduleItems.reduce((sum, item) => sum + (item.cost || 0), 0);
     setPlanDetails(prev => ({ ...prev, usedBudget: totalCost }));
+  }, [dailySchedules]);
+
+  // enabledDays 자동 조정: 일정이 있는 마지막 날을 기준으로 설정 (DAY1은 항상 열려있음)
+  useEffect(() => {
+    const daysWithItems = Object.entries(dailySchedules)
+      .filter(([day, items]) => items && items.length > 0)
+      .map(([day]) => parseInt(day.replace('Day ', ''), 10))
+      .sort((a, b) => a - b);
+
+    if (daysWithItems.length > 0) {
+      const maxDayWithItems = Math.max(...daysWithItems);
+      // DAY1은 항상 열려있으므로 최소 1, 최대 4
+      const newEnabledDays = Math.max(1, Math.min(4, maxDayWithItems));
+      setEnabledDays(newEnabledDays);
+    } else {
+      // 일정이 없으면 DAY1만 열려있도록
+      setEnabledDays(1);
+    }
   }, [dailySchedules]);
 
   // 예산
