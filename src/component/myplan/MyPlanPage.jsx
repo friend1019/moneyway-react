@@ -334,21 +334,24 @@ const MyPlanPage = () => {
     }
 
     if (origin === 'schedule') {
-      const movedItem = active.data.current;
+      const movedItem = { ...active.data.current };
       const originalDay = movedItem.originalDay;
       const [newDay, newTime] = over.id.split('-');
-
+    
       const updatedItem = { ...movedItem, time: newTime, day: newDay };
+    
       if (isOverlapping(updatedItem, dailySchedules[newDay] || [])) {
         alert('해당 시간에는 이미 다른 일정이 있습니다.');
         return;
       }
+    
       setDailySchedules(prev => {
         const ns = { ...prev };
         ns[originalDay] = (ns[originalDay] || []).filter(item => item.id !== movedItem.id);
         ns[newDay] = [...(ns[newDay] || []), updatedItem];
         return ns;
       });
+    
       setIsDirty(true);
     }
   }, [cartItems, dailySchedules]);

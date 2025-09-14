@@ -67,7 +67,7 @@ const toCssCategory = (apiCategory) => {
 const ScheduleItem = ({
     item, day, slotHeight, isEditMode, onItemDeleted, onItemUpdated, onContextMenu, timeSlotsLength,
 }) => {
-    const dndId = item.id;
+    const dndId = `${item.cartId || item.placeId || item.id}-${day}-${item.time}-${item.duration}`;
     const displayCategory = translateCategory(item.category);
     
     const cssCategoryClass = toCssCategory(item.category);
@@ -76,7 +76,7 @@ const ScheduleItem = ({
         id: dndId,
         data: { ...item, origin: 'schedule', originalDay: day },
         disabled: !isEditMode,
-    })
+    });
 
     function getTimeTop(time) {
         const [h, m] = time.split(':').map(Number);

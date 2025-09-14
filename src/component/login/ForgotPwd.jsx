@@ -47,8 +47,6 @@ const ForgotPwd = () => {
         setGeneralError("가입된 계정이 없습니다.");
       } else if (code === "SOCIAL_LOGIN_USER" || code === "KAKAO_USER" || code === "SOCIAL_USER") {
         setGeneralError("해당 이메일은 카카오 로그인 전용 계정입니다. 카카오 로그인을 이용해주세요.");
-      } else if (message && message.includes("카카오") || message && message.includes("소셜")) {
-        setGeneralError("해당 이메일은 카카오 로그인 전용 계정입니다. 카카오 로그인을 이용해주세요.");
       } else {
         setGeneralError("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
       }
