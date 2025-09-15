@@ -36,7 +36,13 @@
     align-items: flex-start;
     gap: 0.33rem;
     border: none;
+    cursor: pointer;
 }
+
+.schedule-cart-card:hover {
+    transform: scale(0.9); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
 
 .cart-category-row {
     display: flex;

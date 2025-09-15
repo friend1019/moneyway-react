@@ -10,7 +10,6 @@ import cartIcon from "../../images/main/cartIcon.svg";
 import RotatingTextWave from "./RotatingTextWave";
 import Footer from "../common/Footer";
 
-// ✅ 배경 이미지 3장 import
 import bg1 from "../../images/main/background1.svg";
 import bg2 from "../../images/main/background2.svg";
 import bg3 from "../../images/main/background3.svg";

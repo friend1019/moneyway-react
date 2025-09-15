@@ -62,11 +62,10 @@
 }
 
 .planner-cell {
-    border: 0.05rem solid #E6E8EC; /* 은은한 회색 */
+    border: 0.05rem solid #E6E8EC; 
     box-sizing: border-box;
   }
 
-/* 스케줄러 시간/카드 wrapper */
 .planner-content-wrapper {
   position: relative;
   width: 100%;
@@ -76,7 +75,7 @@
   display: block;
 }
 
-/* 일정카드 기본 */
+
 .schedule-item,
 .schedule-item-card {
   border-radius: 1rem;
@@ -84,6 +83,11 @@
   box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   overflow: hidden; /* 선을 절대 넘지 않음 */
   transition: box-shadow 0.2s;
+}
+
+.schedule-item-card:hover {
+    transform: scale(1.03); 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
 }
 .schedule-item.숙소, .schedule-item-card.숙소 { background: #e8f5fa;  }
 .schedule-item.식당, .schedule-item-card.식당 { background: #fff6f3;  }
@@ -169,10 +173,6 @@
     color: #007bff;
 }
 
-
-
-
-
 .total-budget {
     padding-top: 1rem;
     display: flex;
@@ -187,8 +187,8 @@
     width: 8rem;
     padding: 0.25rem;
     font-size: 0.875rem;
-    font-weight: 600; /* 금액 폰트 굵게 */
-    color: #495057;   /* 금액 폰트 색상 */
+    font-weight: 600; 
+    color: #495057;   
     text-align: right;
 }
 
@@ -211,7 +211,7 @@
 .budget-alert {
     display: flex;
     align-items: center;
-    gap: 0.5rem; /* 간격 살짝 조정 */
+    gap: 0.5rem; 
     font-size: 1.3rem;
     color: #e03131;
 }
@@ -224,12 +224,12 @@
     font-weight: 700;
 }
 
-/* [추가] 예산 초과 시 사용 금액 말풍선 */
+
 .used-budget-bubble {
     color: #c92a2a;
     font-weight: 700;
     padding: 0.25rem 0 0.25rem 1rem;
-    border-radius: 1rem; /* 타원형 모양 */
+    border-radius: 1rem; 
     font-size: 1.3rem;
 }
 
@@ -290,32 +290,90 @@
 
 .day-locked-mask {
     position: absolute;
-    top: 0;  
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding:1rem;
+    padding: 1rem;
     z-index: 5;
   }
   
   .day-locked-overlay {
-    width: calc(100% - 1rem);   
-    height: calc(100% - 1rem);  
-    margin: 0.5rem;             
-    background: rgba(241, 243, 245, 0.6); 
+    width: calc(100% - 1rem);
+    height: calc(100% - 1rem);
+    margin: 0.5rem;
+    background: rgba(241, 243, 245, 0.6);
     border-radius: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    position: relative;
+    overflow: hidden; /* ripple 원이 밖으로 안 새게 */
+    transition: opacity 0.3s ease;
   }
   
-
   .day-locked-overlay .plus {
     font-size: 3rem;
     font-weight: bold;
     color: #495057;
+    z-index: 1;
+    position: relative;
+  }
+  
+  /* 리플 효과를 위한 ::before pseudo-element */
+  .day-locked-overlay::before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    content: '';
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    pointer-events: none;
+    transition: none;
+  }
+  
+  /* 클릭하면 애니메이션 실행 */
+  .day-locked-overlay.ripple-active::before {
+    animation: day-ripple 0.75s ease-out forwards;
+  }
+  
+  /* 오버레이 자체도 페이드아웃 */
+  .day-locked-overlay.ripple-active {
+    animation: fade-out 0.75s ease-out forwards;
+  }
+  
+  @keyframes day-ripple {
+    0% {
+      opacity: 1;
+      width: 0;
+      height: 0;
+    }
+    40% {
+      opacity: 1;
+    }
+    100% {
+      width: 200%;
+      height: 200%;
+      opacity: 0;
+    }
+  }
+  
+  @keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
   }

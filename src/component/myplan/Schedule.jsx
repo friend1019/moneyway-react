@@ -1,4 +1,5 @@
 import { useDroppable, useDraggable } from '@dnd-kit/core';
+import { useState } from 'react';
 import '../../css/myplan/Schedule.css';
 
 import BudgetDisplay from './BudgetDisplay';
@@ -34,8 +35,6 @@ const CATEGORY_ORDER = [
     { name: "카페", icon: cafeIcon },
     { name: "쇼핑", icon: shoppingIcon },
 ];
-
-
 
 function DroppablePlannerCell({ day, time, disabled }) {
     const { setNodeRef, isOver } = useDroppable({
@@ -138,6 +137,39 @@ const ScheduleItem = ({
     );
 };
 
+// 새로운 컴포넌트: 애니메이션과 함께 Day 추가
+const DayUnlockOverlay = ({ onAddDay, dayIndex }) => {
+    const [isAnimating, setIsAnimating] = useState(false);
+
+    const handleClick = (e) => {
+        e.preventDefault();
+        
+        // 애니메이션 시작
+        setIsAnimating(true);
+        
+        // 애니메이션 완료 후 Day 추가
+        setTimeout(() => {
+            onAddDay();
+            setIsAnimating(false);
+        }, 750); // 애니메이션 duration과 맞춤
+    };
+
+    return (
+        <div className="day-locked-mask">
+            <div 
+                className={`day-locked-overlay ${isAnimating ? 'ripple-active' : ''}`}
+                onClick={handleClick}
+                style={{ 
+                    cursor: 'pointer',
+                    transition: isAnimating ? 'opacity 0.75s ease-out' : 'none',
+                    opacity: isAnimating ? 0 : 1
+                }}
+            >
+                <span className="plus">+</span>
+            </div>
+        </div>
+    );
+};
 
 const Schedule = ({
     dailySchedules, 
@@ -180,7 +212,7 @@ const Schedule = ({
         
         e.target.src = `data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%3E%0A%20%20%20%20%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23FFD3E0%22%2F%3E%0A%20%20%20%20%3Ctext%20x%3D%2250%22%20y%3D%2250%22%20font-family%3D%22%27Arial%27%2C%20sans-serif%22%20font-size%3D%2250%22%20fill%3D%22%23FFFFFF%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3E${firstChar}%3C%2Ftext%3E%0A%3C%2Fsvg%3E%0A`;
     };
-
+    
     return (
         <>
             <div className='plan-info-card'>
@@ -270,15 +302,18 @@ const Schedule = ({
                                     ))}
                                     
                                     {!isOpen && isEditMode && (
-                                        <div 
-                                            className="day-locked-mask" 
-                                            onClick={isNextDay ? onAddDay : undefined}
-                                            style={{ cursor: isNextDay ? 'pointer' : 'default' }}
-                                        >
-                                            <div className="day-locked-overlay">
-                                                {isNextDay && <span className="plus">+</span>}
+                                        isNextDay ? (
+                                            <DayUnlockOverlay 
+                                                onAddDay={onAddDay}
+                                                dayIndex={idx}
+                                            />
+                                        ) : (
+                                            <div className="day-locked-mask">
+                                                <div className="day-locked-overlay disabled-day">
+                                                    {/* 비활성화된 Day는 + 버튼 없음 */}
+                                                </div>
                                             </div>
-                                        </div>
+                                        )
                                     )}
                                 </div>
                             </div>

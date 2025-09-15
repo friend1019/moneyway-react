@@ -19,8 +19,6 @@ function Header() {
 
   const navigate = useNavigate();
   const location = useLocation();
-
-
   const whiteBgPatterns = useMemo(
     () => [
       { path: "/community", end: true },
@@ -28,6 +26,7 @@ function Header() {
       { path: "/cart", end: true },
       { path: "/planlist", end: true },
       { path: "/search", end: true },
+      { path: "/posts", end: false },
       { path: "/myplan", end: false },
     ],
     []
@@ -67,7 +66,6 @@ function Header() {
               to="/"
               className="logo-link"
               onClick={(e) => {
-                // /myplan* 에서 편집중일 때 이동 확인
                 const ok = confirmIfDirty();
                 if (!ok) {
                   e.preventDefault();
