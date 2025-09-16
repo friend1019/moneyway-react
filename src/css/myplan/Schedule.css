@@ -85,10 +85,7 @@
   transition: box-shadow 0.2s;
 }
 
-.schedule-item-card:hover {
-    transform: scale(1.03); 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-}
+
 .schedule-item.숙소, .schedule-item-card.숙소 { background: #e8f5fa;  }
 .schedule-item.식당, .schedule-item-card.식당 { background: #fff6f3;  }
 .schedule-item.관광지, .schedule-item-card.관광지,
@@ -312,7 +309,7 @@
     justify-content: center;
     cursor: pointer;
     position: relative;
-    overflow: hidden; /* ripple 원이 밖으로 안 새게 */
+    overflow: hidden; 
     transition: opacity 0.3s ease;
   }
   
@@ -324,7 +321,6 @@
     position: relative;
   }
   
-  /* 리플 효과를 위한 ::before pseudo-element */
   .day-locked-overlay::before {
     position: absolute;
     top: 50%;
@@ -340,12 +336,9 @@
     transition: none;
   }
   
-  /* 클릭하면 애니메이션 실행 */
   .day-locked-overlay.ripple-active::before {
     animation: day-ripple 0.75s ease-out forwards;
   }
-  
-  /* 오버레이 자체도 페이드아웃 */
   .day-locked-overlay.ripple-active {
     animation: fade-out 0.75s ease-out forwards;
   }

@@ -482,7 +482,7 @@ const MyPlanPage = () => {
       const cartItem = {
         cartId: selectedItem.cartId,
         placeId: selectedItem.placeId,
-        placeName: selectedItem.name, // 카트에서는 placeName 사용
+        placeName: selectedItem.name, 
         category: selectedItem.category,
         price: selectedItem.cost,
         mapX: selectedItem.mapX,
@@ -648,7 +648,7 @@ const MyPlanPage = () => {
       setIsEditMode(false);
       
     
-      setCartItems([]); // 로컬 카트 비우기
+      setCartItems([]);
       setIsDirty(false); // 저장되었으므로 '변경사항 없음'으로 상태 변경
 
        navigate(`/myplan/${currentPlanId}`, { 
@@ -816,10 +816,24 @@ const handleTimeBack = () => {
             </div>
             <div className="header-buttons">
               {!isEditMode && (
-                <button className='map-view-button' onClick={handleMapView}>
-                  지도보기
-                </button>
+                <>
+                  <button className='map-view-button' onClick={handleMapView}>
+                    지도보기
+                  </button>
+
+              
+
+                  <button
+                    className="go-to-shopping"
+                    onClick={() => {
+                      navigate("/search");
+                    }}
+                  >
+                    장소 추가하기 
+                  </button>
+                </> 
               )}
+
               
               {isEditMode ? (
                 <button className='save-button' onClick={handleSave}>저장하기</button>
