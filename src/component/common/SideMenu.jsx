@@ -1,5 +1,5 @@
 // src/components/common/SideMenu.jsx
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "react-toastify";
 import useUserStore from "../../api/userStore";
@@ -58,7 +58,19 @@ const SideMenu = ({ onClose }) => {
     }
   };
 
-  const handleAddPlanClick = async () => {
+  const confirmIfDirty = useCallback(() => {
+    try {
+      const isOnMyPlan = window.location.pathname.startsWith('/myplan');
+      if (isOnMyPlan && typeof window !== 'undefined' && window.__MYPLAN_DIRTY__) {
+        return window.confirm('저장되지 않은 변경사항이 있습니다. 이동하시겠습니까?');
+      }
+    } catch (_) {}
+    return true;
+  }, []);
+
+  const handleAddPlanClick = useCallback(async () => {
+    if (!confirmIfDirty()) return;
+    
     try {
       const res = await api.post("/plans/empty");
       const newPlanId = res?.data?.id ?? res?.data?.planId;
@@ -72,7 +84,18 @@ const SideMenu = ({ onClose }) => {
       console.error("POST /plans/empty 실패:", err);
       toast.error("새 여행 계획을 만들 수 없어요. 잠시 후 다시 시도해주세요.");
     }
-  };
+  }, [confirmIfDirty, navigate, startClose]);
+
+  const handleProtectedRoute = useCallback((path) => {
+    if (!confirmIfDirty()) return;
+    if (isLoggedIn) {
+      navigate(path);
+      startClose();
+    } else {
+      navigate("/login");
+      startClose();
+    }
+  }, [confirmIfDirty, isLoggedIn, navigate, startClose]);
   
 
   return (
@@ -130,19 +153,25 @@ const SideMenu = ({ onClose }) => {
 
         <ul className="menu-list">
           <li>
-            <Link to="/aiplan" onClick={startClose}>
+            <button 
+              className="menu-link" 
+              onClick={() => handleProtectedRoute("/aiplan")}
+            >
               AI 플랜 생성
-            </Link>
+            </button>
           </li>
           <li>
-            <button className="menu-list a" onClick={handleAddPlanClick}>
+            <button className="menu-link" onClick={handleAddPlanClick}>
               나만의 플랜 생성
             </button>
           </li>
           <li>
-            <Link to="/community" onClick={startClose}>
+            <button 
+              className="menu-link" 
+              onClick={() => handleProtectedRoute("/community")}
+            >
               커뮤니티
-            </Link>
+            </button>
           </li>
         </ul>
       </aside>

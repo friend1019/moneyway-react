@@ -24,13 +24,6 @@
   border-bottom: 1px solid #f1f3f5;
 }
 
-.time-back-button {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #6b7280;
-}
 
 .activity-badge {
   flex: 1; 
@@ -54,6 +47,22 @@
 .time-modal-content {
   padding: 1.25rem 1.25rem 1.5rem;
   text-align: center;
+}
+
+.time-modal-backarrow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;       
+}
+
+.time-back-button {
+  position: absolute;
+  left: 0;             
+  background: none;
+  border: none;
+  font-size: 3rem;
+  cursor: pointer;
 }
 
 .time-modal-title {
@@ -92,11 +101,19 @@
   min-width: 11.5rem;                
   font-size: 1.5rem; 
   font-weight: 500;
-  color: #C1C1C1;                   /* 흐린 회색 (비선택) */
+  color: #C1C1C1;                 
   cursor: pointer;
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease;
 }
 
+.time-option:hover {
+  color: #1e66ff;
+}
+
+.time-option:active {
+  transform: scale(0.98);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
 .time-option.selected {
   background: #1e66ff;             
   color: #fff;

@@ -10,7 +10,7 @@ const ContextMenu = ({ position, items, onClose }) => {
     const el = ref.current;
     if (!el) return;
 
-    // 잠시 화면에 배치 후 크기 측정
+    
     const rect = el.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;

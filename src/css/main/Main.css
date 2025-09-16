@@ -26,7 +26,6 @@
   /* 모바일 fixed 이슈 방지: translateZ로 성능 보정 */
   will-change: opacity, transform;
   transform: translateZ(0);
-
   opacity: 0;
   transition: opacity 1.6s ease;  /* JS의 전환 시간과 맞추기 */
 }
@@ -268,7 +267,7 @@
 }
 .panel-btn__arrow::before {
   content: "›"; 
-  transform: translateY(-0.05em); 
+  transform: translateY(-0.08em); 
   display: inline-block;
 }
 /* 호버/포커스 미세 인터랙션 (색상 변경 없음) */

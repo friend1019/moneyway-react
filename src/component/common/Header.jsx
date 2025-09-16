@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation, matchPath } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import SideMenu from "./SideMenu";
 import useUserStore from "../../api/userStore";
 import "../../css/common/Header.css";
@@ -19,8 +19,6 @@ function Header() {
 
   const navigate = useNavigate();
   const location = useLocation();
-
-
   const whiteBgPatterns = useMemo(
     () => [
       { path: "/community", end: true },
@@ -28,6 +26,7 @@ function Header() {
       { path: "/cart", end: true },
       { path: "/planlist", end: true },
       { path: "/search", end: true },
+      { path: "/posts", end: false },
       { path: "/myplan", end: false },
     ],
     []
@@ -42,21 +41,21 @@ function Header() {
 
   const hoverEnabled = location.pathname.startsWith("/cart");
 
-  const confirmIfDirty = () => {
+  const confirmIfDirty = useCallback(() => {
     try {
       const isOnMyPlan = location.pathname.startsWith('/myplan');
       if (isOnMyPlan && typeof window !== 'undefined' && window.__MYPLAN_DIRTY__) {
-        return window.confirm('저장되지 않은 변경사항이 있습니다. 이동하시겠어요?');
+        return window.confirm('저장되지 않은 변경사항이 있습니다. 이동하시겠습니까?');
       }
     } catch (_) {}
     return true;
-  };
+  }, [location.pathname]);
 
-  const handleProtectedRoute = (path) => {
+  const handleProtectedRoute = useCallback((path) => {
     if (!confirmIfDirty()) return;
     if (isLoggedIn) navigate(path);
     else navigate("/login");
-  };
+  }, [confirmIfDirty, isLoggedIn, navigate]);
 
   return (
     <div className={`header ${hoverEnabled ? "hover-enabled" : ""} ${isWhiteBg ? "white-bg" : ""}`}>
@@ -67,7 +66,6 @@ function Header() {
               to="/"
               className="logo-link"
               onClick={(e) => {
-                // /myplan* 에서 편집중일 때 이동 확인
                 const ok = confirmIfDirty();
                 if (!ok) {
                   e.preventDefault();

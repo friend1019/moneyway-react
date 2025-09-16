@@ -153,7 +153,6 @@ function TogetherSection() {
             <a href="/aiplan" className="panel-btn">
               <span className="panel-btn__text">플랜 만들러 가기</span>
               <span className="panel-btn__arrow" aria-hidden="true">
-                ›
               </span>
             </a>
           </div>

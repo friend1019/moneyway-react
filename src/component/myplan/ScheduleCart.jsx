@@ -9,14 +9,12 @@ import shoppingIcon from "../../images/shopping/shopping.svg";
 import tourIcon from "../../images/shopping/tour.svg";
 import "../../css/myplan/ScheduleCart.css";
 
-// 카테고리별 스타일 반환
 const getCartStyle = (category = "") => {
   if (category.includes("액티비티")) return { icon: activityIcon, color: "#7ddc7e", bg: "#f6fff2" };
   if (category.includes("쇼핑")) return { icon: shoppingIcon, color: "#f06595", bg: "#fff0f6" };
   if (category.includes("식당")) return { icon: foodIcon, color: "#fa5252", bg: "#fff6f3" };
   if (category.includes("카페")) return { icon: cafeIcon, color: "#fab005", bg: "#fffbe4" };
   if (category.includes("숙소")) return { icon: hotelIcon, color: "#339af0", bg: "#e8f5fa" };
-  // '관광', '관광지', '관광명소' 모두 인식
   if (category.includes("관광")) return { icon: tourIcon, color: "#845ef7", bg: "#f4f2fd" };
   return { icon: activityIcon, color: "#7ddc7e", bg: "#f6fff2" };
 };
@@ -35,7 +33,6 @@ function DraggableCartItem({ item, children, onDelete }) {
       }
     : undefined;
 
-  // 우클릭시 해당 아이템 서버/로컬에서 삭제
   const handleContextMenu = async (e) => {
     e.preventDefault();
     if (!window.confirm("이 카드를 삭제할까요?")) return;
@@ -68,14 +65,12 @@ const ScheduleCart = ({ cartItems: initialCartItems = [], dailySchedules = {} })
     setCartItems(initialCartItems);
   }, [initialCartItems]);
 
-  // 서버에서 카트 목록 불러오기 (스케줄에 추가된 아이템은 제외)
   const handleFetchCart = async () => {
     setLoading(true);
     try {
       const res = await api.get("/cart");
       const newCartItems = res.data.cartItems || [];
       
-      // 현재 스케줄에 있는 cartId들을 수집
       const scheduledCartIds = new Set();
       Object.values(dailySchedules || {}).forEach(dayItems => {
         (dayItems || []).forEach(item => {
@@ -85,7 +80,6 @@ const ScheduleCart = ({ cartItems: initialCartItems = [], dailySchedules = {} })
         });
       });
       
-      // 스케줄에 없는 아이템들만 필터링
       const filteredItems = newCartItems.filter(item => 
         !scheduledCartIds.has(item.cartId)
       );
@@ -98,12 +92,10 @@ const ScheduleCart = ({ cartItems: initialCartItems = [], dailySchedules = {} })
     setLoading(false);
   };
 
-  // 한 아이템 삭제(로컬에서도 제거)
   const handleDelete = (cartId) => {
     setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
   };
 
-  // 현재 스케줄에 있는 cartId들을 수집
   const scheduledCartIds = new Set();
   Object.values(dailySchedules || {}).forEach(dayItems => {
     (dayItems || []).forEach(item => {
@@ -113,9 +105,10 @@ const ScheduleCart = ({ cartItems: initialCartItems = [], dailySchedules = {} })
     });
   });
 
-  // 숙소가 아닌 항목만 필터링하고, 이미 스케줄에 추가된 것은 제외
   const nonLodgingItems = cartItems.filter(item => 
-    !item.category?.includes("숙소") && !scheduledCartIds.has(item.cartId)
+    !item.category?.includes("숙소") && 
+    !scheduledCartIds.has(item.cartId) &&
+    item.cartId 
   );
 
   return (

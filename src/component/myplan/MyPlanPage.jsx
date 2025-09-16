@@ -28,7 +28,6 @@ const isOverlapping = (newSchedule, existingSchedules) => {
   });
 };
 
-/** ---------- 페이지 ---------- */
 const MyPlanPage = () => {
   const { planId: planIdParam } = useParams();
   const planId = String(planIdParam ?? '');
@@ -62,6 +61,7 @@ const MyPlanPage = () => {
   const [titleInput, setTitleInput] = useState('');
 
   const [isDirty, setIsDirty] = useState(false);
+  const [isAIPlan, setIsAIPlan] = useState(false);
 
   const location = useLocation();
   const isNewPlan = location.state?.isNewPlan;
@@ -72,7 +72,6 @@ const MyPlanPage = () => {
     setEnabledDays((d) => Math.min(4, d + 1));
   }, []);
 
-  // 시간 선택 모달
   const [timeModal, setTimeModal] = useState({
     isOpen: false,
     step: 'start',
@@ -81,7 +80,6 @@ const MyPlanPage = () => {
     selectedStartTime: null,
   });
 
-  // 컨텍스트 메뉴
   const [menuState, setMenuState] = useState({
     visible: false,
     position: { x: 0, y: 0 },
@@ -90,7 +88,6 @@ const MyPlanPage = () => {
     contextType: 'schedule',
   });
 
-  /** ---------- 외부 데이터 ---------- */
   const fetchCartItems = useCallback(async () => {
     setLoadingCart(true);
     try {
@@ -145,7 +142,6 @@ const MyPlanPage = () => {
           placeId: place.placeId,
           category: place.category,
           profileImageUrl: finalProfileImageUrl,
-          // 기존 DB에서 가져온 좌표 정보도 보존
           mapX: place.mapX || null,
           mapY: place.mapY || null,
         });
@@ -198,7 +194,7 @@ const MyPlanPage = () => {
     }
   }, [planId]);
 
-  // prev/next 계산
+
   const { prevPlanId, nextPlanId } = useMemo(() => {
     const currentIndex = allPlanIds.indexOf(String(planId));
     if (currentIndex === -1) {
@@ -211,7 +207,7 @@ const MyPlanPage = () => {
 
   const navigateToPlan = useCallback((targetPlanId) => {
     if (!targetPlanId) return;
-    if (isDirty && !window.confirm('저장되지 않은 변경사항이 있습니다. 정말 이동하시겠습니까?')) {
+    if (isDirty && !window.confirm('저장되지 않은 변경사항이 있습니다. 이동하시겠습니까?')) {
       return;
     }
     navigate(`/myplan/${targetPlanId}`);
@@ -219,7 +215,6 @@ const MyPlanPage = () => {
 
   useEffect(() => {
     if (location.state?.isAIPlan) {
-      // AI 플랜의 경우 카트 아이템만 불러오면 됨
       fetchCartItems();
       fetchAllPlanIds();
       return; 
@@ -242,14 +237,13 @@ const MyPlanPage = () => {
     return () => { mounted = false; };
   }, [planId, location.state, fetchAllPlanIds, fetchCartItems, fetchPlanDetail]);
 
-  // 새 플랜 플래그 반영
   useEffect(() => {
     if (!planId) return;
     if (isNewPlan) setIsEditMode(true);
     else setIsEditMode(false);
   }, [planId, isNewPlan]);
 
-  // 새로 생성된 플랜은 사용자가 손대지 않아도 이탈 시 경고를 띄우기 위해 dirty로 취급
+ 
   useEffect(() => {
     if (isNewPlan) {
       setIsDirty(true);
@@ -258,7 +252,8 @@ const MyPlanPage = () => {
 
   useEffect(() => {
     if (location.state?.isAIPlan && location.state?.planData) {
-      console.log("AI가 생성한 플랜 데이터를 받아 처리합니다:", location.state);
+      
+      setIsAIPlan(true); 
       
       const aiPlanData = location.state.planData;
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
@@ -283,18 +278,19 @@ const MyPlanPage = () => {
             placeId: place.placeId,
             category: place.categoryName, 
             thumbnailUrl: place.thumbnailUrl || "기본 이미지 URL",
-            // AI 플랜 데이터의 좌표 정보 보존
             mapX: place.mapX,
             mapY: place.mapY,
+            isAI: true, 
           });
         });
       });
       setDailySchedules(newSchedules);
 
       setPlanDetails({
-        id: location.state.planId,
-        title: location.state.planTitle,
-        totalBudget: location.state.budget
+      id: location.state.planId,
+      title: location.state.planTitle,
+      totalBudget: location.state.budget,
+      profileImageUrl: loggedInUser?.profileImageUrl || null,
       });
       
       const daysLength = aiPlanData.days?.length || 1;
@@ -302,7 +298,7 @@ const MyPlanPage = () => {
       setIsEditMode(true); 
       setIsDirty(true);
     }
-  }, [location.state]);
+  }, [location.state, loggedInUser]);
 
   const planDurationStr = `${Math.max(0, enabledDays - 1)}박 ${enabledDays}일`;
   const SLOT_HEIGHT_PX = 90;
@@ -338,21 +334,24 @@ const MyPlanPage = () => {
     }
 
     if (origin === 'schedule') {
-      const movedItem = active.data.current;
+      const movedItem = { ...active.data.current };
       const originalDay = movedItem.originalDay;
       const [newDay, newTime] = over.id.split('-');
-
+    
       const updatedItem = { ...movedItem, time: newTime, day: newDay };
+    
       if (isOverlapping(updatedItem, dailySchedules[newDay] || [])) {
         alert('해당 시간에는 이미 다른 일정이 있습니다.');
         return;
       }
+    
       setDailySchedules(prev => {
         const ns = { ...prev };
         ns[originalDay] = (ns[originalDay] || []).filter(item => item.id !== movedItem.id);
         ns[newDay] = [...(ns[newDay] || []), updatedItem];
         return ns;
       });
+    
       setIsDirty(true);
     }
   }, [cartItems, dailySchedules]);
@@ -472,7 +471,7 @@ const MyPlanPage = () => {
   const handleDeleteItem = useCallback(() => {
     const { selectedItem, day } = menuState;
     if (!selectedItem || !day) return;
-
+ 
     setDailySchedules(prev => ({
       ...prev,
       [day]: (prev[day] || []).filter(item => item.id !== selectedItem.id)
@@ -483,7 +482,7 @@ const MyPlanPage = () => {
       const cartItem = {
         cartId: selectedItem.cartId,
         placeId: selectedItem.placeId,
-        placeName: selectedItem.name, // 카트에서는 placeName 사용
+        placeName: selectedItem.name, 
         category: selectedItem.category,
         price: selectedItem.cost,
         mapX: selectedItem.mapX,
@@ -491,7 +490,20 @@ const MyPlanPage = () => {
       };
       setCartItems(prev => [...prev, cartItem]);
     }
+ 
+    setIsDirty(true);
+    closeMenu();
+  }, [menuState, closeMenu]);
 
+  const handleDeleteAIItem = useCallback(() => {
+    const { selectedItem, day } = menuState;
+    if (!selectedItem || !day) return;
+ 
+    setDailySchedules(prev => ({
+      ...prev,
+      [day]: (prev[day] || []).filter(item => item.id !== selectedItem.id)
+    }));
+ 
     setIsDirty(true);
     closeMenu();
   }, [menuState, closeMenu]);
@@ -510,6 +522,24 @@ const MyPlanPage = () => {
     const allScheduleItems = Object.values(dailySchedules).flat();
     const totalCost = allScheduleItems.reduce((sum, item) => sum + (item.cost || 0), 0);
     setPlanDetails(prev => ({ ...prev, usedBudget: totalCost }));
+  }, [dailySchedules]);
+
+  // enabledDays 자동 조정: 일정이 있는 마지막 날을 기준으로 설정 (DAY1은 항상 열려있음)
+  useEffect(() => {
+    const daysWithItems = Object.entries(dailySchedules)
+      .filter(([day, items]) => items && items.length > 0)
+      .map(([day]) => parseInt(day.replace('Day ', ''), 10))
+      .sort((a, b) => a - b);
+
+    if (daysWithItems.length > 0) {
+      const maxDayWithItems = Math.max(...daysWithItems);
+      // DAY1은 항상 열려있으므로 최소 1, 최대 4
+      const newEnabledDays = Math.max(1, Math.min(4, maxDayWithItems));
+      setEnabledDays(newEnabledDays);
+    } else {
+      // 일정이 없으면 DAY1만 열려있도록
+      setEnabledDays(1);
+    }
   }, [dailySchedules]);
 
   // 예산
@@ -618,7 +648,7 @@ const MyPlanPage = () => {
       setIsEditMode(false);
       
     
-      setCartItems([]); // 로컬 카트 비우기
+      setCartItems([]);
       setIsDirty(false); // 저장되었으므로 '변경사항 없음'으로 상태 변경
 
        navigate(`/myplan/${currentPlanId}`, { 
@@ -653,10 +683,20 @@ const MyPlanPage = () => {
         }
       ];
     }
+    
+    // AI 플랜 아이템인지 확인
+    const isAIItem = menuState.selectedItem?.isAI || isAIPlan;
+    
+    if (isAIItem) {
+      return [
+        { label: '삭제하기', action: handleDeleteAIItem },
+      ];
+    }
+    
     return [
       { label: '카트로 옮기기', action: handleDeleteItem },
     ];
-  }, [menuState, handleDeleteItem, closeMenu]);
+  }, [menuState, handleDeleteItem, handleDeleteAIItem, closeMenu, isAIPlan]);
 
   
 
@@ -776,10 +816,24 @@ const handleTimeBack = () => {
             </div>
             <div className="header-buttons">
               {!isEditMode && (
-                <button className='map-view-button' onClick={handleMapView}>
-                  지도보기
-                </button>
+                <>
+                  <button className='map-view-button' onClick={handleMapView}>
+                    지도보기
+                  </button>
+
+              
+
+                  <button
+                    className="go-to-shopping"
+                    onClick={() => {
+                      navigate("/search");
+                    }}
+                  >
+                    장소 추가하기 
+                  </button>
+                </> 
               )}
+
               
               {isEditMode ? (
                 <button className='save-button' onClick={handleSave}>저장하기</button>

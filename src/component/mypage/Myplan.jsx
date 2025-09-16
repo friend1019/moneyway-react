@@ -122,7 +122,7 @@ const MyPlan = ({ onClose }) => {
                 <div className="plan-card-left">
                   <img className="plan-thumb" src={plan.thumbnailUrl} alt="플랜 썸네일" />
                   <div className="plan-title-box">
-                    <div className="plan-title">{plan.title}</div>
+                    <div className="myplan-title">{plan.title}</div>
 
                     {/* 기간(문자열 그대로) */}
                     <div className="plan-subtitle">{plan.period}</div>

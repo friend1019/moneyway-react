@@ -1,9 +1,7 @@
-// src/component/common/AppLayout.jsx
 import React from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Header from "./Header";
-import Footer from "./Footer";
 
 const variants = {
   initial: { opacity: 0, y: 8 },
