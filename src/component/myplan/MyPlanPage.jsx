@@ -267,7 +267,9 @@ const MyPlanPage = () => {
           const end = place.endTime || '10:00';
           const [sh, sm] = start.split(':').map(Number);
           const [eh, em] = end.split(':').map(Number);
-          const duration = Math.max(1, ((eh * 60 + em) - (sh * 60 + sm)) / 60);
+          
+          const originalDurationMinutes = (eh * 60 + em) - (sh * 60 + sm);
+          const duration = Math.max(1, Math.round(originalDurationMinutes / 60));
 
           newSchedules[dayKey].push({
             id: place.placeId || Date.now() + Math.random(),
@@ -445,8 +447,7 @@ const MyPlanPage = () => {
       setIsDirty(true);
     }
   }, []);
-
-  // 변경사항 존재 여부를 전역 플래그로 동기화하여 헤더 내비게이션에서 확인할 수 있게 함
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.__MYPLAN_DIRTY__ = !!isDirty;
@@ -480,7 +481,7 @@ const MyPlanPage = () => {
     const isLodging = selectedItem.category === '숙소' || selectedItem.category?.includes('숙소');
     if (!isLodging && selectedItem.cartId) {
       const cartItem = {
-        cartId: selectedItem.cartId,
+        cartId: selectedItem.cartId || Date.now(),
         placeId: selectedItem.placeId,
         placeName: selectedItem.name, 
         category: selectedItem.category,
