@@ -138,7 +138,7 @@ function Signup() {
       });
 
       toast.success("회원가입 성공!");
-      window.location.href = "/";
+      window.location.href = "/login";
     } catch (err) {
       console.error("서버 응답:", err.response?.data);
       toast.error(
