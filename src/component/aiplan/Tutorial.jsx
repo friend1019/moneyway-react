@@ -49,7 +49,7 @@ const Tutorial = ({ showArrows = false, onClose }) => {
         if (!showArrows) {
             const interval = setInterval(() => {
                 setCurrentTutorialIndex(prevIndex => (prevIndex + 1) % tutorialImages.length);
-            }, 3000);
+            }, 2000);
 
             return () => clearInterval(interval);
         }
