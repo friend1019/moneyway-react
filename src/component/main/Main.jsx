@@ -10,9 +10,9 @@ import cartIcon from "../../images/main/cartIcon.svg";
 import RotatingTextWave from "./RotatingTextWave";
 import Footer from "../common/Footer";
 
-import bg1 from "../../images/main/background1.svg";
-import bg2 from "../../images/main/background2.svg";
-import bg3 from "../../images/main/background3.svg";
+import bg1 from "../../images/main/background1.png";
+import bg2 from "../../images/main/background2.png";
+import bg3 from "../../images/main/background3.png";
 
 const images = [bg1, bg2, bg3];
 const DURATION = 5000; // 한 장 유지 시간(ms)
