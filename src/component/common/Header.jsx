@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation, matchPath } from "react-router-dom";
 import { useState, useMemo, useCallback } from "react";
 import SideMenu from "./SideMenu";
+import Tutorial from '../aiplan/Tutorial';
 import useUserStore from "../../api/userStore";
 import "../../css/common/Header.css";
 
@@ -12,6 +13,10 @@ import cartlogo from "../../images/header/cart.svg";
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const openTutorial = () => setIsTutorialOpen(true);
+  const closeTutorial = () => setIsTutorialOpen(false);
 
   const { user } = useUserStore();
   const isLoggedIn = !!user;
@@ -77,6 +82,16 @@ function Header() {
           </div>
 
           <nav className="navbar-container">
+
+            <li className="nav-item">
+              <button
+                className="nav-link"
+                onClick={openTutorial}
+              >
+                <span className="tutorial-modal">튜토리얼</span>
+              </button>
+            </li>
+
             <li className="nav-item">
               <button
                 className="nav-link"
@@ -122,6 +137,13 @@ function Header() {
       </header>
 
       {isMenuOpen && <SideMenu onClose={toggleMenu} />}
+
+      {isTutorialOpen && (
+        <Tutorial 
+          showArrows={true} 
+          onClose={closeTutorial} 
+        />
+      )}
     </div>
   );
 }

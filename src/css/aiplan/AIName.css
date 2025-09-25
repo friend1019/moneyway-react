@@ -55,10 +55,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.7); /* 살짝 반투명 배경 */
-
+  background: rgba(255, 255, 255, 0.7); 
   z-index: 9999; 
-
   display: flex;
   flex-direction: column; 
   justify-content: center; 
