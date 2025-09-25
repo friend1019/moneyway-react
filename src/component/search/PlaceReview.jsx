@@ -61,7 +61,7 @@ export default function PlaceReview({
           <ul className="rv-list">
             {visible.map((r) => (
               <li className="rv-item" key={r.id}>
-                {/* 작성자 제거, 내용만 */}
+                <p className="rv-name">{r.authorName}</p>
                 <p className="rv-content">{r.content}</p>
               </li>
             ))}
@@ -86,7 +86,7 @@ function normalizeReviews(input, placeId) {
   if (typeof input === "string") {
     const content = input.trim();
     if (!content) return [];
-    return [{ id: `${placeId || "p"}-r0`, placeId, content }];
+    return [{ id: `${placeId || "p"}-r0`, placeId, content, authorName: "익명1" }];
   }
 
   if (Array.isArray(input) && input.every((v) => typeof v === "string")) {
@@ -95,6 +95,7 @@ function normalizeReviews(input, placeId) {
         id: `${placeId || "p"}-rs${i}`,
         placeId,
         content: content.trim(),
+        authorName: "익명1" 
       }))
       .filter((r) => r.content);
   }
@@ -117,16 +118,19 @@ const DUMMY = [
   {
     id: "r1",
     placeId: "demo-1",
+    authorName: "최지인",
     content: "사진보다 실제가 더 예뻐요. 주차 편하고 근처에 카페도 많아서 동선 짜기 좋아요.",
   },
   {
     id: "r2",
     placeId: "demo-1",
+    authorName: "정재민",
     content: "뷰가 좋아요. 다만 주말엔 대기줄이 길었어요. 우천 시 실내 대체 동선 있으면 더 좋을 듯.",
   },
   {
     id: "r3",
     placeId: "demo-2",
+    authorName: "이강현",
     content: "무난합니다. 아침 일찍 가면 조용해요. 기대치가 높았던 탓에 약간의 아쉬움은 있었어요.",
   },
 ];

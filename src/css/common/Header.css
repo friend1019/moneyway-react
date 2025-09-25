@@ -147,12 +147,14 @@
 /* 링크 hover 시 아이콘도 아주 살짝 */
 .nav-link:hover .nav-icon { transform: translateY(-0.05rem) scale(1.01); opacity: .92; }
 
+
 .myplan {
   font-size: 1.8rem; color: var(--ink); font-weight: 500;
   letter-spacing: 0.5px; margin: 0 0.2rem;
   transition: color 0.3s ease;
-}
-.nav-link:hover .myplan { color: var(--brand); }
+};
+
+.nav-link:hover .myplan{ color: var(--brand); }
 
 /* =============================
    사이드 메뉴/오버레이

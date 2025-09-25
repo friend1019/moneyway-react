@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import ProgressStep from '../aiplan/ProgressStep';
 import api from '../../api/axios';
 import Loader from './Loader'; // ✅ Loader import
+import Tutorial from './Tutorial'
 import '../../css/aiplan/AIName.css';
 
 const AIPlanName = () => {
@@ -94,7 +95,9 @@ const AIPlanName = () => {
             {isLoading && (
                 <div className="loader-overlay">
                     <Loader />
+                    <Tutorial />
                 </div>
+
             )}
         </div>
     );

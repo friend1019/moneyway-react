@@ -10,6 +10,12 @@ import TimeSelectionModal from './TimeSelectionModal';
 import api from "../../api/axios";
 import useUserStore from '../../api/userStore'
 
+
+import { ReactComponent as MapIcon } from '../../images/myplan/map.svg';
+import { ReactComponent as PlaceIcon } from '../../images/myplan/place.svg';
+import { ReactComponent as HoverMapIcon } from '../../images/myplan/hovermap.svg';
+import { ReactComponent as HoverPlaceIcon } from '../../images/myplan/hoverplace.svg';
+
 const SLOT_START_HOUR = 8;
 const SLOT_END_HOUR = 23;
 const toSlotIndex = (time) => {
@@ -267,10 +273,12 @@ const MyPlanPage = () => {
           const end = place.endTime || '10:00';
           const [sh, sm] = start.split(':').map(Number);
           const [eh, em] = end.split(':').map(Number);
-          const duration = Math.max(1, ((eh * 60 + em) - (sh * 60 + sm)) / 60);
+          
+          const originalDurationMinutes = (eh * 60 + em) - (sh * 60 + sm);
+          const duration = Math.max(1, Math.round(originalDurationMinutes / 60));
 
           newSchedules[dayKey].push({
-            id: place.placeId || Date.now() + Math.random(),
+            id: place.placeId,
             name: place.title, 
             time: start,
             duration,
@@ -445,8 +453,7 @@ const MyPlanPage = () => {
       setIsDirty(true);
     }
   }, []);
-
-  // 변경사항 존재 여부를 전역 플래그로 동기화하여 헤더 내비게이션에서 확인할 수 있게 함
+  
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.__MYPLAN_DIRTY__ = !!isDirty;
@@ -480,7 +487,7 @@ const MyPlanPage = () => {
     const isLodging = selectedItem.category === '숙소' || selectedItem.category?.includes('숙소');
     if (!isLodging && selectedItem.cartId) {
       const cartItem = {
-        cartId: selectedItem.cartId,
+        cartId: selectedItem.cartId || Date.now(),
         placeId: selectedItem.placeId,
         placeName: selectedItem.name, 
         category: selectedItem.category,
@@ -817,19 +824,19 @@ const handleTimeBack = () => {
             <div className="header-buttons">
               {!isEditMode && (
                 <>
-                  <button className='map-view-button' onClick={handleMapView}>
-                    지도보기
+                  <button className='icon-button map-view-button' onClick={handleMapView}>
+                    <MapIcon className='basic-icon '/>
+                    <HoverMapIcon className='hover-basic-icon'/>
                   </button>
 
-              
-
                   <button
-                    className="go-to-shopping"
+                    className="icon-button go-to-shopping"
                     onClick={() => {
                       navigate("/search");
                     }}
                   >
-                    장소 추가하기 
+                    <PlaceIcon className='basic-icon'/>
+                    <HoverPlaceIcon className='hover-basic-icon'/>
                   </button>
                 </> 
               )}
