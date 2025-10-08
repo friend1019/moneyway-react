@@ -27,7 +27,7 @@ const ShoppingTutorial = ({ onClose }) => {
         <button className="tutorial-modal-close" onClick={onClose}>×</button>
 
         <div className="tutorial-container modal-version">
-          <h2 className="tutorial-title">사용 방법을 확인하고<br/>지금 바로 쇼핑을 시작하세요!</h2>
+          <h2 className="tutorial-title">튜토리얼을 확인하고<br/>나만의 계획을 만들어보세요</h2>
 
           <div className="tutorial-image-wrapper">
             <img src={images[idx]} alt={`튜토리얼 ${idx + 1}`} className="tutorial-image" />
