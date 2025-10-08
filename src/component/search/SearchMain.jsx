@@ -8,6 +8,7 @@ import SearchPlaceBox from "./SearchPlaceBox";
 import CategorySelector from "./CategorySelector";
 import SearchInput from "./SearchInput";
 import { getPlacesByCategory, searchPlacesByKeyword } from "../../api/tourApi";
+import ShoppingTutorial from "./ShoppingTutorial";
 
 /* =======================
    🔧 디버그 유틸
@@ -67,6 +68,7 @@ const SearchMain = () => {
   const queryParams = new URLSearchParams(location.search);
   const defaultCategory = queryParams.get("category") || "카페";
   const [category, setCategory] = useState(defaultCategory);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   // 🔧 오버레이 생성 유틸
   const showOverlay = useCallback(
@@ -185,6 +187,18 @@ const SearchMain = () => {
       console.log("[Map] kakao map init", mapInstance);
       setMap(mapInstance);
     });
+  }, []);
+
+
+  useEffect(() => {
+    try {
+      const key = "mw_search_tutorial_v1";
+      const seen = localStorage.getItem(key);
+      if (!seen) {
+        setShowTutorial(true);
+        localStorage.setItem(key, "1");
+      }
+    } catch (_) {}
   }, []);
 
   const loadPlaces = useCallback(async () => {
@@ -356,6 +370,7 @@ const SearchMain = () => {
         </div>
         <div className="map-canvas" ref={mapRef} />
       </div>
+      {showTutorial && <ShoppingTutorial onClose={() => setShowTutorial(false)} />}
     </>
   );
 };

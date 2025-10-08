@@ -4,12 +4,11 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import '../../css/myplan/MyPlanPage.css';
 import Schedule from './Schedule';
 import ScheduleCart from './ScheduleCart';
-import LodgingCart from './LodgingCart'; 
+import LodgingCart from './LodgingCart';
 import ContextMenu from './ContextMenu';
 import TimeSelectionModal from './TimeSelectionModal';
 import api from "../../api/axios";
-import useUserStore from '../../api/userStore'
-
+import useUserStore from '../../api/userStore';
 
 import { ReactComponent as MapIcon } from '../../images/myplan/map.svg';
 import { ReactComponent as PlaceIcon } from '../../images/myplan/place.svg';
@@ -38,7 +37,7 @@ const MyPlanPage = () => {
   const { planId: planIdParam } = useParams();
   const planId = String(planIdParam ?? '');
   const navigate = useNavigate();
-  const { user: loggedInUser } = useUserStore(); 
+  const { user: loggedInUser } = useUserStore();
   const [planDetails, setPlanDetails] = useState({
     id: null,
     title: '',
@@ -105,7 +104,7 @@ const MyPlanPage = () => {
     } finally {
       setLoadingCart(false);
     }
-  }, []); 
+  }, []);
 
   const fetchPlanDetail = useCallback(async (id) => {
     setLoadingPlan(true);
@@ -113,31 +112,35 @@ const MyPlanPage = () => {
       const res = await api.get(`/plans/${id}`);
       const data = res.data;
 
+      // ✅ 서버/라우터 어느 쪽이든 AI 플래그를 튼튼하게 판정
+      const aiFlag = (data?.isAi ?? data?.isAI ?? data?.ai ?? location.state?.isAIPlan ?? false) === true;
+      setIsAIPlan(aiFlag);
+
       const finalProfileImageUrl = loggedInUser?.profileImageUrl || data.profileImageUrl || "기본 SVG...";
 
-  
       setPlanDetails({
         id: String(data.id ?? data.planId ?? id),
         title: data.title ?? '',
-        username: data.username ?? '', 
-        profileImageUrl: finalProfileImageUrl,      
+        username: data.username ?? '',
+        profileImageUrl: finalProfileImageUrl,
         totalBudget: Number(data.totalPrice ?? 0),
         usedBudget: Number(data.currentPrice ?? 0),
         period: data.period ?? null,
         places: data.places || [],
+        isAi: aiFlag, // 방어용
       });
-  
+
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
       (data.places || []).forEach(place => {
         const day = `Day ${place.dayNumber}`;
         if (!newSchedules[day]) newSchedules[day] = [];
-  
+
         const start = (place.startTime || '09:00:00').slice(0,5);
         const end = (place.endTime || '10:00:00').slice(0,5);
         const [sh, sm] = start.split(':').map(Number);
         const [eh, em] = end.split(':').map(Number);
         const duration = Math.max(1, ((eh*60 + em) - (sh*60 + sm)) / 60);
-  
+
         newSchedules[day].push({
           id: place.placeId || Date.now() + Math.random(),
           name: place.placeName,
@@ -150,9 +153,10 @@ const MyPlanPage = () => {
           profileImageUrl: finalProfileImageUrl,
           mapX: place.mapX || null,
           mapY: place.mapY || null,
+          isAI: aiFlag, // 아이템에도 표기
         });
       });
-      
+
       setDailySchedules(newSchedules);
 
       const maxDay = (data.places || []).reduce(
@@ -160,24 +164,22 @@ const MyPlanPage = () => {
       );
 
       setEnabledDays(Math.max(1, maxDay));
-
       setIsDirty(false);
     } catch (e) {
       console.error('GET /plans/{id} 실패:', e);
-      setPlanDetails({ 
-        id: String(id ?? ''), 
-        title: '', 
+      setPlanDetails({
+        id: String(id ?? ''),
+        title: '',
         username: '',
         profileImageUrl: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='80'><rect width='100%' height='100%' fill='%23eef2ff'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='12'>No Image</text></svg>",
-        totalBudget: 0, 
-        usedBudget: 0 
+        totalBudget: 0,
+        usedBudget: 0
       });
       setDailySchedules(emptyDays);
     } finally {
       setLoadingPlan(false);
     }
-  }, [loggedInUser, emptyDays]); 
-
+  }, [loggedInUser, emptyDays, location.state]);
 
   const fetchAllPlanIds = useCallback(async () => {
     try {
@@ -200,7 +202,6 @@ const MyPlanPage = () => {
     }
   }, [planId]);
 
-
   const { prevPlanId, nextPlanId } = useMemo(() => {
     const currentIndex = allPlanIds.indexOf(String(planId));
     if (currentIndex === -1) {
@@ -219,23 +220,22 @@ const MyPlanPage = () => {
     navigate(`/myplan/${targetPlanId}`);
   }, [isDirty, navigate]);
 
+  // ✅ 초기 로딩: 어떤 경우에도 fetchPlanDetail은 타게 하고, state로 넘어온 isAIPlan도 반영
   useEffect(() => {
-    if (location.state?.isAIPlan) {
-      fetchCartItems();
-      fetchAllPlanIds();
-      return; 
-    }
     let mounted = true;
     const loadData = async () => {
       try {
+        if (location.state?.isAIPlan != null) {
+          setIsAIPlan(!!location.state.isAIPlan);
+        }
         await Promise.all([
-        fetchAllPlanIds(),
-        fetchCartItems(),
-        (planId && !location.state?.isAIPlan) ? fetchPlanDetail(planId) : Promise.resolve(),
+          fetchAllPlanIds(),
+          fetchCartItems(),
+          planId ? fetchPlanDetail(planId) : Promise.resolve(),
         ]);
-        } catch (error) {
+      } catch (error) {
         console.error('데이터 로딩 중 오류:', error);
-        } finally {
+      } finally {
         if (mounted);
       }
     };
@@ -249,23 +249,22 @@ const MyPlanPage = () => {
     else setIsEditMode(false);
   }, [planId, isNewPlan]);
 
- 
   useEffect(() => {
     if (isNewPlan) {
       setIsDirty(true);
     }
   }, [isNewPlan]);
 
+  // ✅ AI 플랜 생성 직후(플로우 진입 시) only: planData가 있을 때만 임시 스케줄 주입
   useEffect(() => {
     if (location.state?.isAIPlan && location.state?.planData) {
-      
-      setIsAIPlan(true); 
-      
+      setIsAIPlan(true);
+
       const aiPlanData = location.state.planData;
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
 
       aiPlanData.days.forEach(dayData => {
-        const dayKey = `Day ${dayData.day.replace('일차', '')}`; 
+        const dayKey = `Day ${dayData.day.replace('일차', '')}`;
         if (!newSchedules[dayKey]) newSchedules[dayKey] = [];
 
         dayData.places.forEach(place => {
@@ -273,37 +272,38 @@ const MyPlanPage = () => {
           const end = place.endTime || '10:00';
           const [sh, sm] = start.split(':').map(Number);
           const [eh, em] = end.split(':').map(Number);
-          
+
           const originalDurationMinutes = (eh * 60 + em) - (sh * 60 + sm);
           const duration = Math.max(1, Math.round(originalDurationMinutes / 60));
 
           newSchedules[dayKey].push({
             id: place.placeId,
-            name: place.title, 
+            name: place.title,
             time: start,
             duration,
             cost: place.cost || 0,
             placeId: place.placeId,
-            category: place.categoryName, 
+            category: place.categoryName,
             thumbnailUrl: place.thumbnailUrl || "기본 이미지 URL",
             mapX: place.mapX,
             mapY: place.mapY,
-            isAI: true, 
+            isAI: true,
           });
         });
       });
       setDailySchedules(newSchedules);
 
       setPlanDetails({
-      id: location.state.planId,
-      title: location.state.planTitle,
-      totalBudget: location.state.budget,
-      profileImageUrl: loggedInUser?.profileImageUrl || null,
+        id: location.state.planId,
+        title: location.state.planTitle,
+        totalBudget: location.state.budget,
+        profileImageUrl: loggedInUser?.profileImageUrl || null,
+        isAi: true,
       });
-      
+
       const daysLength = aiPlanData.days?.length || 1;
       setEnabledDays(daysLength);
-      setIsEditMode(true); 
+      setIsEditMode(true);
       setIsDirty(true);
     }
   }, [location.state, loggedInUser]);
@@ -345,21 +345,21 @@ const MyPlanPage = () => {
       const movedItem = { ...active.data.current };
       const originalDay = movedItem.originalDay;
       const [newDay, newTime] = over.id.split('-');
-    
+
       const updatedItem = { ...movedItem, time: newTime, day: newDay };
-    
+
       if (isOverlapping(updatedItem, dailySchedules[newDay] || [])) {
         alert('해당 시간에는 이미 다른 일정이 있습니다.');
         return;
       }
-    
+
       setDailySchedules(prev => {
         const ns = { ...prev };
         ns[originalDay] = (ns[originalDay] || []).filter(item => item.id !== movedItem.id);
         ns[newDay] = [...(ns[newDay] || []), updatedItem];
         return ns;
       });
-    
+
       setIsDirty(true);
     }
   }, [cartItems, dailySchedules]);
@@ -389,19 +389,17 @@ const MyPlanPage = () => {
 
     const newScheduleItem = {
       id: Date.now(),
-      name: draggedItem.placeName, 
+      name: draggedItem.placeName,
       cost: draggedItem.price,
       category: draggedItem.category,
       time: startTime,
       duration: durationHours,
       cartId: draggedItem.cartId,
       placeId: draggedItem.placeId,
-      
       mapX: draggedItem.mapX,
       mapY: draggedItem.mapY,
+      isAI: isAIPlan, // ✅ AI 플랜에서는 새로 추가되는 아이템도 AI로 표시
     };
-
-    console.log('카트에서 추가되는 스케줄 아이템:', newScheduleItem);
 
     if (isOverlapping(newScheduleItem, dailySchedules[targetDay] || [])) {
       alert('해당 시간에는 이미 다른 일정이 있습니다.');
@@ -421,7 +419,7 @@ const MyPlanPage = () => {
 
     setTimeModal({ isOpen: false, step: 'start', draggedItem: null, targetDay: null, selectedStartTime: null });
     setIsDirty(true);
-  }, [timeModal, dailySchedules]);
+  }, [timeModal, dailySchedules, isAIPlan]);
 
   const handleTimeModalClose = useCallback(() => {
     setTimeModal({ isOpen: false, step: 'start', draggedItem: null, targetDay: null, selectedStartTime: null });
@@ -447,13 +445,13 @@ const MyPlanPage = () => {
   const handleLodgingContextMenu = useCallback((event, item) => {
     event.preventDefault();
     if (!item?.cartId) return;
-    
+
     if (window.confirm(`'${item.placeName}' 항목을 카트에서 삭제하시겠습니까?`)) {
       setCartItems(prev => prev.filter(i => i.cartId !== item.cartId));
       setIsDirty(true);
     }
   }, []);
-  
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       window.__MYPLAN_DIRTY__ = !!isDirty;
@@ -478,7 +476,7 @@ const MyPlanPage = () => {
   const handleDeleteItem = useCallback(() => {
     const { selectedItem, day } = menuState;
     if (!selectedItem || !day) return;
- 
+
     setDailySchedules(prev => ({
       ...prev,
       [day]: (prev[day] || []).filter(item => item.id !== selectedItem.id)
@@ -489,7 +487,7 @@ const MyPlanPage = () => {
       const cartItem = {
         cartId: selectedItem.cartId || Date.now(),
         placeId: selectedItem.placeId,
-        placeName: selectedItem.name, 
+        placeName: selectedItem.name,
         category: selectedItem.category,
         price: selectedItem.cost,
         mapX: selectedItem.mapX,
@@ -497,7 +495,7 @@ const MyPlanPage = () => {
       };
       setCartItems(prev => [...prev, cartItem]);
     }
- 
+
     setIsDirty(true);
     closeMenu();
   }, [menuState, closeMenu]);
@@ -505,16 +503,15 @@ const MyPlanPage = () => {
   const handleDeleteAIItem = useCallback(() => {
     const { selectedItem, day } = menuState;
     if (!selectedItem || !day) return;
- 
+
     setDailySchedules(prev => ({
       ...prev,
       [day]: (prev[day] || []).filter(item => item.id !== selectedItem.id)
     }));
- 
+
     setIsDirty(true);
     closeMenu();
   }, [menuState, closeMenu]);
-
 
   useEffect(() => {
     if (menuState.visible) {
@@ -531,7 +528,7 @@ const MyPlanPage = () => {
     setPlanDetails(prev => ({ ...prev, usedBudget: totalCost }));
   }, [dailySchedules]);
 
-  // enabledDays 자동 조정: 일정이 있는 마지막 날을 기준으로 설정 (DAY1은 항상 열려있음)
+  // enabledDays 자동 조정
   useEffect(() => {
     const daysWithItems = Object.entries(dailySchedules)
       .filter(([day, items]) => items && items.length > 0)
@@ -540,11 +537,9 @@ const MyPlanPage = () => {
 
     if (daysWithItems.length > 0) {
       const maxDayWithItems = Math.max(...daysWithItems);
-      // DAY1은 항상 열려있으므로 최소 1, 최대 4
       const newEnabledDays = Math.max(1, Math.min(4, maxDayWithItems));
       setEnabledDays(newEnabledDays);
     } else {
-      // 일정이 없으면 DAY1만 열려있도록
       setEnabledDays(1);
     }
   }, [dailySchedules]);
@@ -560,7 +555,7 @@ const MyPlanPage = () => {
   }, [planDetails.totalBudget]);
 
   const handleBudgetChange = useCallback((e) => setBudgetInput(e.target.value), []);
-  
+
   const handleBudgetBlur = useCallback(() => {
     const newTotalBudget = parseInt(budgetInput, 10) || 0;
     setPlanDetails(prev => ({ ...prev, totalBudget: newTotalBudget }));
@@ -581,10 +576,10 @@ const MyPlanPage = () => {
 
   const handleSave = async () => {
     const places = [];
-  
+
     Object.entries(dailySchedules).forEach(([day, items]) => {
       const dayNumber = Number(String(day).replace('Day ', '')) || Number(day);
-  
+
       (items || []).forEach((item) => {
         if (!item?.time) {
           console.warn("저장 제외 (ID 정보 부족):", item);
@@ -594,27 +589,26 @@ const MyPlanPage = () => {
         if (!item?.time || (item.cartId == null && item.placeId == null)) {
           console.warn("저장 제외 (ID가 null이거나 없음):", item);
           return;
-      }
-  
-        // 시간 계산
+        }
+
         const [h, m] = String(item.time).split(':').map(Number);
         const startMinutes = (h || 0) * 60 + (m || 0);
         const endMinutes = startMinutes + Math.max(60, Math.round((item.duration || 1) * 60));
-  
+
         const toHHMM = (mins) => {
           const clamped = Math.max(0, Math.min(1439, mins));
           const H = String(Math.floor(clamped / 60)).padStart(2, '0');
           const M = String(clamped % 60).padStart(2, '0');
           return `${H}:${M}`;
         };
-  
+
         const base = {
           cost: Number(item.cost || 0),
           dayNumber,
           startTime: toHHMM(startMinutes),
           endTime: toHHMM(endMinutes),
         };
-  
+
         if (item.placeId && item.cartId) {
           places.push({ ...base, placeId: item.placeId, cartId: item.cartId });
         } else if (item.placeId) {
@@ -624,16 +618,15 @@ const MyPlanPage = () => {
         }
       });
     });
-  
-   
-    if (!places.length && isDirty) { 
+
+    if (!places.length && isDirty) {
       alert('스케줄에 추가된 일정이 없습니다!');
       return;
     }
-  
+
     try {
       let currentPlanId = planId;
-  
+
       if (!currentPlanId || currentPlanId === "new") {
         const res = await api.post("/plans/empty", {
           title: planDetails?.title || "새 여행 계획",
@@ -643,36 +636,37 @@ const MyPlanPage = () => {
           throw new Error("새로운 계획 ID를 발급받지 못했습니다.");
         }
       }
-  
+
       const payload = {
         title: planDetails?.title || "새 여행 계획",
         totalPrice: Number(planDetails.totalBudget || 0),
         places,
       };
       await api.patch(`/plans/${currentPlanId}`, payload);
-  
+
       alert("여행 계획이 저장되었습니다.");
       setIsEditMode(false);
-      
-    
-      setCartItems([]);
-      setIsDirty(false); // 저장되었으므로 '변경사항 없음'으로 상태 변경
 
-       navigate(`/myplan/${currentPlanId}`, { 
-        replace: true, 
-        state: { isNewPlan: false } 
+      setCartItems([]);
+      setIsDirty(false);
+
+      navigate(`/myplan/${currentPlanId}`, {
+        replace: true,
+        state: { isNewPlan: false, isAIPlan }
       });
 
-  
     } catch (e) {
       const msg = e?.response?.data?.message || e.message;
       console.error("ERROR:", e?.response || e);
       alert(`저장 실패! ${msg}`);
     }
   };
-  
 
-  const handleEdit = useCallback(() => setIsEditMode(true), []);
+  // ✅ 수정 버튼에서 한 번 더 방어적으로 AI 플래그 반영
+  const handleEdit = useCallback(() => {
+    setIsEditMode(true);
+    if (planDetails?.isAi === true) setIsAIPlan(true);
+  }, [planDetails]);
 
   // context menu 항목 분기
   const menuItems = useMemo(() => {
@@ -681,7 +675,7 @@ const MyPlanPage = () => {
         {
           action: () => {
             if (menuState.selectedItem?.cartId) {
-              alert('dl 카트를 삭제할까요.'); 
+              alert('dl 카트를 삭제할까요.');
               setCartItems(prev => prev.filter(i => i.cartId !== menuState.selectedItem.cartId));
               setIsDirty(true);
               closeMenu();
@@ -690,106 +684,100 @@ const MyPlanPage = () => {
         }
       ];
     }
-    
+
     // AI 플랜 아이템인지 확인
     const isAIItem = menuState.selectedItem?.isAI || isAIPlan;
-    
+
     if (isAIItem) {
       return [
         { label: '삭제하기', action: handleDeleteAIItem },
       ];
     }
-    
+
     return [
       { label: '카트로 옮기기', action: handleDeleteItem },
     ];
   }, [menuState, handleDeleteItem, handleDeleteAIItem, closeMenu, isAIPlan]);
 
-  
-
   //지도 위치 프롭스
   const handleMapView = () => {
     const toHHMM = (mins) => {
-        const clamped = Math.max(0, Math.min(1439, mins));
-        const H = String(Math.floor(clamped / 60)).padStart(2, '0');
-        const M = String(clamped % 60).padStart(2, '0');
-        return `${H}:${M}`;
+      const clamped = Math.max(0, Math.min(1439, mins));
+      const H = String(Math.floor(clamped / 60)).padStart(2, '0');
+      const M = String(clamped % 60).padStart(2, '0');
+      return `${H}:${M}`;
     };
 
     const placesByDay = Object.entries(dailySchedules)
-        .filter(([day, items]) => {
-            const dayNumber = parseInt(day.replace('Day ', ''), 10);
-            return dayNumber <= enabledDays && items.length > 0;
-        })
-        .map(([day, items]) => {
-            const dayNumber = parseInt(day.replace('Day ', ''), 10);
-            
-            const places = items
-                .filter(item => {
-                    // 좌표 데이터 체크 (문자열로 올 수도 있으니 parseFloat 사용)
-                    const lat = parseFloat(item.mapY);
-                    const lng = parseFloat(item.mapX);
-                    
-                    const hasLocation = !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
-                    
-                    if (!hasLocation) {
-                        console.warn(`위치 정보가 없는 항목: ${item.name}`, {
-                            mapX: item.mapX,
-                            mapY: item.mapY,
-                            parsedLng: lng,
-                            parsedLat: lat
-                        });
-                    }
-                    
-                    return hasLocation;
-                })
-                .map(item => {
-                    const [h, m] = String(item.time || '00:00').split(':').map(Number);
-                    const startMinutes = h * 60 + m;
-                    const durationMinutes = Math.round((item.duration || 1) * 60);
-                    const endMinutes = startMinutes + durationMinutes;
+      .filter(([day, items]) => {
+        const dayNumber = parseInt(day.replace('Day ', ''), 10);
+        return dayNumber <= enabledDays && items.length > 0;
+      })
+      .map(([day, items]) => {
+        const dayNumber = parseInt(day.replace('Day ', ''), 10);
 
-                    return {
-                        id: item.placeId || item.cartId || item.id,
-                        name: item.name,
-                        category: item.category,
-                        lat: parseFloat(item.mapY), 
-                        lng: parseFloat(item.mapX), 
-                        startTime: item.time,        
-                        endTime: toHHMM(endMinutes),
-                    };
-                });
+        const places = items
+          .filter(item => {
+            const lat = parseFloat(item.mapY);
+            const lng = parseFloat(item.mapX);
+            const hasLocation = !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
 
-            // 시간순 정렬
-            places.sort((a, b) => a.startTime.localeCompare(b.startTime));
+            if (!hasLocation) {
+              console.warn(`위치 정보가 없는 항목: ${item.name}`, {
+                mapX: item.mapX,
+                mapY: item.mapY,
+                parsedLng: lng,
+                parsedLat: lat
+              });
+            }
+            return hasLocation;
+          })
+          .map(item => {
+            const [h, m] = String(item.time || '00:00').split(':').map(Number);
+            const startMinutes = h * 60 + m;
+            const durationMinutes = Math.round((item.duration || 1) * 60);
+            const endMinutes = startMinutes + durationMinutes;
 
             return {
-                day: dayNumber,
-                places: places,
+              id: item.placeId || item.cartId || item.id,
+              name: item.name,
+              category: item.category,
+              lat: parseFloat(item.mapY),
+              lng: parseFloat(item.mapX),
+              startTime: item.time,
+              endTime: toHHMM(endMinutes),
             };
-        })
-        .filter(dayData => dayData.places.length > 0);
+          });
 
-    
+        places.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+        return {
+          day: dayNumber,
+          places: places,
+        };
+      })
+      .filter(dayData => dayData.places.length > 0);
+
     if (placesByDay.length === 0 || placesByDay.every(day => day.places.length === 0)) {
-        alert('지도에 표시할 위치 정보가 없습니다. 장소를 추가하거나 위치 정보를 확인해주세요.');
-        return;
+      alert('지도에 표시할 위치 정보가 없습니다. 장소를 추가하거나 위치 정보를 확인해주세요.');
+      return;
     }
 
     navigate('/map', { state: { placesByDay: placesByDay } });
-};
-const handleTimeBack = () => {
-  setTimeModal((prev) => ({
-    ...prev,
-    step: "start" 
-  }));
-};
+  };
+
+  const handleTimeBack = () => {
+    setTimeModal((prev) => ({
+      ...prev,
+      step: "start"
+    }));
+  };
 
   return (
     <DndContext onDragEnd={handleDragEnd} disabled={!isEditMode}>
       <div className='myplan-page-container'>
         {isEditMode ? (
-          <LodgingCart 
+          <LodgingCart
             cartItems={cartItems}
             isEditMode={isEditMode}
             onContextMenu={handleLodgingContextMenu}
@@ -825,8 +813,8 @@ const handleTimeBack = () => {
               {!isEditMode && (
                 <>
                   <button className='icon-button map-view-button' onClick={handleMapView}>
-                    <MapIcon className='basic-icon '/>
-                    <HoverMapIcon className='hover-basic-icon'/>
+                    <MapIcon className='basic-icon ' />
+                    <HoverMapIcon className='hover-basic-icon' />
                   </button>
 
                   <button
@@ -835,13 +823,12 @@ const handleTimeBack = () => {
                       navigate("/search");
                     }}
                   >
-                    <PlaceIcon className='basic-icon'/>
-                    <HoverPlaceIcon className='hover-basic-icon'/>
+                    <PlaceIcon className='basic-icon' />
+                    <HoverPlaceIcon className='hover-basic-icon' />
                   </button>
-                </> 
+                </>
               )}
 
-              
               {isEditMode ? (
                 <button className='save-button' onClick={handleSave}>저장하기</button>
               ) : (
@@ -856,7 +843,6 @@ const handleTimeBack = () => {
 
           <div className='schedule-main-container'>
             <Schedule
-            
               isEditingTitle={isEditingTitle}
               titleInput={titleInput}
               onTitleClick={handleTitleClick}
@@ -887,7 +873,7 @@ const handleTimeBack = () => {
               itemName={timeModal.draggedItem?.placeName}
               category={timeModal.draggedItem?.category}
               step={timeModal.step}
-              onBack={handleTimeBack} 
+              onBack={handleTimeBack}
             />
           </div>
         </div>

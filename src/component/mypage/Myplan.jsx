@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
-import BudgetDisplay from "../myplan/BudgetDisplay.jsx"; 
+import BudgetDisplay from "../myplan/BudgetDisplay.jsx";
 import "../../css/mypage/MyPlan.css";
 import ArrowRightIcon from "../../images/myplan/right-arrow.svg";
 
@@ -27,11 +27,11 @@ const MyPlan = ({ onClose }) => {
       const res = await api.get("/plans");
       const list = Array.isArray(res.data) ? res.data : [];
 
-
+      // ✅ isAi 보존해서 전달
       const normalized = list.map((p, idx) => {
-        const id = String(p.id ?? idx);                
-        const maxBudget = toNumber(p.totalPrice);      
-        const current = toNumber(p.currentPrice);       
+        const id = String(p.id ?? idx);
+        const maxBudget = toNumber(p.totalPrice);
+        const current = toNumber(p.currentPrice);
         const thumb =
           p.thumbnailUrl ||
           p.profileImageUrl ||
@@ -45,6 +45,7 @@ const MyPlan = ({ onClose }) => {
           period: p.period ?? "일정 미정",
           maxBudget,
           currentSpent: current,
+          isAi: !!(p?.isAi ?? p?.isAI ?? p?.ai), // ✅ 추가
         };
       });
 
@@ -77,6 +78,7 @@ const MyPlan = ({ onClose }) => {
       alert("새 여행 계획을 만들 수 없어요. 잠시 후 다시 시도해주세요.");
     }
   };
+
   /* 플랜 삭제: DELETE /api/plans/{id} */
   const handleDelete = async (id) => {
     if (!window.confirm("이 여행 계획을 삭제할까요?")) return;
@@ -102,12 +104,12 @@ const MyPlan = ({ onClose }) => {
           <h1>새로운 제주 여행 계획하기</h1>
           <p className="plan-empty-text">
             '+'버튼을 눌러 당신의 여정을 시작하세요.<br />
-          여행의 이름을 설정하고 나만의 플랜을 만들 수 있습니다.</p>
+            여행의 이름을 설정하고 나만의 플랜을 만들 수 있습니다.
+          </p>
         </>
       )}
 
       {plans.map((plan, idx) => {
-
         return (
           <section key={plan.id} className="plan-section">
             <p className="section-label">{orderLabel(idx)}</p>
@@ -123,23 +125,20 @@ const MyPlan = ({ onClose }) => {
                   <img className="plan-thumb" src={plan.thumbnailUrl} alt="플랜 썸네일" />
                   <div className="plan-title-box">
                     <div className="myplan-title">{plan.title}</div>
-
-                    {/* 기간(문자열 그대로) */}
                     <div className="plan-subtitle">{plan.period}</div>
                   </div>
                 </div>
 
                 <div className="plan-card-right">
-                  {/* 기존 예산 바를 BudgetDisplay 컴포넌트로 교체 */}
                   <BudgetDisplay
                     usedBudget={plan.currentSpent}
                     totalBudget={plan.maxBudget}
-                    isEditMode={false} 
+                    isEditMode={false}
                     isEditingBudget={false}
-                    onBudgetClick={() => {}} 
-                    onBudgetChange={() => {}} 
-                    onBudgetBlur={() => {}} 
-                    onBudgetKeyDown={() => {}} 
+                    onBudgetClick={() => {}}
+                    onBudgetChange={() => {}}
+                    onBudgetBlur={() => {}}
+                    onBudgetKeyDown={() => {}}
                     budgetInput=""
                     zeroBudgetDisplay="number"
                   />
@@ -172,7 +171,8 @@ const MyPlan = ({ onClose }) => {
                   className="action-btn primary"
                   onClick={() =>
                     navigate(`/myplan/${plan.id}`, {
-                      state: { isNewPlan: false, viewOnly: true },
+                      // ✅ 계획보기로 들어갈 때 isAIPlan 함께 전달
+                      state: { isNewPlan: false, viewOnly: true, isAIPlan: plan.isAi },
                     })
                   }
                 >
