@@ -7,10 +7,11 @@ import {
   FaPhone,
   FaMapMarkerAlt,
   FaShareAlt,
-  FaCopy,
   FaStar,
   FaStarHalfAlt,
   FaRegStar,
+  FaLocationArrow,
+  FaCommentDots,
 } from "react-icons/fa";
 
 
@@ -49,10 +50,8 @@ function StarRating({ value = 0 }) {
 }
 
 const PlaceDetailView = ({ place, onBack }) => {
-  const handleCopyAddress = () => {
-    navigator.clipboard.writeText(place.address || "");
-    toast.success("주소가 복사되었습니다!");
-  };
+  const [showReviews, setShowReviews] = React.useState(false);
+  // 주소 복사 기능은 현재 UI에서 사용하지 않음
 
   const handleShare = () => {
     if (navigator.share) {
@@ -77,6 +76,25 @@ const PlaceDetailView = ({ place, onBack }) => {
       toast.error("로그인이 필요한 기능입니다.");
       console.error(err);
     }
+  };
+
+  const handleDirections = () => {
+    const name = encodeURIComponent(place.title || "목적지");
+    const hasCoords = typeof place.latitude === "number" && typeof place.longitude === "number";
+    if (hasCoords) {
+      const url = `https://map.kakao.com/link/to/${name},${place.latitude},${place.longitude}?level=5`;
+      window.open(url, "_blank");
+      return;
+    }
+    const query = encodeURIComponent(place.address || place.title || "제주 관광지");
+    const url = `https://map.kakao.com/?q=${query}&level=5`;
+    window.open(url, "_blank");
+  };
+
+  const scrollToReviews = () => {
+    setShowReviews(true);
+    const el = document.getElementById("reviews");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -116,28 +134,30 @@ const PlaceDetailView = ({ place, onBack }) => {
           ))}
         </div>
 
-        <div className="action-buttons">
-          <button onClick={handleCopyAddress}>
-            <FaCopy style={{ marginRight: "6px" }} />
-            주소 복사
-          </button>
-          <button onClick={handleShare}>
-            <FaShareAlt style={{ marginRight: "6px" }} />
-            공유
-          </button>
-          {place.phone && (
-            <a href={`tel:${place.phone}`} style={{ textDecoration: "none" }}>
-              <button>
-                <FaPhone style={{ marginRight: "6px" }} />
-                전화걸기
-              </button>
-            </a>
-          )}
-        </div>
-
         <button className="schedule-btn" onClick={handleAddToCart}>
-          장바구니에 추가하기
+          일정 추가하기
         </button>
+
+        <div className="bottom-actions">
+          <button className="circle-action" onClick={handleDirections}>
+            <div className="circle-icon">
+              <FaLocationArrow size={20} />
+            </div>
+            <span className="circle-label">길찾기</span>
+          </button>
+          <button className="circle-action" onClick={scrollToReviews}>
+            <div className="circle-icon">
+              <FaCommentDots size={20} />
+            </div>
+            <span className="circle-label">리뷰</span>
+          </button>
+          <button className="circle-action" onClick={handleShare}>
+            <div className="circle-icon">
+              <FaShareAlt size={20} />
+            </div>
+            <span className="circle-label">공유</span>
+          </button>
+        </div>
 
         <div className="info-section">
           <div className="info-row">
@@ -198,8 +218,12 @@ const PlaceDetailView = ({ place, onBack }) => {
           )}
         </div>
 
-        {/* ✅ 리뷰: 이름 제거 버전, prop은 reviews로 통일 */}
-        <PlaceReview placeId={place.placeId} reviews={place.review} />
+        {/* ✅ 리뷰: 클릭 시 표시 */}
+        {showReviews && (
+          <div id="reviews" style={{ marginTop: 8 }}>
+            <PlaceReview placeId={place.placeId} reviews={place.review} />
+          </div>
+        )}
       </div>
     </>
   );

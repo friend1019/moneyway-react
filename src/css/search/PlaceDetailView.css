@@ -262,6 +262,38 @@
   opacity: 1;
 }
 
+/* 하단 동그란 액션 버튼들 */
+.bottom-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 1.6rem;
+}
+
+.circle-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.circle-icon {
+  width: 6.4rem;
+  height: 6.4rem;
+  border-radius: 50%;
+  border: 1px solid #cfe2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1967ff;
+  box-shadow: var(--shadow-sm);
+  background-color: #fff;
+}
+
+.circle-label { margin-top: .8rem; font-size: 1.4rem; color: var(--ink); }
+
 /* =============================
    정보 영역
 ============================= */

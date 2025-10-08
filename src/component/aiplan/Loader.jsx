@@ -1,5 +1,5 @@
 import React from "react";
-import "../../css/aiplan/Loader.css"; // CSS 따로 관리
+import "../../css/aiplan/Loader.css"; 
 
 const Loader = () => {
   return (
