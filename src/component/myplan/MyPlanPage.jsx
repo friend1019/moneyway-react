@@ -71,7 +71,6 @@ const MyPlanPage = () => {
   const location = useLocation();
   const isNewPlan = location.state?.isNewPlan;
 
-  // 🔹 Day + 열기 상태
   const [enabledDays, setEnabledDays] = useState(1);
   const handleAddDay = useCallback(() => {
     setEnabledDays((d) => Math.min(4, d + 1));
@@ -112,7 +111,7 @@ const MyPlanPage = () => {
       const res = await api.get(`/plans/${id}`);
       const data = res.data;
 
-      // ✅ 서버/라우터 어느 쪽이든 AI 플래그를 튼튼하게 판정
+    
       const aiFlag = (data?.isAi ?? data?.isAI ?? data?.ai ?? location.state?.isAIPlan ?? false) === true;
       setIsAIPlan(aiFlag);
 
@@ -127,7 +126,7 @@ const MyPlanPage = () => {
         usedBudget: Number(data.currentPrice ?? 0),
         period: data.period ?? null,
         places: data.places || [],
-        isAi: aiFlag, // 방어용
+        isAi: aiFlag, 
       });
 
       const newSchedules = { 'Day 1': [], 'Day 2': [], 'Day 3': [], 'Day 4': [] };
@@ -153,7 +152,7 @@ const MyPlanPage = () => {
           profileImageUrl: finalProfileImageUrl,
           mapX: place.mapX || null,
           mapY: place.mapY || null,
-          isAI: aiFlag, // 아이템에도 표기
+          isAI: aiFlag, 
         });
       });
 
@@ -220,7 +219,7 @@ const MyPlanPage = () => {
     navigate(`/myplan/${targetPlanId}`);
   }, [isDirty, navigate]);
 
-  // ✅ 초기 로딩: 어떤 경우에도 fetchPlanDetail은 타게 하고, state로 넘어온 isAIPlan도 반영
+  
   useEffect(() => {
     let mounted = true;
     const loadData = async () => {
@@ -255,7 +254,6 @@ const MyPlanPage = () => {
     }
   }, [isNewPlan]);
 
-  // ✅ AI 플랜 생성 직후(플로우 진입 시) only: planData가 있을 때만 임시 스케줄 주입
   useEffect(() => {
     if (location.state?.isAIPlan && location.state?.planData) {
       setIsAIPlan(true);
@@ -398,7 +396,7 @@ const MyPlanPage = () => {
       placeId: draggedItem.placeId,
       mapX: draggedItem.mapX,
       mapY: draggedItem.mapY,
-      isAI: isAIPlan, // ✅ AI 플랜에서는 새로 추가되는 아이템도 AI로 표시
+      isAI: isAIPlan, 
     };
 
     if (isOverlapping(newScheduleItem, dailySchedules[targetDay] || [])) {
@@ -521,14 +519,13 @@ const MyPlanPage = () => {
     }
   }, [menuState.visible, closeMenu]);
 
-  // 사용 예산 계산
+
   useEffect(() => {
     const allScheduleItems = Object.values(dailySchedules).flat();
     const totalCost = allScheduleItems.reduce((sum, item) => sum + (item.cost || 0), 0);
     setPlanDetails(prev => ({ ...prev, usedBudget: totalCost }));
   }, [dailySchedules]);
 
-  // enabledDays 자동 조정
   useEffect(() => {
     const daysWithItems = Object.entries(dailySchedules)
       .filter(([day, items]) => items && items.length > 0)
@@ -544,7 +541,7 @@ const MyPlanPage = () => {
     }
   }, [dailySchedules]);
 
-  // 예산
+ 
   const handleBudgetClick = useCallback(() => {
     if (planDetails.totalBudget > 0) {
       setBudgetInput(String(planDetails.totalBudget));
@@ -564,7 +561,7 @@ const MyPlanPage = () => {
   }, [budgetInput]);
   const handleBudgetKeyDown = useCallback((e) => { if (e.key === 'Enter') handleBudgetBlur(); }, [handleBudgetBlur]);
 
-  // 제목
+
   const handleTitleClick = useCallback(() => { setTitleInput(planDetails.title); setIsEditingTitle(true); }, [planDetails.title]);
   const handleTitleChange = useCallback((e) => setTitleInput(e.target.value), []);
   const handleTitleBlur = useCallback(() => {
@@ -662,13 +659,12 @@ const MyPlanPage = () => {
     }
   };
 
-  // ✅ 수정 버튼에서 한 번 더 방어적으로 AI 플래그 반영
+ 
   const handleEdit = useCallback(() => {
     setIsEditMode(true);
     if (planDetails?.isAi === true) setIsAIPlan(true);
   }, [planDetails]);
 
-  // context menu 항목 분기
   const menuItems = useMemo(() => {
     if (menuState.contextType === 'lodging') {
       return [
@@ -685,7 +681,6 @@ const MyPlanPage = () => {
       ];
     }
 
-    // AI 플랜 아이템인지 확인
     const isAIItem = menuState.selectedItem?.isAI || isAIPlan;
 
     if (isAIItem) {
@@ -699,7 +694,6 @@ const MyPlanPage = () => {
     ];
   }, [menuState, handleDeleteItem, handleDeleteAIItem, closeMenu, isAIPlan]);
 
-  //지도 위치 프롭스
   const handleMapView = () => {
     const toHHMM = (mins) => {
       const clamped = Math.max(0, Math.min(1439, mins));

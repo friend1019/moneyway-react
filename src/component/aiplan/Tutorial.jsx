@@ -16,6 +16,7 @@ const tutorialImages = [tutorial1, tutorial2, tutorial3, tutorial4, tutorial5, t
 
 const Tutorial = ({ showArrows = false, onClose }) => {
     const [currentTutorialIndex, setCurrentTutorialIndex] = useState(0);
+    const [dotCount, setDotCount] = useState(1);
 
     const handleNext = () => {
         setCurrentTutorialIndex(prevIndex => (prevIndex + 1) % tutorialImages.length);
@@ -52,6 +53,16 @@ const Tutorial = ({ showArrows = false, onClose }) => {
             }, 2000);
 
             return () => clearInterval(interval);
+        }
+    }, [showArrows]);
+
+    useEffect(() => {
+        if (!showArrows) {
+            const dotInterval = setInterval(() => {
+                setDotCount(prevCount => (prevCount % 3) + 1); // 1, 2, 3 순환
+            }, 500); // 0.5초마다 점 개수 변경
+
+            return () => clearInterval(dotInterval);
         }
     }, [showArrows]);
 
@@ -105,7 +116,7 @@ const Tutorial = ({ showArrows = false, onClose }) => {
 
     return (
         <div className="tutorial-container">
-            <p>계획 생성중...<br/>Tip: 머니웨이 튜토리얼을 확인하세요</p>
+            <p>계획 생성중{'.'.repeat(dotCount)}<br/>Tip: 머니웨이 튜토리얼을 확인하세요</p>
             
             <div className="tutorial-image-wrapper">
                 <img
