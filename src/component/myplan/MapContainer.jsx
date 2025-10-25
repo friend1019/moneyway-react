@@ -105,6 +105,7 @@ export default function MapContainer({
   const pulseOverlaysRef = useRef([]);
   const segmentRefs = useRef([]);
   const firstCardOpenedOnceRef = useRef(false);
+  const initialZoomAppliedRef = useRef(false);
 
   /* 최신 콜백 ref 동기화 */
   useEffect(() => {
@@ -454,6 +455,32 @@ export default function MapContainer({
     [activeDayIdx, days, routeInfo]
   );
 
+  const applyInitialZoom = useCallback((center) => {
+    const map = mapRef.current;
+    if (!map || typeof window === "undefined") return;
+    const run = () => {
+      map.setLevel(7);
+
+      if (initialZoomAppliedRef.current) return;
+
+      initialZoomAppliedRef.current = true;
+
+      const targetCenter =
+        center ||
+        (typeof map.getCenter === "function" ? map.getCenter() : null);
+
+      if (targetCenter && typeof map.setCenter === "function") {
+        map.setCenter(targetCenter);
+      }
+    };
+
+    if (typeof window.requestAnimationFrame === "function") {
+      window.requestAnimationFrame(run);
+    } else {
+      setTimeout(run, 0);
+    }
+  }, []);
+
   /* === 지도 범위 맞추기 === */
   const fitBoundsForAll = useCallback(() => {
     const map = mapRef.current;
@@ -463,7 +490,10 @@ export default function MapContainer({
     markersRef.current.forEach((m) => bounds.extend(m.getPosition()));
     map.relayout();
     map.setBounds(bounds);
-  }, []);
+    const center =
+      typeof bounds.getCenter === "function" ? bounds.getCenter() : null;
+    applyInitialZoom(center);
+  }, [applyInitialZoom]);
 
   /* === 구간 포커스 (오른쪽 패널 폭만큼 X 보정) === */
   const focusSegmentCenter = useCallback(
@@ -524,6 +554,24 @@ export default function MapContainer({
     });
   }, []);
 
+  const updateMarkerVisibility = useCallback((idx) => {
+    const map = mapRef.current;
+    if (!map) return;
+    const showAll = idx === null;
+
+    markersRef.current.forEach((marker, markerIdx) => {
+      if (!marker?.setMap) return;
+      const shouldShow = showAll || markerIdx === idx || markerIdx === idx + 1;
+      marker.setMap(shouldShow ? map : null);
+    });
+
+    pulseOverlaysRef.current.forEach((pulse, pulseIdx) => {
+      if (!pulse?.setMap) return;
+      const shouldShow = showAll || pulseIdx === idx || pulseIdx === idx + 1;
+      pulse.setMap(shouldShow ? map : null);
+    });
+  }, []);
+
   const showOverlaysForSegment = useCallback((i) => {
     const map = mapRef.current;
     if (!map) return;
@@ -538,6 +586,7 @@ export default function MapContainer({
       setSelectedSegmentIndex(i);
       applySegmentVisibility(i);
       showOverlaysForSegment(i);
+      updateMarkerVisibility(i);
 
       const needDelay = !showRouteInfo;
       if (!showRouteInfo) setShowRouteInfo(true);
@@ -548,6 +597,7 @@ export default function MapContainer({
       showOverlaysForSegment,
       focusSegmentCenter,
       showRouteInfo,
+      updateMarkerVisibility,
     ]
   );
 
@@ -555,8 +605,9 @@ export default function MapContainer({
     setSelectedSegmentIndex(null);
     applySegmentVisibility(null);
     overlaysRef.current.forEach((o) => o.setMap && o.setMap(null));
+    updateMarkerVisibility(null);
     fitBoundsForAll();
-  }, [applySegmentVisibility, fitBoundsForAll]);
+  }, [applySegmentVisibility, fitBoundsForAll, updateMarkerVisibility]);
 
   /* === 지도 초기화/업데이트 === */
   useEffect(() => {
@@ -593,9 +644,15 @@ export default function MapContainer({
             bounds.extend(marker.getPosition());
           });
           map.setBounds(bounds);
+          const center =
+            typeof bounds.getCenter === "function" ? bounds.getCenter() : null;
+          applyInitialZoom(center);
+        } else {
+          applyInitialZoom();
         }
 
         await drawRoute(places, map);
+        updateMarkerVisibility(selectedSegmentIndex);
 
         if (selectedSegmentIndex === null) {
           fitBoundsForAll();
@@ -622,6 +679,8 @@ export default function MapContainer({
     focusSegmentCenter,
     showOverlaysForSegment,
     showRouteInfo,
+    applyInitialZoom,
+    updateMarkerVisibility,
   ]);
 
   /* === 네이버 directions === */

@@ -396,7 +396,7 @@ const MyPlanPage = () => {
       placeId: draggedItem.placeId,
       mapX: draggedItem.mapX,
       mapY: draggedItem.mapY,
-      isAI: isAIPlan, 
+      isAI: !!draggedItem?.isAI, 
     };
 
     if (isOverlapping(newScheduleItem, dailySchedules[targetDay] || [])) {
@@ -417,7 +417,7 @@ const MyPlanPage = () => {
 
     setTimeModal({ isOpen: false, step: 'start', draggedItem: null, targetDay: null, selectedStartTime: null });
     setIsDirty(true);
-  }, [timeModal, dailySchedules, isAIPlan]);
+  }, [timeModal, dailySchedules]);
 
   const handleTimeModalClose = useCallback(() => {
     setTimeModal({ isOpen: false, step: 'start', draggedItem: null, targetDay: null, selectedStartTime: null });
@@ -681,7 +681,10 @@ const MyPlanPage = () => {
       ];
     }
 
-    const isAIItem = menuState.selectedItem?.isAI || isAIPlan;
+    const selected = menuState.selectedItem;
+    const isAIItem =
+      selected?.isAI === true ||
+      (isAIPlan && selected && selected.isAI === undefined && !selected?.cartId);
 
     if (isAIItem) {
       return [
